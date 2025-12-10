@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="text-center mb-10">
+    <h1 class="text-3xl font-black text-white brand-font uppercase">КОНФИГУРАЦИЯ СЕССИИ</h1>
+    <p class="text-[#6ECBF5]">Настройка параметров доступа</p>
+  </div>
+
+  <div class="glass-card p-8 relative">
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#C252E1] via-[#6ECBF5] to-[#C252E1]"></div>
+
+    <form method="post" id="booking-form" class="space-y-6 mt-4">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div>
+        <label for="id_place">ТЕРМИНАЛ</label>
+        {% if place %}
+          <div class="flex items-center justify-between bg-[#15122b] p-4 rounded border border-[#586AE2]">
+            <span class="text-white font-bold text-lg">{{ place.title }} (#{{ place.number }})</span>
+            <span class="text-[#C252E1] font-mono">{{ place.tariff.price_per_hour }} ₽/ч</span>
+          </div>
+          <input type="hidden" name="place" value="{{ place.id }}">
+          <input type="hidden" id="fixed-price" value="{{ place.tariff.price_per_hour }}">
+        {% else %}
+          <select name="place" id="id_place">
+            {% for p in places %}
+              <option value="{{ p.id }}" data-price="{{ p.tariff.price_per_hour }}">
+                {{ p.title }} — {{ p.number }} ({{ p.tariff.price_per_hour }} ₽/ч)
+              </option>
+            {% endfor %}
+          </select>
+        {% endif %}
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label>ВРЕМЯ СТАРТА</label>
+          {{ form.start_time }}
+        </div>
+        <div>
+          <label>ДЛИТЕЛЬНОСТЬ (ЧАСОВ)</label>
+          {{ form.hours }}
+        </div>
+      </div>
+
+      <div class="bg-[#15122b] p-6 rounded-xl flex justify-between items-center border border-[#C252E1]/30 mt-8 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+        <span class="text-[#E0D9F6] font-bold uppercase text-sm">ИТОГО К ОПЛАТЕ</span>
+        <span class="text-4xl font-black text-[#C252E1] drop-shadow-[0_0_5px_#C252E1]"><span id="total-price">0</span> ₽</span>
+      </div>
+
+      <button class="btn w-full py-4 text-lg mt-6" type="submit">ПОДТВЕРДИТЬ БРОНЬ</button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const hoursInput = document.querySelector('input[name="hours"]');
+  const placeSelect = document.querySelector('select[name="place"]');
+  const fixedPriceInput = document.getElementById('fixed-price');
+  const totalEl = document.getElementById('total-price');
+
+  function getPrice(){
+    if(fixedPriceInput) return parseFloat(fixedPriceInput.value);
+    if(placeSelect){
+      const option = placeSelect.options[placeSelect.selectedIndex];
+      return parseFloat(option.dataset.price || 0);
+    }
+    return 0;
+  }
+
+  function updatePrice(){
+    const hours = parseInt(hoursInput ? hoursInput.value : 1) || 1;
+    const price = getPrice();
+    const total = (price * hours).toFixed(0); // Округляем до целых для рублей
+    totalEl.textContent = total;
+  }
+
+  if(hoursInput) hoursInput.addEventListener('input', updatePrice);
+  if(placeSelect) placeSelect.addEventListener('change', updatePrice);
+  updatePrice();
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,127 @@
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Orbitron:wght@700;900&display=swap');
+
+:root {
+  /* Палитра Synthwave */
+  --neon-purple: #C252E1;       /* Medium Orchid - Основной акцент */
+  --neon-cyan: #6ECBF5;         /* Light Sky Blue - Вторичный акцент */
+  --bg-deep: #15122b;           /* Очень темная версия Midnight Blue для фона страницы */
+  --bg-card: #2A2356;           /* Midnight Blue - Фон карточек */
+  --royal-blue: #586AE2;        /* Royal Blue - Границы/Кнопки */
+  --text-main: #E0D9F6;         /* Lavender - Основной текст */
+  --text-white: #ffffff;
+  
+  --glass-border: rgba(194, 82, 225, 0.3);
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  margin: 0;
+  background-image: radial-gradient(circle at 50% 0%, #2a2356 0%, #15122b 70%);
+  min-height: 100vh;
+}
+
+h1, h2, h3, .brand-font {
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-white);
+  text-shadow: 0 0 10px rgba(194, 82, 225, 0.4);
+}
+
+a {
+  color: var(--neon-cyan);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+a:hover {
+  color: var(--neon-purple);
+  text-shadow: 0 0 8px var(--neon-purple);
+}
+
+/* Кнопки (FIXED: центрирование текста) */
+.btn {
+  display: inline-flex; /* <-- Изменено для центрирования */
+  justify-content: center; /* <-- Центрирование по горизонтали */
+  align-items: center;   /* <-- Центрирование по вертикали */
+  background: linear-gradient(90deg, var(--royal-blue), var(--neon-purple));
+  color: #fff !important;
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  padding: 12px 28px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(88, 106, 226, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.btn:hover {
+  box-shadow: 0 0 20px rgba(194, 82, 225, 0.6);
+  transform: translateY(-2px);
+}
+.btn:hover::before {
+  opacity: 1;
+}
+
+/* Поля ввода (Input) */
+input, select, textarea {
+  width: 100%;
+  background-color: rgba(42, 35, 86, 0.6);
+  border: 1px solid var(--royal-blue);
+  color: var(--text-white);
+  padding: 14px 16px;
+  border-radius: 8px;
+  outline: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+input:focus, select:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(110, 203, 245, 0.3);
+  background-color: rgba(42, 35, 86, 0.9);
+}
+
+label {
+  color: var(--neon-cyan);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Карточки */
+.glass-card {
+  background: rgba(42, 35, 86, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+}
+/* ... скроллбар и другие стили ... */
+
+/* Скроллбар */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--royal-blue); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neon-purple); }

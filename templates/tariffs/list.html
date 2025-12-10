@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="text-center mb-16 relative">
+  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#C252E1] opacity-20 blur-[100px] rounded-full -z-10"></div>
+  
+  <h1 class="text-5xl font-black text-white mb-4">ТАРИФЫ <span class="text-[#6ECBF5]">SYSTEM</span></h1>
+  <p class="text-[#E0D9F6] max-w-2xl mx-auto text-lg">
+    Выбирай свой пакет загрузки.
+  </p>
+</section>
+
+<div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+  {% for tariff in tariffs %}
+  <div class="group glass-card p-1 relative transition-all duration-300 hover:-translate-y-2">
+    <div class="absolute inset-0 bg-gradient-to-r from-[#C252E1] to-[#6ECBF5] opacity-0 group-hover:opacity-100 rounded-xl transition-opacity duration-300 -z-10 blur-sm"></div>
+    
+    <div class="bg-[#2A2356] rounded-xl p-8 h-full flex flex-col justify-between relative z-10 border border-[#586AE2]/20">
+      <div>
+        <div class="flex justify-between items-start mb-6">
+          <h2 class="text-2xl font-bold text-white group-hover:text-[#C252E1] transition-colors brand-font">{{ tariff.name }}</h2>
+          <span class="px-3 py-1 bg-[#15122b] rounded text-xs text-[#6ECBF5] uppercase tracking-widest border border-[#586AE2]">
+            {{ tariff.category.name }}
+          </span>
+        </div>
+        
+        <p class="text-[#E0D9F6]/70 leading-relaxed mb-8 border-l-2 border-[#C252E1] pl-4">
+          {{ tariff.description|default:"Оптимальный выбор для сессии." }}
+        </p>
+      </div>
+
+      <div class="border-t border-[#586AE2]/30 pt-6 flex items-center justify-between mt-auto">
+        <div>
+          <span class="block text-xs text-[#586AE2] uppercase font-bold">Стоимость</span>
+          <p class="text-4xl font-black text-white">{{ tariff.price_per_hour }} <span class="text-[#C252E1]">₽</span><span class="text-sm font-normal text-[#E0D9F6]/50">/час</span></p>
+        </div>
+        <a href="{% url 'places:list' %}" class="btn text-sm px-6 shadow-none hover:shadow-[0_0_15px_#C252E1]">Выбрать</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-center text-[#E0D9F6] col-span-full">Тарифы загружаются...</p>
+  {% endfor %}
+</div>
+{% endblock %}

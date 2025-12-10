@@ -1,0 +1,38 @@
+{# templates/users/register.html #}
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-md mx-auto mt-6">
+  <div class="glass-card p-8 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-[#C252E1] blur-[80px] opacity-20 pointer-events-none"></div>
+
+    <h2 class="text-3xl font-bold text-center mb-8 text-white brand-font">НОВЫЙ ПОЛЬЗОВАТЕЛЬ</h2>
+    
+    <form method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="bg-red-500/20 border border-red-500 text-red-200 p-3 rounded mb-4 text-sm">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="space-y-4">
+        {% for field in form %}
+          <div>
+            <label class="block mb-1 text-sm font-bold text-[#6ECBF5]" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <p class="text-red-400 text-xs mt-1">{{ field.errors.0 }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <button class="btn w-full mt-8 py-3 shadow-[0_0_20px_#C252E1]" type="submit">СОЗДАТЬ АККАУНТ</button>
+    </form>
+    
+    <div class="mt-6 text-center border-t border-[#586AE2]/30 pt-4">
+      <p class="text-[#E0D9F6]/60 text-sm">Есть аккаунт? <a href="{% url 'users:login' %}" class="text-[#6ECBF5] hover:underline">Войти</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
