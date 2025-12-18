@@ -56,9 +56,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для те�
 DEFAULT_FROM_EMAIL = 'no-reply@catalystclub.ru'
 
 
-# простой редирект после логина
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'places:list'
+LOGOUT_REDIRECT_URL = 'users:login'
 
 
 

@@ -50,9 +50,16 @@ def create_booking(request, place_id=None):
 
 @login_required
 def cancel_booking(request, booking_id):
-    b = get_object_or_404(Booking, id=booking_id, user=request.user)
-    b.status = 'cancelled'
-    b.save()
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id,
+        user=request.user,
+        status=Booking.STATUS_ACTIVE
+    )
+
+    booking.status = Booking.STATUS_CANCELED
+    booking.save()
+
     return redirect('users:profile')
 
 @login_required
