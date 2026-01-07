@@ -27,6 +27,9 @@ urlpatterns = [
     path('places/', include(('places.urls','places'))),
     path('booking/', include(('booking.urls','booking'))),
     path('tariffs/', include(('tariffs.urls', 'tariffs'))),
+    path('news/', views.news_page, name='news'),
+    path('news/delete/<int:pk>/', views.news_delete, name='news_delete'),
+    path('contacts/', views.contacts, name='contacts'),
 ]
 
 if settings.DEBUG:

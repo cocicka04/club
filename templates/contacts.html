@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-8">Контакты</h1>
+
+<div class="grid md:grid-cols-2 gap-8">
+
+  <div class="glass-card p-6 space-y-4">
+    <p><strong>Адрес:</strong> г. Москва, ул. Примерная, 12</p>
+    <p><strong>Телефон:</strong> +7 (999) 123-45-67</p>
+    <p><strong>Email:</strong> info@catalyst.gg</p>
+    <p><strong>Режим работы:</strong> 24/7</p>
+  </div>
+
+  <div class="glass-card overflow-hidden">
+    <script type="text/javascript" charset="utf-8" async
+      src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A2c5189b9c80a712a0fb302430d51acf9dc69a315af073dc74a6359f8ba9a4189&amp;width=100%&amp;height=400&amp;lang=ru_RU&amp;scroll=true">
+    </script>
+  </div>
+
+</div>
+
+{% endblock %}

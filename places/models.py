@@ -1,19 +1,25 @@
 from django.db import models
-from tariffs.models import Category, Tariff
+from tariffs.models import Tariff, Category
 
 class Place(models.Model):
-    number = models.CharField("Номер места", max_length=20)
-    title = models.CharField("Название места/зоны", max_length=200)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name="Категория ПК")
-    tariff = models.ForeignKey(Tariff, on_delete=models.PROTECT, verbose_name="Тариф по умолчанию")
-    description = models.TextField("Описание места/зоны", blank=True)
-    specs = models.TextField("Характеристики ПК", blank=True)
-    is_active = models.BooleanField("Доступно для бронирования", default=True)
-    image = models.ImageField("Фото места", upload_to="places/", blank=True, null=True)
+    title = models.CharField(max_length=255)
+    number = models.PositiveIntegerField("Номер места")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    tariff = models.ForeignKey(Tariff, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='places/', blank=True, null=True)
+    description = models.TextField(blank=True, verbose_name='Описание места')
+    cpu = models.CharField(max_length=255, default='')
+    gpu = models.CharField(max_length=255, default='')
+    ram = models.CharField(max_length=255, default='')
+    monitor = models.CharField(max_length=255, default='')
+    keyboard = models.CharField(max_length=255, default='')
+    mouse = models.CharField(max_length=255, default='')
+    headset = models.CharField(max_length=255, default='')
 
     class Meta:
-        verbose_name = "Место/Зона"
-        verbose_name_plural = "Места/Зоны"
+        verbose_name = "Место"
+        verbose_name_plural = "Места"
+        ordering = ["number"]
 
     def __str__(self):
-        return f"{self.title} ({self.number})"
+        return f"{self.title} (№{self.number})"

@@ -1,45 +1,152 @@
 {% extends 'base.html' %}
 {% block content %}
-<section class="flex flex-col md:flex-row justify-between items-end mb-10 border-b border-[#586AE2]/30 pb-6">
-  <div>
-    <h1 class="text-4xl font-black text-white mb-2">ИГРОВЫЕ СТАНЦИИ</h1>
-    <p class="text-[#6ECBF5]">Доступные терминалы для подключения</p>
+
+<section class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-[#586AE2]/30 pb-8">
+  <div class="relative">
+    <div class="absolute -left-4 top-0 w-1 h-full bg-[#C252E1] shadow-[0_0_15px_#C252E1]"></div>
+
+    <h1 class="text-4xl font-black text-white mb-2 tracking-tighter uppercase italic">
+      Игровые станции
+    </h1>
+
+    <p class="text-[#6ECBF5] font-mono text-sm uppercase tracking-widest">
+      Network: <span class="text-green-400">Active</span>
+      <span class="mx-2 opacity-30">|</span>
+      Nodes: <span class="text-white">{{ places|length }}</span>
+    </p>
   </div>
+
+  {% if request.user.is_superuser %}
+    <a href="{% url 'places:create' %}"
+       class="group flex items-center gap-2 bg-[#C252E1]/10 border border-[#C252E1]
+              px-6 py-2 text-[#C252E1] font-bold uppercase text-xs
+              hover:bg-[#C252E1] hover:text-white transition-all
+              shadow-[0_0_15px_rgba(194,82,225,0.2)]">
+      +
+      Добавить терминал
+    </a>
+  {% endif %}
 </section>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-  {% for place in places %}
-    <div class="glass-card overflow-hidden group">
-      
-      <div class="h-48 bg-[#15122b] relative overflow-hidden">
-        {% if place.image %}
-          <img src="{{ place.image.url }}" alt="{{ place.title }}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
-        {% else %}
-          <div class="flex items-center justify-center h-full">
-            <span class="text-4xl font-bold text-[#2A2356] drop-shadow-[0_0_5px_#586AE2]">OFFLINE</span>
-          </div>
-        {% endif %}
-        <div class="absolute top-0 right-0 bg-[#C252E1] text-white font-black text-lg px-4 py-2 rounded-bl-xl shadow-[0_0_15px_#C252E1]">
-          {{ place.number }}
-        </div>
-      </div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
 
-      <div class="p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-bold text-white brand-font tracking-wide">{{ place.title }}</h3>
-          <span class="text-[#6ECBF5] font-bold text-lg border border-[#6ECBF5] px-2 rounded">{{ place.tariff.price_per_hour }} ₽<span class="text-xs">/ч</span></span>
-        </div>
-        
-        <p class="text-sm text-[#E0D9F6]/60 mb-6 h-10 overflow-hidden">{{ place.description|truncatechars:80 }}</p>
-        
-        <div class="grid grid-cols-2 gap-3">
-          <a class="btn text-center text-xs py-3 w-full" href="{% url 'booking:create_with_place' place.id %}">Забронировать</a>
-          <a class="text-center py-3 rounded border border-[#586AE2] text-[#E0D9F6] hover:bg-[#586AE2] hover:text-white transition-all text-xs font-bold uppercase" href="{% url 'places:detail' place.id %}">Характеристики</a>
-        </div>
+{% for place in places %}
+<div class="group relative bg-[#15122b]/60 border border-[#586AE2]/20
+            backdrop-blur-md hover:border-[#C252E1]/40
+            transition-all overflow-hidden">
+
+  <!-- IMAGE -->
+  <div class="h-56 relative overflow-hidden">
+
+    {% if place.image %}
+      <img src="{{ place.image.url }}"
+           class="w-full h-full object-cover opacity-60
+                  group-hover:opacity-100 group-hover:scale-110
+                  transition-all duration-700">
+    {% else %}
+      <div class="flex items-center justify-center h-full bg-[#0a081a]">
+        <span class="text-[#2A2356] tracking-[0.4em] font-black text-sm">
+          NO_SIGNAL
+        </span>
       </div>
+    {% endif %}
+
+    <div class="absolute inset-0 bg-gradient-to-t from-[#15122b] to-transparent"></div>
+
+    <!-- NUMBER -->
+    <div class="absolute top-0 left-0 bg-[#15122b] px-4 py-2 text-sm font-mono text-[#6ECBF5]">
+      #{{ place.number }}
     </div>
-  {% empty %}
-    <p class="text-[#E0D9F6] col-span-full text-center">Все станции заняты или отключены.</p>
-  {% endfor %}
+
+    <!-- STATUS -->
+    {% if place.active_booking %}
+      <div class="absolute top-4 right-0 bg-red-600/90 text-white
+                  px-4 py-1 text-[10px] font-black uppercase">
+        Занято до {{ place.active_booking.end_time|date:"H:i" }}
+      </div>
+    {% else %}
+      <div class="absolute top-4 right-4 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+        <span class="text-[10px] text-green-500 font-bold uppercase">
+          Available
+        </span>
+      </div>
+    {% endif %}
+
+    <!-- ADMIN BUTTONS -->
+    {% if request.user.is_superuser %}
+      <div class="absolute bottom-4 right-4 flex gap-2 opacity-0
+                  group-hover:opacity-100 transition-all">
+        <a href="{% url 'places:edit' place.id %}" class="admin-btn">✎</a>
+        <a href="{% url 'places:delete' place.id %}" class="admin-btn text-red-400">✕</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- TARIFF -->
+  <div class="p-4 border-l-4 border-[#6ECBF5] bg-[#15122b]/80">
+    <h3 class="text-[#6ECBF5] font-bold text-lg">
+      {{ place.tariff.name }}
+    </h3>
+
+    {% if place.tariff.description %}
+      <p class="text-sm text-[#E0D9F6]/70 mt-1">
+        {{ place.tariff.description }}
+      </p>
+    {% endif %}
+
+    <div class="flex justify-between items-center mt-3">
+      <span class="text-white font-bold text-xl">
+        {{ place.tariff.price_per_hour }} ₽
+        <span class="text-sm text-[#E0D9F6]/60">/час</span>
+      </span>
+
+      <span class="px-3 py-1 rounded-full text-xs font-bold
+                   bg-[#586AE2]/20 text-[#6ECBF5]">
+        {{ place.category.name }}
+      </span>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="p-6">
+    <h3 class="text-xl font-black text-white uppercase mb-2">
+      {{ place.title }}
+    </h3>
+
+    <p class="text-xs text-[#E0D9F6]/40 mb-6">
+      {{ place.description|truncatechars:90 }}
+    </p>
+
+    <div class="flex gap-3">
+      {% if not place.active_booking %}
+        <a href="{% url 'booking:create_with_place' place.id %}"
+           class="flex-grow bg-white text-black py-3 text-xs font-black uppercase
+                  text-center hover:bg-gradient-to-r hover:from-[#C252E1]
+                  hover:to-[#6ECBF5] hover:text-white transition-all">
+          Забронировать
+        </a>
+      {% else %}
+        <div class="flex-grow bg-gray-600/30 text-gray-400 py-3 text-xs
+                    font-bold uppercase text-center cursor-not-allowed">
+          Недоступно
+        </div>
+      {% endif %}
+
+      <a href="{% url 'places:detail' place.id %}"
+         class="w-12 border border-[#586AE2]/30 flex items-center justify-center
+                text-[#6ECBF5] hover:border-[#6ECBF5] transition-all">
+        ℹ
+      </a>
+    </div>
+  </div>
+
 </div>
+{% empty %}
+  <div class="col-span-full text-center py-32 text-[#6ECBF5]/40">
+    Нет доступных станций
+  </div>
+{% endfor %}
+</div>
+
 {% endblock %}

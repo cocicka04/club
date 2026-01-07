@@ -1,4 +1,3 @@
-# users/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate  # Добавил authenticate
 from django.contrib.auth.models import User
@@ -12,6 +11,8 @@ from .tokens import account_activation_token
 from booking.models import Booking
 from booking.utils import finish_expired_bookings
 
+def is_superuser(user):
+    return user.is_superuser
 
 def register(request):
     if request.method == 'POST':
@@ -64,16 +65,22 @@ def activate(request, uidb64, token):
 
 @login_required
 def profile(request):
-    # 🔹 автоматически закрываем истёкшие брони
     finish_expired_bookings(user=request.user)
 
-    # 🔹 активные сессии
+    profile = request.user.profile
+
+    # 🔹 ОБРАБОТКА АВАТАРА
+    if request.method == 'POST' and request.FILES.get('avatar'):
+        profile.avatar = request.FILES['avatar']
+        profile.save()
+        messages.success(request, "Фото профиля обновлено")
+        return redirect('users:profile')
+
     active = Booking.objects.filter(
         user=request.user,
         status=Booking.STATUS_ACTIVE
     )
 
-    # 🔹 история (ТОЛЬКО завершённые и отменённые)
     completed = Booking.objects.filter(
         user=request.user,
         status__in=[

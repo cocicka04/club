@@ -1,39 +1,89 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="glass-card overflow-hidden">
-  <div class="md:flex">
+<div class="relative max-w-6xl mx-auto">
+  <div class="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-[#C252E1]"></div>
+  <div class="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-[#6ECBF5]"></div>
+
+  <div class="bg-[#15122b]/80 border border-[#586AE2]/20 backdrop-blur-xl overflow-hidden md:flex">
     
-    <div class="md:w-1/2 relative bg-[#000]">
+    <div class="md:w-1/2 relative">
       {% if place.image %}
-        <img src="{{ place.image.url }}" alt="{{ place.title }}" class="w-full h-full object-cover opacity-80">
-        <div class="absolute inset-0 bg-gradient-to-t from-[#2A2356] via-transparent to-transparent"></div>
+        <img src="{{ place.image.url }}" alt="{{ place.title }}" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#15122b] via-transparent"></div>
       {% endif %}
+      <div class="absolute bottom-6 left-6">
+        <span class="bg-[#C252E1] text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest shadow-[0_0_15px_#C252E1]">
+          {{ place.category.name }}
+        </span>
+      </div>
     </div>
 
-    <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-[#2A2356]/80">
+    <div class="md:w-1/2 p-8 md:p-12 flex flex-col">
       <div class="mb-8">
-        <span class="text-[#C252E1] font-bold tracking-[0.2em] text-sm uppercase mb-2 block glow-text">Категория: {{ place.category.name }}</span>
-        <h1 class="text-5xl font-black text-white mb-2 brand-font">{{ place.title }}</h1>
-        <p class="text-[#6ECBF5] text-xl font-mono">ID терминала: #{{ place.number }}</p>
-      </div>
-
-      <div class="bg-[#15122b]/50 rounded-lg p-6 border-l-4 border-[#C252E1] mb-8">
-        <p class="text-[#E0D9F6] leading-relaxed">{{ place.description }}</p>
-      </div>
-
-      <div class="mb-8">
-        <h3 class="text-white font-bold uppercase mb-4 text-sm tracking-wider opacity-70">Спецификации системы</h3>
-        <div class="grid grid-cols-1 gap-2 text-sm font-mono text-[#6ECBF5]">
-          <div class="bg-[#15122b] p-3 rounded border border-[#586AE2]/30">{{ place.specs|default:"Характеристики уточняются" }}</div>
+        <h1 class="text-5xl font-black text-white italic tracking-tighter uppercase mb-2">{{ place.title }}</h1>
+        <div class="flex items-center gap-3 font-mono text-[#6ECBF5] text-sm">
+          <span>NODE_ID: #{{ place.number }}</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></span>
         </div>
       </div>
 
-      <div class="flex items-center justify-between border-t border-[#586AE2]/30 pt-8 mt-auto">
+      <div class="bg-[#0a081a]/50 p-6 border-l-2 border-[#C252E1] mb-8 text-sm text-[#E0D9F6]/80 leading-relaxed italic">
+        "{{ place.description }}"
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+        <div class="flex items-center gap-3 p-3 bg-[#15122b] border border-[#586AE2]/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#C252E1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <div class="text-[11px]">
+            <span class="block text-[#586AE2] font-bold uppercase">Процессор</span>
+            <span class="text-white font-mono">{{ place.cpu }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 p-3 bg-[#15122b] border border-[#586AE2]/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#C252E1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17L4 12L9 7M19 12H5" />
+          </svg>
+          <div class="text-[11px]">
+            <span class="block text-[#586AE2] font-bold uppercase">Видеокарта</span>
+            <span class="text-white font-mono">{{ place.gpu }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 p-3 bg-[#15122b] border border-[#586AE2]/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#C252E1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <div class="text-[11px]">
+            <span class="block text-[#586AE2] font-bold uppercase">ОЗУ</span>
+            <span class="text-white font-mono">{{ place.ram }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 p-3 bg-[#15122b] border border-[#586AE2]/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#C252E1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21h6l-.75-4M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <div class="text-[11px]">
+            <span class="block text-[#586AE2] font-bold uppercase">Монитор</span>
+            <span class="text-white font-mono">{{ place.monitor }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-auto border-t border-[#586AE2]/30 pt-8 flex items-center justify-between">
         <div>
-          <span class="block text-[#E0D9F6]/50 text-xs uppercase">Тарифный план</span>
-          <p class="text-4xl font-black text-white">{{ place.tariff.price_per_hour }} ₽<span class="text-lg text-[#E0D9F6]/50 font-normal">/час</span></p>
+          <span class="block text-[#E0D9F6]/40 text-[10px] uppercase font-bold tracking-widest">Тариф на запуск</span>
+          <p class="text-4xl font-black text-white italic">{{ place.tariff.price_per_hour }}<span class="text-lg text-[#6ECBF5] ml-1">₽/ч</span></p>
         </div>
-        <a href="{% url 'booking:create_with_place' place.id %}" class="btn text-lg px-12 py-4 shadow-[0_0_20px_#C252E1]">Забронировать</a>
+        
+        <div class="flex flex-col items-end gap-3">
+          <a href="{% url 'booking:create_with_place' place.id %}" class="bg-white text-black px-10 py-4 font-black uppercase text-xs tracking-[0.2em] hover:bg-[#C252E1] hover:text-white transition-all shadow-[0_0_20px_rgba(110,203,245,0.3)]">
+            Подключиться
+          </a>
+          {% if active_booking %}
+            <span class="text-red-500 font-mono text-[10px] uppercase animate-pulse">Занято до {{ active_booking.end_time|date:"H:i" }}</span>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>

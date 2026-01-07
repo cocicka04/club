@@ -4,39 +4,101 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catalyst — Cyber Lounge</title>
+  
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body class="flex flex-col min-h-screen text-[#E0D9F6]">
 
-<header class="sticky top-0 z-50 border-b border-[#586AE2]/30 bg-[#15122b]/80 backdrop-blur-md">
-  <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+  <style>
+    /* Базовые настройки шрифтов и цветов */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0a081a;
+      color: #E0D9F6;
+    }
     
-    <a href="{% url 'home' %}" class="flex items-center gap-2 group">
-      <div class="w-8 h-8 rounded-md bg-gradient-to-tr from-[#C252E1] to-[#6ECBF5] shadow-[0_0_15px_#C252E1] group-hover:rotate-90 transition-transform duration-500"></div>
+    /* Шрифт для логотипа и заголовков */
+    .brand-font {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* Эффект стеклянной карточки (Glassmorphism) */
+    .glass-card {
+      background: rgba(21, 18, 43, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(88, 106, 226, 0.2);
+      border-radius: 0.75rem; /* rounded-xl */
+    }
+
+    /* Основная кнопка с градиентом */
+    .btn {
+      display: inline-block;
+      background: linear-gradient(90deg, #6ECBF5 0%, #C252E1 100%);
+      color: white;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 0.375rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn:hover {
+      box-shadow: 0 0 20px rgba(194, 82, 225, 0.6);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen relative">
+
+<div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none z-0"></div>
+
+<header class="sticky top-0 z-50 border-b border-[#586AE2]/30 bg-[#15122b]/90 backdrop-blur-xl">
+  <div class="container mx-auto px-6 py-4 flex justify-between items-center relative z-10">
+    
+    <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+      <div class="w-9 h-9 rounded bg-gradient-to-tr from-[#C252E1] to-[#6ECBF5] shadow-[0_0_15px_#C252E1] group-hover:rotate-180 transition-transform duration-700 flex items-center justify-center">
+        <div class="w-4 h-4 bg-[#15122b] rounded-sm"></div>
+      </div>
       <span class="text-2xl font-black tracking-widest text-white group-hover:text-[#6ECBF5] transition-colors brand-font">
         CATALYST
       </span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-wider">
-      <a href="{% url 'places:list' %}" class="hover:text-[#C252E1]">Зоны</a>
-      <a href="{% url 'tariffs:list' %}" class="hover:text-[#C252E1]">Тарифы</a>
+    {% if request.user.is_superuser %}
+      <div class="fixed bottom-6 right-6 z-50 pointer-events-none">
+        <div class="glass-card px-4 py-2 text-[10px] font-black uppercase text-[#C252E1] tracking-widest shadow-[0_0_15px_rgba(194,82,225,0.3)]">
+          System_Admin_Mode
+        </div>
+      </div>
+    {% endif %}
+  
+    <nav class="hidden md:flex items-center text-xs font-black uppercase tracking-widest">
+      <div class="flex gap-8 mr-8">
+        <a href="{% url 'places:list' %}" class="text-white/70 hover:text-[#C252E1] transition-colors py-2">Зоны</a>
+        <a href="{% url 'tariffs:list' %}" class="text-white/70 hover:text-[#C252E1] transition-colors py-2">Тарифы</a>
+      </div>
       
-      {% if user.is_authenticated %}
-        <div class="flex items-center gap-4 pl-8 border-l border-[#586AE2]/50">
-          <a href="{% url 'users:profile' %}" class="text-[#6ECBF5] hover:text-white drop-shadow-[0_0_5px_rgba(110,203,245,0.5)]">
+      <div class="h-6 w-[1px] bg-[#586AE2]/30"></div>
+      
+      <div class="flex items-center gap-6 pl-8">
+        {% if user.is_authenticated %}
+          <a href="{% url 'users:profile' %}" class="text-[#6ECBF5] hover:text-white drop-shadow-[0_0_8px_rgba(110,203,245,0.5)] transition-all">
             {{ user.username }}
           </a>
-          <a href="{% url 'users:logout' %}" class="text-[#C252E1] hover:text-white transition-colors">Выход</a>
-        </div>
-      {% else %}
-        <div class="flex items-center gap-4 pl-8 border-l border-[#586AE2]/50">
-          <a href="{% url 'users:login' %}" class="hover:text-white">Войти</a>
-          <a href="{% url 'users:register' %}" class="btn py-2 px-6 text-xs shadow-[0_0_15px_#C252E1]">Регистрация</a>
-        </div>
-      {% endif %}
+          <a href="{% url 'users:logout' %}" class="text-[#C252E1]/70 hover:text-[#C252E1] transition-colors">Выход</a>
+        {% else %}
+          <a href="{% url 'users:login' %}" class="text-white/70 hover:text-white transition-colors">Войти</a>
+          <a href="{% url 'users:register' %}" class="btn py-2.5 px-6 shadow-[0_0_15px_#C252E1]">Регистрация</a>
+        {% endif %}
+      </div>
     </nav>
   </div>
 </header>
@@ -45,28 +107,31 @@
   {% block content %}{% endblock %}
 </main>
 
-<footer class="border-t border-[#586AE2]/20 bg-[#0f0c20] py-8 mt-auto">
+<footer class="border-t border-[#586AE2]/20 bg-[#0a081a] py-10 mt-auto relative z-10">
   <div class="container mx-auto px-6">
-    <div class="grid md:grid-cols-3 gap-8 text-left mb-6 pb-6 border-b border-[#586AE2]/20">
+    <div class="grid md:grid-cols-3 gap-12 text-left mb-8 pb-8 border-b border-[#586AE2]/10">
       
       <div>
-        <h4 class="text-lg font-bold text-[#6ECBF5] mb-3 uppercase tracking-wider brand-font">Контакты</h4>
-        <p class="text-[#E0D9F6]/80 text-sm"></p>
-        <a href="mailto:support@catalyst.ru" class="text-[#C252E1] font-mono text-sm hover:underline break-all">support@catalyst.ru</a>
+        <h4 class="text-sm font-bold text-[#6ECBF5] mb-4 uppercase tracking-[0.2em] brand-font">Контакты</h4>
+        <a href="mailto:support@catalyst.ru" class="text-[#C252E1] font-mono text-xs hover:text-[#6ECBF5] transition-colors">support@catalyst.ru</a>
       </div>
       
       <div class="md:col-span-2">
-        <h4 class="text-lg font-bold text-[#6ECBF5] mb-3 uppercase tracking-wider brand-font">О нас</h4>
-        <p class="text-[#E0D9F6]/80 text-sm max-w-xl">
+        <h4 class="text-sm font-bold text-[#6ECBF5] mb-4 uppercase tracking-[0.2em] brand-font">О нас</h4>
+        <p class="text-[#E0D9F6]/50 text-xs leading-relaxed max-w-xl font-medium uppercase">
           Catalyst — это портал в киберспортивную реальность. Мы предлагаем премиум-оборудование, эксклюзивные игровые зоны и атмосферу, вдохновляющую на победы.
         </p>
       </div>
     </div>
     
-    <div class="text-center pt-6">
-      <p class="text-[#E0D9F6]/60 text-sm">
-        &copy; {{ now|date:"Y" }} <span class="text-[#C252E1] font-bold">CATALYST</span> SYSTEM. ALL RIGHTS RESERVED.
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-[#E0D9F6]/20 text-[10px] font-mono tracking-widest uppercase">
+        &copy; {% now "Y" %} <span class="text-[#C252E1] font-bold">CATALYST</span> SYSTEM. ALL RIGHTS RESERVED.
       </p>
+      <div class="flex gap-2 items-center opacity-30">
+        <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+        <span class="text-[9px] font-mono text-green-500">SERVER ONLINE</span>
+      </div>
     </div>
   </div>
 </footer>

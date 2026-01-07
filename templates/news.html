@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-8">Новости</h1>
+
+{% if request.user.is_superuser %}
+<form method="post" class="glass-card p-6 mb-10">
+  {% csrf_token %}
+  <input name="title" placeholder="Заголовок" class="input mb-3 w-full">
+  <textarea name="text" placeholder="Текст новости" class="input w-full h-32"></textarea>
+  <button class="btn mt-4">Опубликовать</button>
+</form>
+{% endif %}
+
+<div class="space-y-6">
+{% for item in news %}
+  <div class="glass-card p-6 relative">
+    <h3 class="text-xl font-bold">{{ item.title }}</h3>
+    <p class="text-sm text-gray-400 mb-2">{{ item.created_at|date:"d.m.Y" }}</p>
+    <p>{{ item.text }}</p>
+
+    {% if request.user.is_superuser %}
+      <a href="{% url 'news_delete' item.id %}" class="absolute top-4 right-4 text-red-400">✕</a>
+    {% endif %}
+  </div>
+{% endfor %}
+</div>
+
+{% endblock %}

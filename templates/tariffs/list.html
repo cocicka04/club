@@ -1,44 +1,93 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
-<section class="text-center mb-16 relative">
-  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#C252E1] opacity-20 blur-[100px] rounded-full -z-10"></div>
-  
-  <h1 class="text-5xl font-black text-white mb-4">ТАРИФЫ <span class="text-[#6ECBF5]">SYSTEM</span></h1>
-  <p class="text-[#E0D9F6] max-w-2xl mx-auto text-lg">
-    Выбирай свой пакет загрузки.
-  </p>
+<section class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-[#586AE2]/30 pb-8">
+  <div class="relative">
+    <div class="absolute -left-4 top-0 w-1 h-full bg-[#C252E1] shadow-[0_0_15px_#C252E1]"></div>
+    <h1 class="text-4xl font-black text-white mb-2 tracking-tighter uppercase italic">Игровые Станции</h1>
+    <p class="text-[#6ECBF5] font-mono text-sm uppercase tracking-widest">System Status: <span class="text-green-400 animate-pulse">Online</span></p>
+  </div>
+  {% if request.user.is_superuser %}
+    <a href="{% url 'places:create' %}" class="group flex items-center gap-2 bg-[#C252E1]/10 border border-[#C252E1] px-6 py-2 text-[#C252E1] font-bold uppercase text-xs hover:bg-[#C252E1] hover:text-white transition-all duration-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+      </svg>
+      Добавить юнит
+    </a>
+  {% endif %}
 </section>
 
-<div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-  {% for tariff in tariffs %}
-  <div class="group glass-card p-1 relative transition-all duration-300 hover:-translate-y-2">
-    <div class="absolute inset-0 bg-gradient-to-r from-[#C252E1] to-[#6ECBF5] opacity-0 group-hover:opacity-100 rounded-xl transition-opacity duration-300 -z-10 blur-sm"></div>
-    
-    <div class="bg-[#2A2356] rounded-xl p-8 h-full flex flex-col justify-between relative z-10 border border-[#586AE2]/20">
-      <div>
-        <div class="flex justify-between items-start mb-6">
-          <h2 class="text-2xl font-bold text-white group-hover:text-[#C252E1] transition-colors brand-font">{{ tariff.name }}</h2>
-          <span class="px-3 py-1 bg-[#15122b] rounded text-xs text-[#6ECBF5] uppercase tracking-widest border border-[#586AE2]">
-            {{ tariff.category.name }}
-          </span>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+  {% for place in places %}
+    <div class="group relative bg-[#15122b]/60 border border-[#586AE2]/20 backdrop-blur-md hover:border-[#C252E1]/50 transition-all duration-500 overflow-hidden">
+      
+      <div class="h-56 relative overflow-hidden bg-[#0a081a]">
+        {% if place.image %}
+          <img src="{{ place.image.url }}" alt="{{ place.title }}" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-1000">
+        {% else %}
+          <div class="flex items-center justify-center h-full">
+            <span class="text-xl font-black text-[#2A2356] tracking-[0.4em]">NO_SIGNAL</span>
+          </div>
+        {% endif %}
+
+        <div class="absolute top-0 left-0 bg-[#15122b] border-b border-r border-[#586AE2]/30 px-4 py-2 font-mono text-[#6ECBF5] text-xs font-bold z-10">
+          ID: {{ place.number|default:"00" }}
         </div>
-        
-        <p class="text-[#E0D9F6]/70 leading-relaxed mb-8 border-l-2 border-[#C252E1] pl-4">
-          {{ tariff.description|default:"Оптимальный выбор для сессии." }}
-        </p>
+
+        {% if place.active_booking %}
+          <div class="absolute top-4 right-0 bg-red-600 text-white px-3 py-1 text-[10px] font-black uppercase tracking-tighter shadow-[0_0_15px_rgba(220,38,38,0.5)] z-10">
+            Занято до {{ place.active_booking.end_time|date:"H:i" }}
+          </div>
+        {% else %}
+          <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-[10px] font-bold text-green-500 uppercase">Свободно</span>
+          </div>
+        {% endif %}
+
+        {% if request.user.is_superuser %}
+          <div class="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-20">
+            <a href="{% url 'places:edit' place.id %}" class="w-10 h-10 flex items-center justify-center bg-[#6ECBF5]/20 backdrop-blur-md border border-[#6ECBF5]/50 text-[#6ECBF5] hover:bg-[#6ECBF5] hover:text-white transition-all" title="Редактировать">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </a>
+            <a href="{% url 'places:delete' place.id %}" class="w-10 h-10 flex items-center justify-center bg-red-500/20 backdrop-blur-md border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all" title="Удалить">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </a>
+          </div>
+        {% endif %}
       </div>
 
-      <div class="border-t border-[#586AE2]/30 pt-6 flex items-center justify-between mt-auto">
-        <div>
-          <span class="block text-xs text-[#586AE2] uppercase font-bold">Стоимость</span>
-          <p class="text-4xl font-black text-white">{{ tariff.price_per_hour }} <span class="text-[#C252E1]">₽</span><span class="text-sm font-normal text-[#E0D9F6]/50">/час</span></p>
+      <div class="p-6 relative">
+        <div class="flex justify-between items-start mb-4">
+          <h3 class="text-xl font-black text-white uppercase tracking-tighter group-hover:text-[#6ECBF5] transition-colors">{{ place.title }}</h3>
+          <div class="text-right">
+            <span class="text-2xl font-black text-[#C252E1]">{{ place.tariff.price_per_hour }}<span class="text-xs ml-0.5 opacity-60">₽/ч</span></span>
+          </div>
         </div>
-        <a href="{% url 'places:list' %}" class="btn text-sm px-6 shadow-none hover:shadow-[0_0_15px_#C252E1]">Выбрать</a>
+        
+        <p class="text-[11px] text-[#E0D9F6]/40 mb-6 leading-relaxed h-8 overflow-hidden">
+          {{ place.description|truncatechars:80 }}
+        </p>
+        
+        <div class="flex gap-2">
+          <a href="{% url 'booking:create_with_place' place.id %}" class="flex-grow bg-white text-black text-center py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#C252E1] hover:text-white transition-all shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
+            Забронировать
+          </a>
+          <a href="{% url 'places:detail' place.id %}" class="w-12 border border-[#586AE2]/30 flex items-center justify-center text-[#6ECBF5] hover:bg-[#586AE2]/10 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
   {% empty %}
-  <p class="text-center text-[#E0D9F6] col-span-full">Тарифы загружаются...</p>
+    <div class="col-span-full py-20 text-center border border-dashed border-[#586AE2]/20">
+      <p class="text-[#E0D9F6]/30 font-mono italic">No terminals found in this sector.</p>
+    </div>
   {% endfor %}
 </div>
 {% endblock %}
