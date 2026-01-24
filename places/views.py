@@ -55,7 +55,7 @@ def place_edit(request, pk):
     place = get_object_or_404(Place, pk=pk)
 
     if request.method == 'POST':
-        form = PlaceForm(request.POST, instance=place)
+        form = PlaceForm(request.POST, request.FILES, instance=place)
         if form.is_valid():
             form.save()
             return redirect('places:detail', pk=pk)

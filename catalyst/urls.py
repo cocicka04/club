@@ -29,6 +29,7 @@ urlpatterns = [
     path('tariffs/', include(('tariffs.urls', 'tariffs'))),
     path('news/', views.news_page, name='news'),
     path('news/delete/<int:pk>/', views.news_delete, name='news_delete'),
+    path('about/', views.about, name='about'),
     path('contacts/', views.contacts, name='contacts'),
 ]
 

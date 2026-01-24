@@ -28,7 +28,7 @@
       </div>
 
       <div class="bg-[#0a081a]/50 p-6 border-l-2 border-[#C252E1] mb-8 text-sm text-[#E0D9F6]/80 leading-relaxed italic">
-        "{{ place.description }}"
+        {{ place.description }}
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
@@ -76,9 +76,9 @@
           <p class="text-4xl font-black text-white italic">{{ place.tariff.price_per_hour }}<span class="text-lg text-[#6ECBF5] ml-1">₽/ч</span></p>
         </div>
         
-        <div class="flex flex-col items-end gap-3">
-          <a href="{% url 'booking:create_with_place' place.id %}" class="bg-white text-black px-10 py-4 font-black uppercase text-xs tracking-[0.2em] hover:bg-[#C252E1] hover:text-white transition-all shadow-[0_0_20px_rgba(110,203,245,0.3)]">
-            Подключиться
+        <div class="flex flex-col h-full">
+          <a href="{% url 'booking:create_with_place' place.id %}" class="mt-auto bg-white text-black px-10 py-4 font-black uppercase text-xs tracking-[0.2em] hover:bg-[#C252E1] hover:text-white transition-all shadow-[0_0_20px_rgba(110,203,245,0.3)]">
+            Забронировать
           </a>
           {% if active_booking %}
             <span class="text-red-500 font-mono text-[10px] uppercase animate-pulse">Занято до {{ active_booking.end_time|date:"H:i" }}</span>

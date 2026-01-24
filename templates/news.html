@@ -1,29 +1,239 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1 class="text-3xl font-bold mb-8">Новости</h1>
+<section class="max-w-3xl mx-auto space-y-10">
 
-{% if request.user.is_superuser %}
-<form method="post" class="glass-card p-6 mb-10">
-  {% csrf_token %}
-  <input name="title" placeholder="Заголовок" class="input mb-3 w-full">
-  <textarea name="text" placeholder="Текст новости" class="input w-full h-32"></textarea>
-  <button class="btn mt-4">Опубликовать</button>
-</form>
-{% endif %}
+  {% if request.user.is_superuser %}
+  <!-- СОЗДАНИЕ НОВОСТИ -->
+  <form method="post" class="glass-card p-8 space-y-4">
+    {% csrf_token %}
+    <input type="hidden" name="create" value="1">
+  
+    <h2 class="text-xl font-bold text-white uppercase">Новая новость</h2>
+  
+    <input type="text"
+           name="title"
+           maxlength="120"
+           required
+           placeholder="Заголовок"
+           class="w-full px-4 py-2 bg-[#0a081a] border border-[#586AE2]/30 text-white">
+  
+    <textarea name="text"
+              maxlength="1000"
+              rows="6"
+              required
+              placeholder="Текст новости..."
+              class="w-full px-4 py-2 bg-[#0a081a] border border-[#586AE2]/30 text-white resize-none"></textarea>
+  
+    <button class="btn px-8">Опубликовать</button>
+  </form>  
+  {% endif %}
 
-<div class="space-y-6">
-{% for item in news %}
+  <!-- СПИСОК НОВОСТЕЙ -->
+  {% for n in news %}
   <div class="glass-card p-6 relative">
-    <h3 class="text-xl font-bold">{{ item.title }}</h3>
-    <p class="text-sm text-gray-400 mb-2">{{ item.created_at|date:"d.m.Y" }}</p>
-    <p>{{ item.text }}</p>
 
     {% if request.user.is_superuser %}
-      <a href="{% url 'news_delete' item.id %}" class="absolute top-4 right-4 text-red-400">✕</a>
+    <div class="absolute top-4 right-4 flex gap-2 z-20">
+    
+      <!-- РЕДАКТИРОВАНИЕ -->
+      <button
+        type="button"
+        onclick="toggleEdit({{ n.id }})"
+        class="action-icon"
+        title="Редактировать"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="w-4 h-4"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor">
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5
+                   m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828
+                   l8.586-8.586z"/>
+        </svg>
+      </button>
+    
+      <!-- УДАЛЕНИЕ -->
+      <form method="post"
+            action="{% url 'news_delete' n.id %}"
+            onsubmit="return confirm('Удалить эту новость?')">
+        {% csrf_token %}
+        <button
+          type="submit"
+          class="action-icon delete"
+          title="Удалить"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg"
+               class="w-4 h-4"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862
+                     a2 2 0 01-1.995-1.858L5 7
+                     m5 4v6m4-6v6
+                     m1-10V4a1 1 0 00-1-1h-4
+                     a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      </form>
+    
+    </div>
+    {% endif %}
+    
+
+    <!-- ПРОСМОТР -->
+    <div id="view-{{ n.id }}">
+      <h3 class="text-xl font-bold text-white mb-1">{{ n.title }}</h3>
+      <p class="text-xs text-[#6ECBF5] mb-3">{{ n.created_at|date:"d.m.Y H:i" }}</p>
+
+      <p id="short-{{ n.id }}" class="text-[#E0D9F6]/80">
+        {{ n.text|truncatechars:200 }}
+      </p>
+
+      <p id="full-{{ n.id }}" class="hidden text-[#E0D9F6]/80 whitespace-pre-line leading-relaxed">
+        {{ n.text }}
+      </p>
+
+      {% if n.text|length > 200 %}
+      <button onclick="toggleText({{ n.id }})"
+              id="btn-{{ n.id }}"
+              class="mt-3 text-xs text-[#6ECBF5] uppercase">
+        Подробнее
+      </button>
+      {% endif %}
+    </div>
+
+    {% if request.user.is_superuser %}
+    <!-- РЕДАКТИРОВАНИЕ -->
+    <form method="post" id="edit-{{ n.id }}" class="hidden space-y-4 mt-4">
+      {% csrf_token %}
+      <input type="hidden" name="edit" value="1">
+      <input type="hidden" name="news_id" value="{{ n.id }}">
+    
+      <input type="text"
+             name="title"
+             value="{{ n.title }}"
+             maxlength="120"
+             class="w-full px-4 py-2 bg-[#0a081a] border border-[#586AE2]/30 text-white">
+    
+      <textarea name="text"
+                maxlength="1000"
+                rows="6"
+                class="w-full px-4 py-2 bg-[#0a081a] border border-[#586AE2]/30 text-white resize-none">{{ n.text }}</textarea>
+    
+      <div class="flex gap-3">
+        <button class="btn px-6">Сохранить</button>
+        <button type="button"
+                onclick="toggleEdit({{ n.id }})"
+                class="text-xs text-white/40 uppercase">
+          Отмена
+        </button>
+      </div>
+    </form>    
     {% endif %}
   </div>
-{% endfor %}
+  {% endfor %}
+
+  {% if news.paginator.num_pages > 1 %}
+<div class="flex justify-center items-center gap-2 mt-12 text-xs font-bold">
+
+  <!-- В НАЧАЛО -->
+  {% if news.has_previous %}
+    <a href="?page=1"
+       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
+      в начало
+    </a>
+    <a href="?page={{ news.previous_page_number }}"
+       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
+      ←
+    </a>
+  {% endif %}
+
+  <!-- НОМЕРА СТРАНИЦ -->
+  {% for num in news.paginator.page_range %}
+    {% if num == news.number %}
+      <span class="px-3 py-2 bg-[#C252E1] text-black">
+        {{ num }}
+      </span>
+    {% elif num >= news.number|add:-2 and num <= news.number|add:2 %}
+      <a href="?page={{ num }}"
+         class="px-3 py-2 border border-[#586AE2]/40 text-white hover:bg-[#586AE2]/20 transition">
+        {{ num }}
+      </a>
+    {% endif %}
+  {% endfor %}
+
+  <!-- В КОНЕЦ -->
+  {% if news.has_next %}
+    <a href="?page={{ news.next_page_number }}"
+       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
+      →
+    </a>
+    <a href="?page={{ news.paginator.num_pages }}"
+       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
+      в конец
+    </a>
+  {% endif %}
+
 </div>
+{% endif %}
+
+
+</section>
+
+<script>
+function toggleText(id) {
+  const shortText = document.getElementById('short-' + id);
+  const fullText = document.getElementById('full-' + id);
+  const btn = document.getElementById('btn-' + id);
+
+  if (fullText.classList.contains('hidden')) {
+    fullText.classList.remove('hidden');
+    shortText.classList.add('hidden');
+    btn.innerText = 'Свернуть';
+  } else {
+    fullText.classList.add('hidden');
+    shortText.classList.remove('hidden');
+    btn.innerText = 'Подробнее';
+  }
+}
+
+function toggleEdit(id) {
+  document.getElementById('view-' + id).classList.toggle('hidden');
+  document.getElementById('edit-' + id).classList.toggle('hidden');
+}
+
+document.querySelectorAll('form').forEach(form => {
+  form.onsubmit = function () {
+    const txt = form.querySelector('textarea');
+    if (!txt) return;
+
+    let value = txt.value;
+
+    value = value
+      // убрать пробелы перед знаками препинания
+      .replace(/\s+([.,!?;:])/g, '$1')
+      // убрать двойные и тройные знаки препинания
+      .replace(/([?%№#$;:^*(),]){2,}/g, '$1')
+      // нормализовать пробелы
+      .replace(/[ \t]{2,}/g, ' ')
+      // убрать больше 2 переносов строк подряд
+      .replace(/\n{3,}/g, '\n\n')
+      // убрать пробелы в начале строк
+      .replace(/^\s+/gm, '')
+      // финальный trim
+      .trim();
+    txt.value = value;
+  };
+});
+
+</script>
 
 {% endblock %}

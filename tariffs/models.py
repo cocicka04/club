@@ -14,7 +14,7 @@ class Category(models.Model):
 class Tariff(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="tariffs", verbose_name="Категория ПК")
     name = models.CharField("Название тарифа", max_length=100)
-    price_per_hour = models.DecimalField("Цена за час (₴)", max_digits=8, decimal_places=2, default=0)
+    price_per_hour = models.DecimalField("Цена за час (₽)", max_digits=8, decimal_places=2, default=0)
     description = models.TextField("Описание тарифа", blank=True)
 
     class Meta:

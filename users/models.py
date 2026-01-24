@@ -11,7 +11,7 @@ def create_profile(sender, instance, created, **kwargs):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to='media/avatars/', blank=True,null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True,null=True)
 
     class Meta:
         verbose_name = "Профиль пользователя"
@@ -21,8 +21,8 @@ class Profile(models.Model):
         return self.user.username
 
 class News(models.Model):
-    title = models.CharField("Заголовок", max_length=200)
-    text = models.TextField("Текст")
+    title = models.CharField(max_length=120)
+    text = models.TextField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
