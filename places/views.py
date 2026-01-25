@@ -6,19 +6,28 @@ from .forms import PlaceForm
 from booking.models import Booking
 from django.utils import timezone
 
-def place_list(request):
-    places = Place.objects.all()
+from django.core.paginator import Paginator
 
-    for place in places:
+def place_list(request):
+    places_qs = Place.objects.select_related(
+        'category', 'tariff'
+    ).order_by('number')
+
+    for place in places_qs:
         place.active_booking = Booking.objects.filter(
             place=place,
             status=Booking.STATUS_ACTIVE,
             end_time__gt=timezone.now()
         ).order_by('end_time').first()
 
+    paginator = Paginator(places_qs, 9)  # ← 9 станций на страницу
+    page_number = request.GET.get('page')
+    places = paginator.get_page(page_number)
+
     return render(request, 'places/place_list.html', {
         'places': places
     })
+
 
 
 

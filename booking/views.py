@@ -30,45 +30,48 @@ def create_booking(request, place_id=None):
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
-            # Если форма содержит выбор place, берем оттуда, иначе используем place из URL
-            booking = form.save(commit=False, user=request.user)
-            if not place:
-                # У формы поле place должно быть валидно заполнено
-                booking.place = form.cleaned_data.get('place')
-            else:
+            booking = form.save(commit=False)
+            booking.user = request.user
+
+            if place:
                 booking.place = place
+            else:
+                booking.place = form.cleaned_data.get('place')
 
-            overlap = Booking.objects.filter(
-                place=place,
+            # 🔥 ВОТ ЗДЕСЬ КЛЮЧЕВАЯ ПРОВЕРКА
+            conflicts = Booking.objects.filter(
+                place=booking.place,
                 status=Booking.STATUS_ACTIVE,
-                start_time__lt=end_time,
-                end_time__gt=start_time
-            ).exists()
-
-            if overlap:
-                form.add_error(None, "Это место уже занято на выбранное время")
-                return render(request, 'booking/create.html', {'form': form})
-
-            # проверка пересечений: запрещаем создание броней на один place с пересечением времени
-            conflicts = Booking.objects.filter(place=booking.place, status='active').filter(
-                start_time__lt=booking.end_time, end_time__gt=booking.start_time
+                start_time__lt=booking.end_time,
+                end_time__gt=booking.start_time
             )
+
             if conflicts.exists():
                 form.add_error(None, "В выбранный интервал место уже занято.")
             else:
-                booking.user = request.user
                 booking.save()
                 return redirect('users:profile')
     else:
         initial = {}
         if place:
             initial['place'] = place
-            # предложим старт сейчас + 10 минут (или оставить поле пустым)
-            initial['start_time'] = (timezone.now() + timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M")
+            initial['start_time'] = (
+                timezone.now() + timedelta(minutes=10)
+            ).strftime("%Y-%m-%dT%H:%M")
+
         form = BookingForm(initial=initial)
-    # для рендера select с data-price: передадим все места (чтобы шаблон мог рендерить опции)
+
     places = Place.objects.all()
-    return render(request, 'booking/create_booking.html', {'form': form, 'place': place, 'places': places})
+    return render(
+        request,
+        'booking/create_booking.html',
+        {
+            'form': form,
+            'place': place,
+            'places': places
+        }
+    )
+
 
 @login_required
 def cancel_booking(request, booking_id):
@@ -87,27 +90,35 @@ def cancel_booking(request, booking_id):
 @login_required
 def extend_booking(request, booking_id):
     b = get_object_or_404(Booking, id=booking_id, user=request.user)
+
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
-            # Создадим новое бронирование с предзаполненным start_time = предыдущий end_time
             new_booking = form.save(commit=False)
             new_booking.user = request.user
             new_booking.place = b.place
-            # Проверка конфликтов как выше
-            conflicts = Booking.objects.filter(place=new_booking.place, status='active').filter(
-                start_time__lt=new_booking.end_time, end_time__gt=new_booking.start_time
+
+            conflicts = Booking.objects.filter(
+                place=new_booking.place,
+                status=Booking.STATUS_ACTIVE,
+                start_time__lt=new_booking.end_time,
+                end_time__gt=new_booking.start_time
             )
+
             if conflicts.exists():
                 form.add_error(None, "В выбранный интервал место уже занято.")
             else:
                 new_booking.save()
                 return redirect('users:profile')
     else:
-        initial = {
+        form = BookingForm(initial={
             'place': b.place.id,
             'start_time': b.end_time.strftime("%Y-%m-%dT%H:%M"),
             'hours': 1
-        }
-        form = BookingForm(initial=initial)
-    return render(request, 'booking/create_booking.html', {'form': form, 'place': b.place})
+        })
+
+    return render(
+        request,
+        'booking/create_booking.html',
+        {'form': form, 'place': b.place}
+    )

@@ -10,6 +10,7 @@ from .utils import send_activation_email
 from .tokens import account_activation_token
 from booking.models import Booking
 from booking.utils import finish_expired_bookings
+from django.core.paginator import Paginator
 
 def is_superuser(user):
     return user.is_superuser
@@ -88,6 +89,12 @@ def profile(request):
             Booking.STATUS_CANCELED
         ]
     ).order_by('-start_time')
+
+    bookings = Booking.objects.filter(user=request.user).order_by('-start_time')
+
+    paginator = Paginator(completed, 10)  # ← 10 записей
+    page_number = request.GET.get('page')
+    completed = paginator.get_page(page_number)
 
     return render(request, 'users/profile.html', {
         'active': active,

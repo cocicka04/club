@@ -18,9 +18,11 @@
             {% endif %}
           </div>
           
-          <div class="avatar-overlay rounded-full">
+
+          <!-- карандаш не работает -->
+          <!-- <div class="avatar-overlay rounded-full">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
+          </div> -->
           
           <input type="file" name="avatar" id="avatar-input" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="document.getElementById('avatar-form').submit()">
         </label>
@@ -104,7 +106,53 @@
         {% endfor %}
       </div>
     </section>
-
   </div>
+
+{% with page_obj=completed %}
+
+
+<!-- ПАГИНАТОР ИСТОРИИ -->
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center items-center gap-2 mt-12 text-xs font-bold">
+
+  {% if page_obj.has_previous %}
+    <a href="?page=1"
+       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
+      в начало
+    </a>
+    <a href="?page={{ page_obj.previous_page_number }}"
+       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
+      ←
+    </a>
+  {% endif %}
+
+  {% for num in page_obj.paginator.page_range %}
+    {% if num == page_obj.number %}
+      <span class="px-3 py-2 bg-[#C252E1] text-white font-bold rounded">
+        {{ num }}
+      </span>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+      <a href="?page={{ num }}"
+         class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition rounded">
+        {{ num }}
+      </a>
+    {% endif %}
+  {% endfor %}
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}"
+       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
+      →
+    </a>
+    <a href="?page={{ page_obj.paginator.num_pages }}"
+       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
+      в конец
+    </a>
+  {% endif %}
+
+</div>
+{% endif %}
+{% endwith %}
+  
 </div>
 {% endblock %}
