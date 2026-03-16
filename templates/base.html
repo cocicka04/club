@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catalyst — Cyber Lounge</title>
+  <title>Catalyst</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   
+  <link rel="icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
@@ -88,14 +89,14 @@
     <div class="grid md:grid-cols-3 gap-6 text-left mb-4 pb-4 border-b border-[#586AE2]/10">
       
       <div>
-        <a href="{% url 'contacts' %}" class="font-bold text-[#6ECBF5] mb-2 uppercase tracking-widest brand-font">Контакты</a>
+        <a href="{% url 'contacts' %}" class="link">Контакты</a>
         <p>
           <a href="mailto:support@catalyst.ru" class="text-[#C252E1] font-mono hover:text-white transition-colors">support@catalyst.ru</a>
         </p>
       </div>
       
       <div class="md:col-span-2">
-        <a href="{% url 'about' %}" class="font-bold text-[#6ECBF5] mb-2 uppercase tracking-widest brand-font">О нас</a>
+        <a href="{% url 'about' %}" class="link">О нас</a>
         <p class="text-[#E0D9F6]/50 leading-relaxed max-w-xl font-medium uppercase">
           Catalyst — это портал в киберспортивную реальность. Мы предлагаем премиум-оборудование, эксклюзивные игровые зоны и атмосферу, вдохновляющую на победы.
         </p>

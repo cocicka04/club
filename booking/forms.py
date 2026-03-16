@@ -1,4 +1,3 @@
-# booking/forms.py
 from django import forms
 from .models import Booking
 from django.utils import timezone
@@ -8,7 +7,9 @@ class BookingForm(forms.ModelForm):
     hours = forms.IntegerField(label="Часы", min_value=1, max_value=24, initial=1)
     start_time = forms.DateTimeField(
         label="Время начала",
-        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        input_formats=['%Y-%m-%dT%H:%M'],
+        widget=forms.DateTimeInput(attrs={
+        'type': 'datetime-local'})
     )
 
     class Meta:

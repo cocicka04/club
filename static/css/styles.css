@@ -130,3 +130,13 @@ input, textarea, select {
 .news-text p {
   text-indent: 1.5em;
 }
+
+.link {
+  font:bold; 
+  color: #6ECBF5; 
+  text-transform: uppercase;
+}
+
+.link:hover {
+  color: white;
+}
