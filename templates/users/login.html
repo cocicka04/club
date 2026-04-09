@@ -1,55 +1,40 @@
-{# templates/users/login.html #}
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="max-w-md mx-auto mt-10">
-  <div class="glass-card p-8 relative overflow-hidden">
+<div class="form-container">
+  <div class="glass-card form-card">
+    <div class="form-header-bar"></div>
 
-<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#C252E1] via-[#6ECBF5] to-[#C252E1]"></div>
+    <h2 class="form-title">АВТОРИЗАЦИЯ</h2>
 
-<h2 class="text-3xl font-bold text-center mb-8 text-white brand-font">
-  АВТОРИЗАЦИЯ
-</h2>
+    <form method="post">
+      {% csrf_token %}
 
-<form method="post">
-  {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="form-error">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
 
-  {% if form.non_field_errors %}
-    <div class="bg-red-500/20 border border-red-500 text-red-200 p-3 rounded mb-4 text-sm">
-      {{ form.non_field_errors }}
+      <div class="form-group">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Логин</label>
+        {{ form.username }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.password.id_for_label }}">Пароль</label>
+        {{ form.password }}
+      </div>
+
+      <button class="btn btn-full" type="submit">ВОЙТИ В СИСТЕМУ</button>
+    </form>
+
+    <div class="form-footer">
+      <p class="form-footer-text">
+        Не зарегистрированы?
+        <a href="{% url 'users:register' %}" class="form-footer-link">Регистрация</a>
+      </p>
     </div>
-  {% endif %}
-
-  <div class="mb-4 flex flex-col">
-    <label class="block mb-1 text-sm font-bold text-[#6ECBF5]" for="{{ form.username.id_for_label }}">
-      Логин
-    </label>
-
-    {{ form.username }}
-  </div>
-
-  <div class="mb-6 flex flex-col">
-    <label class="block mb-1 text-sm font-bold text-[#6ECBF5]" for="{{ form.password.id_for_label }}">
-      Пароль
-    </label>
-
-    {{ form.password }}
-  </div>
-
-  <button class="btn w-full text-center justify-center shadow-[0_0_20px_#C252E1]" type="submit">
-    ВОЙТИ В СИСТЕМУ
-  </button>
-
-</form>
-
-<div class="mt-6 text-center border-t border-[#586AE2]/30 pt-4">
-  <p class="text-[#E0D9F6]/60 text-sm">
-    Не зарегистрированы?
-    <a href="{% url 'users:register' %}" class="text-[#6ECBF5] hover:underline">
-      Регистрация
-    </a>
-  </p>
-</div>
 
   </div>
 </div>

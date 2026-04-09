@@ -1,30 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<section class="max-w-6xl mx-auto">
-  <h1 class="text-4xl font-black text-white mb-10 uppercase tracking-tight">
-    Контакты
-  </h1>
+<section class="contacts-container">
+  <h1 class="contacts-title">Контакты</h1>
 
-  <div class="grid md:grid-cols-2 gap-12">
+  <div class="contacts-grid">
     <div>
-      <h3 class="text-xl font-bold text-[#6ECBF5] mb-4">Catalyst Cyber Lounge</h3>
-      <p class="text-[#E0D9F6]/70 mb-4">
+      <h3 class="contacts-subtitle">Catalyst Cyber Lounge</h3>
+      <p class="contacts-text">
         Премиальный компьютерный клуб нового поколения.
       </p>
 
-      <p class="text-sm text-white/60 mb-2">
-        📍 Курск, просп. Хрущёва, 2, 2 этаж
-      </p>
-      <p class="text-sm text-white/60 mb-2">
-        📞 +7 (999) 999-99-99
-      </p>
-      <p class="text-sm text-white/60">
-        ✉ support@catalyst.ru
-      </p>
+      <p class="contacts-address">📍 Курск, просп. Хрущёва, 2, 2 этаж</p>
+      <p class="contacts-phone">📞 +7 (999) 999-99-99</p>
+      <p class="contacts-email">✉ support@catalyst.ru</p>
     </div>
 
-    <div class="glass-card p-4">
+    <div class="glass-card map-container">
       <script type="text/javascript" charset="utf-8" async
         src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A2c5189b9c80a712a0fb302430d51acf9dc69a315af073dc74a6359f8ba9a4189&amp;width=100%25&amp;height=400&amp;lang=ru_RU&amp;scroll=true">
       </script>

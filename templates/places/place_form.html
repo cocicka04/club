@@ -2,122 +2,84 @@
 {% load static %}
 
 {% block content %}
-<section class="max-w-4xl mx-auto">
+<section class="form-container">
 
-  <!-- Заголовок -->
-  <div class="glass-card p-6 mb-8">
-    <h1 class="text-3xl font-black text-white">
+  <div class="glass-card form-card">
+    <div class="form-header-bar"></div>
+    <h2 class="form-title">
       {% if form.instance.pk %}
         Редактирование места №{{ form.instance.number }}
       {% else %}
         Создание нового места
       {% endif %}
-    </h1>
-    <p class="text-[#6ECBF5] mt-2">
-      Заполните информацию о рабочем месте и его характеристиках
-    </p>
-  </div>
+    </h2>
+    <p class="text-center mb-6">Заполните информацию о рабочем месте и его характеристиках</p>
 
-  <!-- Форма -->
-  <form method="post" enctype="multipart/form-data" class="space-y-8">
-    {% csrf_token %}
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
 
-    <!-- Основная информация -->
-    <div class="glass-card p-6 space-y-4">
-      <h2 class="text-xl font-bold text-white mb-4">Основная информация</h2>
-
-      <div class="grid md:grid-cols-2 gap-6">
-        <div>
-          <label class="form-label">Название</label>
-          {{ form.title }}
-        </div>
-
-        <div>
-          <label class="form-label">Номер места</label>
-          {{ form.number }}
-        </div>
-
-        <div>
-          <label class="form-label">Категория</label>
-          {{ form.category }}
-        </div>
-
-        <div>
-          <label class="form-label">Тариф</label>
-          {{ form.tariff }}
+      <div class="form-group">
+        <h3 class="form-label">Основная информация</h3>
+        <div class="grid-2">
+          <div><label class="form-label">Название</label>{{ form.title }}</div>
+          <div><label class="form-label">Номер места</label>{{ form.number }}</div>
+          <div><label class="form-label">Категория</label>{{ form.category }}</div>
+          <div><label class="form-label">Тариф</label>{{ form.tariff }}</div>
         </div>
       </div>
 
-      <div>
+      <div class="form-group">
         <label class="form-label">Описание</label>
         {{ form.description }}
       </div>
 
-      <div>
+      <div class="form-group">
         <label class="form-label">Изображение</label>
         {{ form.image }}
         {% if form.instance.image %}
           <img src="{{ form.instance.image.url }}" class="mt-4 rounded-lg max-h-60">
         {% endif %}
       </div>
-    </div>
 
-    <!-- Характеристики ПК -->
-    <div class="glass-card p-6">
-      <h2 class="text-xl font-bold text-white mb-6">
-        Характеристики ПК
-      </h2>
-
-      <div class="grid md:grid-cols-2 gap-6">
-        <div>
-          <label class="form-label">Процессор</label>
-          {{ form.cpu }}
-        </div>
-
-        <div>
-          <label class="form-label">Видеокарта</label>
-          {{ form.gpu }}
-        </div>
-
-        <div>
-          <label class="form-label">Оперативная память</label>
-          {{ form.ram }}
-        </div>
-
-        <div>
-          <label class="form-label">Монитор</label>
-          {{ form.monitor }}
-        </div>
-
-        <div>
-          <label class="form-label">Клавиатура</label>
-          {{ form.keyboard }}
-        </div>
-
-        <div>
-          <label class="form-label">Мышь</label>
-          {{ form.mouse }}
-        </div>
-
-        <div class="md:col-span-2">
-          <label class="form-label">Гарнитура</label>
-          {{ form.headset }}
+      <div class="form-group">
+        <h3 class="form-label">Характеристики ПК</h3>
+        <div class="grid-2">
+          <div><label class="form-label">Процессор</label>{{ form.cpu }}</div>
+          <div><label class="form-label">Видеокарта</label>{{ form.gpu }}</div>
+          <div><label class="form-label">Оперативная память</label>{{ form.ram }}</div>
+          <div><label class="form-label">Монитор</label>{{ form.monitor }}</div>
+          <div><label class="form-label">Клавиатура</label>{{ form.keyboard }}</div>
+          <div><label class="form-label">Мышь</label>{{ form.mouse }}</div>
+          <div class="col-span-2"><label class="form-label">Гарнитура</label>{{ form.headset }}</div>
         </div>
       </div>
-    </div>
 
-    <!-- Кнопки -->
-    <div class="flex justify-between items-center">
-      <a href="{% url 'places:list' %}"
-         class="text-[#E0D9F6] hover:text-[#6ECBF5] transition">
-        ← Назад к списку мест
-      </a>
+      <div class="flex justify-between items-center mt-8">
+        <a href="{% url 'places:list' %}" class="form-footer-link">← Назад к списку мест</a>
+        <button type="submit" class="btn btn-lg">Сохранить</button>
+      </div>
 
-      <button type="submit" class="btn text-lg px-10">
-        Сохранить
-      </button>
-    </div>
-
-  </form>
+    </form>
+  </div>
 </section>
+
+<style>
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+.col-span-2 {
+  grid-column: span 2;
+}
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+</style>
 {% endblock %}

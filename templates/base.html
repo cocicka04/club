@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catalyst</title>
   
-  <script src="https://cdn.tailwindcss.com"></script>
-  
   <link rel="icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,102 +13,95 @@
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-<body class="flex flex-col min-h-screen bg-[#0a081a] text-[#E0D9F6]">
+<body class="flex-col-min-h-screen">
 
-<div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none z-0"></div>
+<div class="bg-carbon-overlay"></div>
 
-<header class="sticky top-0 z-50 border-b border-[#586AE2]/30 bg-[#15122b]/95 backdrop-blur-xl">
-  <div class="container mx-auto px-4 md:px-6 py-3 flex justify-between items-center relative z-10">
+<header class="header-sticky">
+  <div class="container-main header-container">
     
-    <a href="{% url 'home' %}" class="flex items-center gap-3 group select-none">
-      <div class="w-8 h-8 rounded bg-gradient-to-tr from-[#C252E1] to-[#6ECBF5] shadow-[0_0_15px_#C252E1] 
-                  transition-all duration-500 ease-out 
-                  group-hover:rotate-90 group-hover:scale-110">
-      </div>
-      <span class="text-xl md:text-2xl font-black tracking-widest text-white group-hover:text-[#6ECBF5] transition-colors brand-font">
-        CATALYST
-      </span>
+    <a href="{% url 'home' %}" class="logo-link">
+      <div class="logo-square"></div>
+      <span class="logo-text">CATALYST</span>
     </a>
 
-    <nav class="hidden md:flex items-center text-xs font-black uppercase tracking-widest">
-      <div class="flex gap-6 mr-6">
-        <a href="{% url 'places:list' %}" class="text-white/70 hover:text-[#C252E1] transition-colors py-2">Зоны</a>
-        <a href="{% url 'tariffs:list' %}" class="text-white/70 hover:text-[#C252E1] transition-colors py-2">Тарифы</a>
-        <a href="{% url 'news' %}" class="text-white/70 hover:text-[#C252E1] transition-colors py-2">Новости</a>
+    <nav class="nav-desktop">
+      <div class="nav-links">
+        <a href="{% url 'places:list' %}" class="nav-link">Зоны</a>
+        <a href="{% url 'tariffs:list' %}" class="nav-link">Тарифы</a>
+        <a href="{% url 'news' %}" class="nav-link">Новости</a>
       </div>
       
-      <div class="h-5 w-[1px] bg-[#586AE2]/30"></div>
+      <div class="nav-divider"></div>
       
-      <div class="flex items-center gap-4 pl-6">
+      <div class="nav-auth">
         {% if user.is_authenticated %}
-          <a href="{% url 'users:profile' %}" class="text-[#6ECBF5] hover:text-white drop-shadow-[0_0_8px_rgba(110,203,245,0.5)] transition-all">
+          <a href="{% url 'users:profile' %}" class="auth-username">
             {{ user.username }}
           </a>
-          <a href="{% url 'users:logout' %}" class="text-[#C252E1]/70 hover:text-[#C252E1] transition-colors">Выход</a>
+          <a href="{% url 'users:logout' %}" class="auth-logout">Выход</a>
         {% else %}
-          <a href="{% url 'users:login' %}" class="text-white/70 hover:text-white transition-colors">Войти</a>
-          <a href="{% url 'users:register' %}" class="px-4 py-2 bg-gradient-to-r from-[#6ECBF5] to-[#C252E1] text-white rounded hover:shadow-[0_0_15px_#C252E1] transition-all">
-            Регистрация
-          </a>
+          <a href="{% url 'users:login' %}" class="auth-login">Войти</a>
+          <a href="{% url 'users:register' %}" class="btn-register">Регистрация</a>
         {% endif %}
       </div>
     </nav>
 
-    <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
-      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button id="mobile-menu-btn" class="mobile-menu-btn">
+      <svg class="mobile-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
       </svg>
     </button>
   </div>
 
-  <div id="mobile-menu" class="hidden md:hidden bg-[#15122b] border-t border-[#586AE2]/20">
-    <nav class="flex flex-col px-4 py-4 space-y-4 text-sm font-bold uppercase tracking-widest text-center">
-      <a href="{% url 'places:list' %}" class="text-white/80 hover:text-[#C252E1]">Зоны</a>
-      <a href="{% url 'tariffs:list' %}" class="text-white/80 hover:text-[#C252E1]">Тарифы</a>
-      <a href="{% url 'news' %}" class="text-white/80 hover:text-[#C252E1]">Новости</a>
-      <hr class="border-[#586AE2]/20">
+  <div id="mobile-menu" class="mobile-menu">
+    <nav class="mobile-nav">
+      <a href="{% url 'places:list' %}" class="mobile-nav-link">Зоны</a>
+      <a href="{% url 'tariffs:list' %}" class="mobile-nav-link">Тарифы</a>
+      <a href="{% url 'news' %}" class="mobile-nav-link">Новости</a>
+      <hr class="mobile-divider">
       {% if user.is_authenticated %}
-        <a href="{% url 'users:profile' %}" class="text-[#6ECBF5]">{{ user.username }}</a>
-        <a href="{% url 'users:logout' %}" class="text-[#C252E1]">Выход</a>
+        <a href="{% url 'users:profile' %}" class="mobile-auth-username">{{ user.username }}</a>
+        <a href="{% url 'users:logout' %}" class="mobile-auth-logout">Выход</a>
       {% else %}
-        <a href="{% url 'users:login' %}" class="text-white">Войти</a>
-        <a href="{% url 'users:register' %}" class="text-[#C252E1]">Регистрация</a>
+        <a href="{% url 'users:login' %}" class="mobile-auth-login">Войти</a>
+        <a href="{% url 'users:register' %}" class="mobile-auth-register">Регистрация</a>
       {% endif %}
     </nav>
   </div>
 </header>
 
-<main class="container mx-auto px-4 md:px-6 py-8 flex-grow relative z-10">
+<main class="container-main flex-grow-main">
   {% block content %}{% endblock %}
 </main>
 
-<footer class="border-t border-[#586AE2]/20 bg-[#0a081a] py-6 mt-auto relative z-10 text-xs">
-  <div class="container mx-auto px-4 md:px-6">
-    <div class="grid md:grid-cols-3 gap-6 text-left mb-4 pb-4 border-b border-[#586AE2]/10">
+<footer class="footer">
+  <div class="container-main">
+    <div class="footer-grid">
       
       <div>
-        <a href="{% url 'contacts' %}" class="link">Контакты</a>
+        <a href="{% url 'contacts' %}" class="footer-link">Контакты</a>
         <p>
-          <a href="mailto:support@catalyst.ru" class="text-[#C252E1] font-mono hover:text-white transition-colors">support@catalyst.ru</a>
+          <a href="mailto:support@catalyst.ru" class="footer-email">support@catalyst.ru</a>
         </p>
       </div>
       
-      <div class="md:col-span-2">
-        <a href="{% url 'about' %}" class="link">О нас</a>
-        <p class="text-[#E0D9F6]/50 leading-relaxed max-w-xl font-medium uppercase">
+      <div class="md-col-span-2">
+        <a href="{% url 'about' %}" class="footer-link">О нас</a>
+        <p class="footer-about-text">
           Catalyst — это портал в киберспортивную реальность. Мы предлагаем премиум-оборудование, эксклюзивные игровые зоны и атмосферу, вдохновляющую на победы.
         </p>
       </div>
     </div>
     
-    <div class="flex flex-col md:flex-row justify-between items-center gap-2">
-      <p class="text-[#E0D9F6]/20 font-mono tracking-widest uppercase">
-        &copy; {% now "Y" %} <span class="text-[#C252E1] font-bold">CATALYST</span> SYSTEM. ALL RIGHTS RESERVED.
+    <div class="footer-bottom">
+      <p class="footer-copyright">
+        &copy; {% now "Y" %} <span class="footer-copyright-span">CATALYST</span> SYSTEM. ALL RIGHTS RESERVED.
       </p>
       
-      <div class="flex gap-2 items-center opacity-40">
-        <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-        <span class="text-[9px] font-mono text-green-500">SERVER ONLINE</span>
+      <div class="footer-status">
+        <div class="status-dot"></div>
+        <span class="status-text">SERVER ONLINE</span>
       </div>
     </div>
   </div>
@@ -121,7 +112,7 @@
   const menu = document.getElementById('mobile-menu');
 
   btn.addEventListener('click', () => {
-    menu.classList.toggle('hidden');
+    menu.classList.toggle('show');
   });
 </script>
 
