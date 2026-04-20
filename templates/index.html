@@ -41,9 +41,6 @@
         Забронировать ПК
       </a>
 
-      <a href="{% url 'tariffs:list' %}" class="btn-outline-animated inline-block px-10 py-4 rounded bg-[#2A2356]/50 border border-[#6ECBF5] text-[#6ECBF5] font-bold uppercase">
-        Тарифы
-      </a>
     </div>
   </div>
 </section>
@@ -73,4 +70,157 @@
     <p class="text-[#E0D9F6]/80">Клуб работает 24/7. Специальные ночные Тарифы по сниженной цене.</p>
   </div>
 </section>
+
+<!-- Секция Тарифы (Карусель) -->
+<section class="mt-20">
+  <div class="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-[#586AE2]/30 pb-6">
+    <div class="relative mb-4 md:mb-0">
+      <div class="absolute -left-4 top-0 w-1 h-full bg-[#C252E1] shadow-[0_0_15px_#C252E1]"></div>
+      <h2 class="text-3xl md:text-4xl font-black text-white uppercase italic brand-font">
+        Тарифы клуба
+      </h2>
+      <p class="text-[#6ECBF5] font-mono text-sm uppercase tracking-widest">
+        Select your loadout
+      </p>
+    </div>
+
+    {% if request.user.is_superuser %}
+      <a href="{% url 'tariffs:create' %}" 
+         class="group flex items-center gap-2 border border-[#C252E1] 
+                px-6 py-2 text-[#C252E1] font-bold uppercase text-xs 
+                hover:bg-[#C252E1] hover:text-white transition-all 
+                shadow-[0_0_15px_rgba(194,82,225,0.1)] hover:shadow-[0_0_20px_rgba(194,82,225,0.4)] rounded">
+        <span>+</span> Добавить тариф
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Карусель -->
+  <div class="relative carousel-fade">
+    <!-- Контейнер с карточками -->
+    <div id="tariffCarousel" class="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 no-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
+      {% for tariff in tariffs %}
+        <div class="glass-card p-6 flex flex-col justify-between w-[300px] md:w-[350px] flex-shrink-0 snap-start group hover:border-[#C252E1]/50 transition-colors duration-300">
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="text-xl font-black text-white brand-font tracking-wide">
+                {{ tariff.name }}
+              </h3>
+              <span class="px-2 py-1 bg-[#586AE2]/10 border border-[#586AE2]/30 rounded text-[10px] text-[#6ECBF5] font-bold uppercase tracking-widest whitespace-nowrap">
+                {{ tariff.category.name }}
+              </span>
+            </div>
+
+            {% if tariff.description %}
+              <p class="text-sm text-[#E0D9F6]/60 leading-relaxed border-l-2 border-[#586AE2]/30 pl-3 my-4">
+                {{ tariff.description }}
+              </p>
+            {% endif %}
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-[#586AE2]/20">
+            <div class="text-2xl md:text-3xl font-black text-white mb-4 flex items-baseline gap-2">
+              {{ tariff.price_per_hour }} <span class="text-[#C252E1]">₽</span>
+              <span class="text-xs text-[#E0D9F6]/40 font-normal font-mono">/ ЧАС</span>
+            </div>
+
+            <div class="flex gap-2">
+              <a href="{% url 'places:list' %}"
+                 class="btn flex-1 py-2 text-xs shadow-none hover:shadow-[0_0_15px_#C252E1] text-center">
+                Выбрать
+              </a>
+
+              {% if request.user.is_superuser %}
+                <!-- РЕДАКТИРОВАТЬ -->
+                <a href="{% url 'tariffs:edit' tariff.id %}"
+                   class="px-3 py-2 border border-[#6ECBF5]/50 text-[#6ECBF5] rounded
+                          hover:bg-[#6ECBF5] hover:text-black transition-all
+                          flex items-center justify-center text-xs"
+                   title="Редактировать">
+                  ✎
+                </a>
+
+                <!-- УДАЛИТЬ -->
+                <a href="{% url 'tariffs:delete' tariff.id %}"
+                   class="px-3 py-2 border border-red-500/50 text-red-400 rounded
+                          hover:bg-red-500 hover:text-white transition-all
+                          flex items-center justify-center text-xs"
+                   title="Удалить">
+                  ✕
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="w-full glass-card p-8 text-center text-[#6ECBF5]/40 border-dashed border-[#586AE2]/30">
+          <p class="font-mono uppercase tracking-widest">Тарифы не инициализированы</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Кнопки навигации (появляются, если есть тарифы) -->
+    {% if tariffs %}
+      <button id="carouselPrev" class="absolute left-0 top-1/2 -translate-y-1/2 -ml-5 w-10 h-10 rounded-full bg-[#2A2356]/80 border border-[#6ECBF5] text-[#6ECBF5] flex items-center justify-center hover:bg-[#6ECBF5] hover:text-black transition-all shadow-lg z-10 flex">
+        ←
+      </button>
+      <button id="carouselNext" class="absolute right-0 top-1/2 -translate-y-1/2 -mr-5 w-10 h-10 rounded-full bg-[#2A2356]/80 border border-[#6ECBF5] text-[#6ECBF5] flex items-center justify-center hover:bg-[#6ECBF5] hover:text-black transition-all shadow-lg z-10 flex">
+        →
+      </button>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  /* Скрываем полосу прокрутки, но оставляем функциональность */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+
+<script>
+  (function() {
+    const carousel = document.getElementById('tariffCarousel');
+    if (!carousel) return;
+
+    const prevBtn = document.getElementById('carouselPrev');
+    const nextBtn = document.getElementById('carouselNext');
+    
+    if (!prevBtn || !nextBtn) return;
+
+    // Ширина прокрутки примерно равна ширине одной карточки + отступ
+    const scrollAmount = () => {
+      const firstCard = carousel.querySelector('.glass-card');
+      if (!firstCard) return 300;
+      const cardWidth = firstCard.offsetWidth;
+      const gap = 24; // gap-6 = 1.5rem = 24px
+      return cardWidth + gap;
+    };
+
+    prevBtn.addEventListener('click', () => {
+      carousel.scrollBy({
+        left: -scrollAmount(),
+        behavior: 'smooth'
+      });
+    });
+
+    nextBtn.addEventListener('click', () => {
+      carousel.scrollBy({
+        left: scrollAmount(),
+        behavior: 'smooth'
+      });
+    });
+
+    // Показывать/скрывать кнопки в зависимости от положения прокрутки (опционально)
+    const updateButtonsVisibility = () => {
+      const isScrollable = carousel.scrollWidth > carousel.clientWidth;
+      if (prevBtn && nextBtn) {
+        // На мобилках кнопки скрыты через класс flex, так что не трогаем
+      }
+    };
+    
+    window.addEventListener('resize', updateButtonsVisibility);
+    updateButtonsVisibility();
+  })();
+</script>
 {% endblock %}

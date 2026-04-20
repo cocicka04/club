@@ -4,10 +4,17 @@ from .models import Tariff
 from .forms import TariffForm
 from django.core.paginator import Paginator
 
+def index(request):
+    tariffs = Tariff.objects.select_related('category').order_by('-id')
+
+    return render(request, 'index.html', {
+        'tariffs': tariffs
+    })
+
 def tariff_list(request):
     tariffs = Tariff.objects.all()
 
-    paginator = Paginator(tariffs, 6)  # ← 6 тарифов на страницу
+    paginator = Paginator(tariffs, 6)
     page_number = request.GET.get('page')
     tariffs = paginator.get_page(page_number)
 
@@ -17,7 +24,7 @@ def tariff_list(request):
         tariff.price_per_hour = request.POST.get('price_per_hour')
         tariff.description = request.POST.get('description')
         tariff.save()
-        return redirect('tariffs:list')
+        return redirect('index')
 
     return render(request, 'tariffs/list.html', {
         'tariffs': tariffs
@@ -29,7 +36,7 @@ def tariff_create(request):
         form = TariffForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('tariffs:list')
+            return redirect('index')
     else:
         form = TariffForm()
 
@@ -45,7 +52,7 @@ def tariff_edit(request, pk):
         form = TariffForm(request.POST, instance=tariff)
         if form.is_valid():
             form.save()
-            return redirect('tariffs:list')
+            return redirect('index')
     else:
         form = TariffForm(instance=tariff)
 
@@ -59,4 +66,4 @@ def tariff_edit(request, pk):
 @staff_member_required
 def tariff_delete(request, pk):
     Tariff.objects.filter(pk=pk).delete()
-    return redirect('tariffs:list')
+    return redirect('index')
