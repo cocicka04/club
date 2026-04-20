@@ -1,116 +1,83 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<section class="flex flex-col md:flex-row justify-between items-end mb-10 border-b border-[#586AE2]/30 pb-6 gap-4">
-  <div class="relative">
-    <div class="absolute -left-4 top-1 w-1 h-full bg-[#C252E1] shadow-[0_0_15px_#C252E1] rounded-full"></div>
-    <h1 class="text-3xl md:text-4xl font-black text-white uppercase italic brand-font tracking-wide mb-1">
-      Игровые зоны
-    </h1>
-    <p class="text-[#6ECBF5] font-mono text-xs md:text-sm uppercase tracking-[0.2em] opacity-80">
-      Select your battle station
-    </p>
+<section class="section-header">
+  <div class="section-header-left">
+    <div class="section-header-accent"></div>
+    <h1 class="section-title">Игровые зоны</h1>
+    <p class="section-subtitle">Select your battle station</p>
   </div>
 
   {% if request.user.is_superuser %}
-    <a href="{% url 'places:create' %}" 
-       class="flex items-center gap-2 px-5 py-2.5 bg-[#C252E1]/10 border border-[#C252E1] 
-              text-[#C252E1] font-bold text-xs uppercase tracking-wider rounded
-              hover:bg-[#C252E1] hover:text-white transition-all duration-300
-              shadow-[0_0_10px_rgba(194,82,225,0.1)] hover:shadow-[0_0_20px_rgba(194,82,225,0.4)]">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      Добавить зону
+    <a href="{% url 'places:create' %}" class="btn-outline">
+      + Добавить зону
     </a>
   {% endif %}
 </section>
 
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
+<div class="places-grid">
   {% for place in places %}
-    <div class="glass-card group relative flex flex-col overflow-hidden h-full hover:border-[#C252E1]/50 transition-colors duration-500">
+    <div class="glass-card place-card">
       
-      <div class="relative h-56 bg-[#05040a] overflow-hidden">
+      <div class="place-image-wrapper">
         {% if place.image %}
-          <img src="{{ place.image.url }}" alt="{{ place.title }}" 
-               class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 ease-in-out">
+          <img src="{{ place.image.url }}" alt="{{ place.title }}" class="place-image">
         {% else %}
-          <div class="w-full h-full flex items-center justify-center bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
-             <span class="text-[#2A2356] font-black text-xl tracking-[0.3em] animate-pulse">NO SIGNAL</span>
+          <div class="place-image-placeholder">
+             <span class="placeholder-text">NO SIGNAL</span>
           </div>
         {% endif %}
 
-        <div class="absolute inset-0 bg-gradient-to-t from-[#15122b] via-transparent to-transparent"></div>
+        <div class="place-image-gradient"></div>
 
-        <div class="absolute top-0 left-0 bg-[#15122b]/90 backdrop-blur border-r border-b border-[#586AE2]/30 px-3 py-2">
-          <span class="text-white font-black text-lg font-mono">#{{ place.number }}</span>
+        <div class="place-number-badge">
+          <span class="place-number">#{{ place.number }}</span>
         </div>
 
-        <div class="absolute top-3 right-3">
+        <div class="place-status">
           {% if place.active_booking %}
-            <div class="flex items-center gap-2 px-2 py-1 bg-red-900/80 border border-red-500/50 backdrop-blur rounded text-[10px] font-black uppercase text-red-100 tracking-wider shadow-[0_0_10px_rgba(239,68,68,0.3)]">
-               <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+            <div class="status-busy">
+               <span class="status-busy-dot"></span>
                BUSY
             </div>
           {% else %}
-            <div class="flex items-center gap-2 px-2 py-1 bg-green-900/80 border border-green-500/50 backdrop-blur rounded text-[10px] font-black uppercase text-green-100 tracking-wider shadow-[0_0_10px_rgba(74,222,128,0.3)]">
-               <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+            <div class="status-free">
+               <span class="status-free-dot"></span>
                FREE
             </div>
           {% endif %}
         </div>
       </div>
 
-      <div class="p-6 flex flex-col flex-grow">
+      <div class="place-content">
         
-        <div class="flex justify-between items-start mb-3">
-          <h3 class="text-xl font-bold text-white uppercase brand-font leading-tight group-hover:text-[#6ECBF5] transition-colors">
-            {{ place.title }}
-          </h3>
-          <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#C252E1] border border-[#C252E1]/30 rounded bg-[#C252E1]/5">
-            {{ place.category.name }}
-          </span>
+        <div class="place-title-row">
+          <h3 class="place-title">{{ place.title }}</h3>
+          <span class="place-category">{{ place.category.name }}</span>
         </div>
 
-        <p class="text-sm text-[#E0D9F6]/60 mb-4 line-clamp-2 leading-relaxed">
-          {{ place.description|default:"Описание отсутствует" }}
-        </p>
+        <p class="place-desc">{{ place.description|default:"Описание отсутствует" }}</p>
 
-        <div class="grid grid-cols-2 gap-2 mb-6 text-[11px] font-mono text-[#E0D9F6]/50 border-t border-b border-[#586AE2]/10 py-3">
-           <div>
-             <span class="text-[#586AE2]">CPU:</span> {{ place.cpu|default:"-"|truncatechars:12 }}
-           </div>
-           <div>
-             <span class="text-[#586AE2]">GPU:</span> {{ place.gpu|default:"-"|truncatechars:12 }}
-           </div>
+        <div class="place-specs">
+           <div><span class="spec-label">CPU:</span> {{ place.cpu|default:"-"|truncatechars:12 }}</div>
+           <div><span class="spec-label">GPU:</span> {{ place.gpu|default:"-"|truncatechars:12 }}</div>
         </div>
 
-        <div class="mt-auto">
-          <div class="flex items-baseline gap-2 mb-4">
-             <span class="text-2xl font-black text-white">{{ place.tariff.price_per_hour }}</span>
-             <span class="text-[#C252E1] font-bold">₽</span>
-             <span class="text-xs text-[#E0D9F6]/40 uppercase">/ час</span>
+        <div>
+          <div class="place-price">
+             <span class="place-price-value">{{ place.tariff.price_per_hour }}</span>
+             <span class="place-price-currency">₽</span>
+             <span class="place-price-period">/ час</span>
           </div>
 
-          <div class="flex gap-2">
+          <div class="place-actions">
             {% if not place.active_booking %}
-              <a href="{% url 'booking:create_with_place' place.id %}" 
-                 class="flex-grow bg-gradient-to-r from-[#C252E1] to-[#6ECBF5] text-white 
-                        font-bold uppercase text-xs py-3 rounded text-center
-                        hover:shadow-[0_0_15px_#C252E1] hover:scale-[1.02] transition-all duration-300">
-                Забронировать
-              </a>
+              <a href="{% url 'booking:create_with_place' place.id %}" class="place-book-btn">Забронировать</a>
             {% else %}
-              <div class="flex-grow bg-[#15122b] border border-[#586AE2]/20 text-[#E0D9F6]/20 
-                          font-bold uppercase text-xs py-3 rounded text-center cursor-not-allowed select-none">
-                Недоступно
-              </div>
+              <div class="place-book-disabled">Недоступно</div>
             {% endif %}
 
-            <a href="{% url 'places:detail' place.id %}" 
-               class="w-10 flex items-center justify-center border border-[#586AE2]/40 rounded text-[#6ECBF5] 
-                      hover:bg-[#6ECBF5] hover:text-[#0a081a] transition-all"
-               title="Подробнее">
+            <a href="{% url 'places:detail' place.id %}" class="place-detail-btn" title="Подробнее">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
@@ -118,10 +85,10 @@
           </div>
 
           {% if request.user.is_superuser %}
-            <div class="flex gap-2 mt-3 pt-3 border-t border-[#586AE2]/10 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-               <a href="{% url 'places:edit' place.id %}" class="text-[10px] uppercase font-bold text-[#6ECBF5] hover:text-white">Ред.</a>
-               <span class="text-[#586AE2]/30">|</span>
-               <a href="{% url 'places:delete' place.id %}" class="text-[10px] uppercase font-bold text-red-400 hover:text-white">Удалить</a>
+            <div class="place-admin-actions">
+               <a href="{% url 'places:edit' place.id %}" class="admin-edit-link">Ред.</a>
+               <span class="admin-divider">|</span>
+               <a href="{% url 'places:delete' place.id %}" class="admin-delete-link">Удалить</a>
             </div>
           {% endif %}
         </div>
@@ -129,56 +96,34 @@
       </div>
     </div>
   {% empty %}
-    <div class="col-span-full py-20 text-center border-2 border-dashed border-[#586AE2]/30 rounded-xl bg-[#15122b]/30">
-      <p class="text-[#6ECBF5] font-mono uppercase tracking-widest text-lg">Системы офлайн</p>
-      <p class="text-[#E0D9F6]/40 text-sm mt-2">Нет доступных станций для отображения</p>
+    <div class="tariff-empty">
+      <p>Нет доступных станций для отображения</p>
     </div>
   {% endfor %}
 </div>
 
-<!-- ПАГИНАТОР -->
 {% with page_obj=places %}
-{% if page_obj.has_other_pages %}
-<div class="flex justify-center items-center gap-2 mt-12">
+  {% if page_obj.has_other_pages %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="pagination-link">в начало</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">←</a>
+      {% endif %}
 
-  {% if page_obj.has_previous %}
-    <a href="?page=1"
-       class="px-3 py-2 border border-[#586AE2]/30 text-[#6ECBF5] hover:bg-[#586AE2]/10 transition">
-      в начало
-    </a>
-    <a href="?page={{ page_obj.previous_page_number }}"
-       class="px-3 py-2 border border-[#586AE2]/30 text-[#6ECBF5] hover:bg-[#586AE2]/10 transition">
-      ←
-    </a>
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="pagination-current">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">→</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">в конец</a>
+      {% endif %}
+    </div>
   {% endif %}
-
-  {% for num in page_obj.paginator.page_range %}
-    {% if num == page_obj.number %}
-      <span class="px-4 py-2 bg-[#C252E1] text-white font-bold rounded">
-        {{ num }}
-      </span>
-    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-      <a href="?page={{ num }}"
-         class="px-4 py-2 border border-[#586AE2]/30 text-[#6ECBF5] hover:bg-[#586AE2]/10 transition rounded">
-        {{ num }}
-      </a>
-    {% endif %}
-  {% endfor %}
-
-  {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}"
-       class="px-3 py-2 border border-[#586AE2]/30 text-[#6ECBF5] hover:bg-[#586AE2]/10 transition">
-      →
-    </a>
-    <a href="?page={{ page_obj.paginator.num_pages }}"
-       class="px-3 py-2 border border-[#586AE2]/30 text-[#6ECBF5] hover:bg-[#586AE2]/10 transition">
-      в конец
-    </a>
-  {% endif %}
-
-</div>
-{% endif %}
 {% endwith %}
-
 
 {% endblock %}

@@ -1,140 +1,84 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<section class="max-w-3xl mx-auto space-y-10">
+<section class="news-container">
 
   {% if request.user.is_superuser %}
-  <!-- СОЗДАНИЕ НОВОСТИ -->
-  <form method="post" class="glass-card p-8 space-y-4">
+  <form method="post" class="glass-card news-create-form">
     {% csrf_token %}
     <input type="hidden" name="create" value="1">
   
-    <h2 class="text-xl font-bold text-white uppercase">Новая новость</h2>
+    <h2 class="news-form-title">Новая новость</h2>
   
     <input type="text"
            name="title"
            maxlength="120"
            required
            placeholder="Заголовок"
-           class="w-full px-4 py-2 bg-[#0a081a] border border-[#586AE2]/30 text-white">
+           class="form-input">
   
     <textarea name="text"
               maxlength="1000"
               rows="6"
               required
               placeholder="Текст новости..."
-              class="w-full px-4 py-2 bg-[#0a081a] border border-[#586AE2]/30 text-white resize-none"></textarea>
+              class="form-textarea"></textarea>
   
-    <button class="btn px-8">Опубликовать</button>
+    <button class="btn">Опубликовать</button>
   </form>  
   {% endif %}
 
-  <!-- СПИСОК НОВОСТЕЙ -->
   {% for n in news %}
-  <div class="glass-card p-6 relative">
+  <div class="glass-card news-item">
 
     {% if request.user.is_superuser %}
-    <div class="absolute top-4 right-4 flex gap-2 z-20">
-    
-      <!-- РЕДАКТИРОВАНИЕ -->
-      <button
-        type="button"
-        onclick="toggleEdit({{ n.id }})"
-        class="action-icon"
-        title="Редактировать"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg"
-             class="w-4 h-4"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor">
-          <path stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5
-                   m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828
-                   l8.586-8.586z"/>
-        </svg>
+    <div class="news-actions">
+      <button type="button" onclick="toggleEdit({{ n.id }})" class="action-icon" title="Редактировать">
+        ред.
       </button>
     
-      <!-- УДАЛЕНИЕ -->
-      <form method="post"
-            action="{% url 'news_delete' n.id %}"
-            onsubmit="return confirm('Удалить эту новость?')">
+      <form method="post" action="{% url 'news_delete' n.id %}" onsubmit="return confirm('Удалить эту новость?')" style="display: inline;">
         {% csrf_token %}
-        <button
-          type="submit"
-          class="action-icon delete"
-          title="Удалить"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg"
-               class="w-4 h-4"
-               fill="none"
-               viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862
-                     a2 2 0 01-1.995-1.858L5 7
-                     m5 4v6m4-6v6
-                     m1-10V4a1 1 0 00-1-1h-4
-                     a1 1 0 00-1 1v3M4 7h16"/>
-          </svg>
+        <button type="submit" class="action-icon action-icon-delete" title="Удалить">
+          удалить
         </button>
       </form>
-    
     </div>
     {% endif %}
     
 
-    <!-- ПРОСМОТР -->
     <div id="view-{{ n.id }}">
-      <h3 class="text-xl font-bold text-white mb-1">{{ n.title }}</h3>
-      <p class="text-xs text-[#6ECBF5] mb-3">{{ n.created_at|date:"d.m.Y H:i" }}</p>
+      <h3 class="news-title">{{ n.title }}</h3>
+      <p class="news-date">{{ n.created_at|date:"d.m.Y H:i" }}</p>
 
-      <p id="short-{{ n.id }}" class="text-[#E0D9F6]/80">
+      <p id="short-{{ n.id }}" class="news-short-text">
         {{ n.text|truncatechars:200 }}
       </p>
 
-      <p id="full-{{ n.id }}" class="hidden text-[#E0D9F6]/80 whitespace-pre-line leading-relaxed">
+      <p id="full-{{ n.id }}" class="news-full-text hidden">
         {{ n.text }}
       </p>
 
       {% if n.text|length > 200 %}
-      <button onclick="toggleText({{ n.id }})"
-              id="btn-{{ n.id }}"
-              class="mt-3 text-xs text-[#6ECBF5] uppercase">
+      <button onclick="toggleText({{ n.id }})" id="btn-{{ n.id }}" class="news-toggle-btn">
         Подробнее
       </button>
       {% endif %}
     </div>
 
     {% if request.user.is_superuser %}
-    <!-- РЕДАКТИРОВАНИЕ -->
-    <form method="post" id="edit-{{ n.id }}" class="hidden space-y-4 mt-4">
+    <form method="post" id="edit-{{ n.id }}" class="news-edit-form hidden">
       {% csrf_token %}
       <input type="hidden" name="edit" value="1">
       <input type="hidden" name="news_id" value="{{ n.id }}">
     
-      <input type="text"
-             name="title"
-             value="{{ n.title }}"
-             maxlength="120"
-             class="w-full px-4 py-2 bg-[#0a081a] border border-[#586AE2]/30 text-white">
+      <input type="text" name="title" value="{{ n.title }}" maxlength="120" class="form-input">
     
-      <textarea name="text"
-                maxlength="1000"
-                rows="6"
-                class="w-full px-4 py-2 bg-[#0a081a] border border-[#586AE2]/30 text-white resize-none">{{ n.text }}</textarea>
+      <textarea name="text" maxlength="1000" rows="6" class="form-textarea">{{ n.text }}</textarea>
     
-      <div class="flex gap-3">
-        <button class="btn px-6">Сохранить</button>
-        <button type="button"
-                onclick="toggleEdit({{ n.id }})"
-                class="text-xs text-white/40 uppercase">
-          Отмена
-        </button>
+      <div class="news-edit-buttons">
+        <button class="btn">Сохранить</button>
+        <button type="button" onclick="toggleEdit({{ n.id }})" class="news-cancel-btn">Отмена</button>
       </div>
     </form>    
     {% endif %}
@@ -142,49 +86,26 @@
   {% endfor %}
 
   {% if news.paginator.num_pages > 1 %}
-<div class="flex justify-center items-center gap-2 mt-12 text-xs font-bold">
+    <div class="pagination">
+      {% if news.has_previous %}
+        <a href="?page=1" class="pagination-link">в начало</a>
+        <a href="?page={{ news.previous_page_number }}" class="pagination-link">←</a>
+      {% endif %}
 
-  <!-- В НАЧАЛО -->
-  {% if news.has_previous %}
-    <a href="?page=1"
-       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
-      в начало
-    </a>
-    <a href="?page={{ news.previous_page_number }}"
-       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
-      ←
-    </a>
+      {% for num in news.paginator.page_range %}
+        {% if num == news.number %}
+          <span class="pagination-current">{{ num }}</span>
+        {% elif num >= news.number|add:-2 and num <= news.number|add:2 %}
+          <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if news.has_next %}
+        <a href="?page={{ news.next_page_number }}" class="pagination-link">→</a>
+        <a href="?page={{ news.paginator.num_pages }}" class="pagination-link">в конец</a>
+      {% endif %}
+    </div>
   {% endif %}
-
-  <!-- НОМЕРА СТРАНИЦ -->
-  {% for num in news.paginator.page_range %}
-    {% if num == news.number %}
-      <span class="px-3 py-2 bg-[#C252E1] text-black">
-        {{ num }}
-      </span>
-    {% elif num >= news.number|add:-2 and num <= news.number|add:2 %}
-      <a href="?page={{ num }}"
-         class="px-3 py-2 border border-[#586AE2]/40 text-white hover:bg-[#586AE2]/20 transition">
-        {{ num }}
-      </a>
-    {% endif %}
-  {% endfor %}
-
-  <!-- В КОНЕЦ -->
-  {% if news.has_next %}
-    <a href="?page={{ news.next_page_number }}"
-       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
-      →
-    </a>
-    <a href="?page={{ news.paginator.num_pages }}"
-       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
-      в конец
-    </a>
-  {% endif %}
-
-</div>
-{% endif %}
-
 
 </section>
 
@@ -218,22 +139,15 @@ document.querySelectorAll('form').forEach(form => {
     let value = txt.value;
 
     value = value
-      // убрать пробелы перед знаками препинания
       .replace(/\s+([.,!?;:])/g, '$1')
-      // убрать двойные и тройные знаки препинания
       .replace(/([?%№#$;:^*(),]){2,}/g, '$1')
-      // нормализовать пробелы
       .replace(/[ \t]{2,}/g, ' ')
-      // убрать больше 2 переносов строк подряд
       .replace(/\n{3,}/g, '\n\n')
-      // убрать пробелы в начале строк
       .replace(/^\s+/gm, '')
-      // финальный trim
       .trim();
     txt.value = value;
   };
 });
-
 </script>
 
 {% endblock %}

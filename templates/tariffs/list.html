@@ -1,136 +1,82 @@
 {% extends "base.html" %}
 {% block content %}
 
-<section class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-[#586AE2]/30 pb-8">
-  <div class="relative mb-4 md:mb-0">
-    <div class="absolute -left-4 top-0 w-1 h-full bg-[#C252E1] shadow-[0_0_15px_#C252E1]"></div>
-    <h1 class="text-4xl font-black text-white uppercase italic brand-font">
-      Тарифы
-    </h1>
-    <p class="text-[#6ECBF5] font-mono text-sm uppercase tracking-widest">
-      Select your loadout
-    </p>
+<section class="section-header">
+  <div class="section-header-left">
+    <div class="section-header-accent"></div>
+    <h1 class="section-title">Тарифы</h1>
+    <p class="section-subtitle">Select your loadout</p>
   </div>
 
   {% if request.user.is_superuser %}
-    <a href="{% url 'tariffs:create' %}" 
-       class="group flex items-center gap-2 border border-[#C252E1] 
-              px-6 py-2 text-[#C252E1] font-bold uppercase text-xs 
-              hover:bg-[#C252E1] hover:text-white transition-all 
-              shadow-[0_0_15px_rgba(194,82,225,0.1)] hover:shadow-[0_0_20px_rgba(194,82,225,0.4)] rounded">
-      <span>+</span> Добавить тариф
+    <a href="{% url 'tariffs:create' %}" class="btn-outline">
+      + Добавить тариф
     </a>
   {% endif %}
 </section>
 
-<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="tariffs-grid">
 
 {% for tariff in tariffs %}
-  <div class="glass-card p-9 flex flex-col justify-between group hover:border-[#C252E1]/50 transition-colors duration-300">
+  <div class="glass-card tariff-card glass-card-hover">
 
     <div>
-      <div class="flex justify-between items-start mb-2">
-        <h2 class="text-2xl font-black text-white brand-font tracking-wide">
-          {{ tariff.name }}
-        </h2>
-        <span class="px-2 py-1 bg-[#586AE2]/10 border border-[#586AE2]/30 rounded text-[10px] text-[#6ECBF5] font-bold uppercase tracking-widest">
-            {{ tariff.category.name }}
-        </span>
+      <div class="tariff-header">
+        <h2 class="tariff-name">{{ tariff.name }}</h2>
+        <span class="tariff-badge">{{ tariff.category.name }}</span>
       </div>
 
       {% if tariff.description %}
-        <p class="text-sm text-[#E0D9F6]/60 leading-relaxed border-l-2 border-[#586AE2]/30 pl-3 my-4">
-          {{ tariff.description }}
-        </p>
+        <p class="tariff-desc">{{ tariff.description }}</p>
       {% endif %}
     </div>
 
-    <div class="mt-6 pt-6 border-t border-[#586AE2]/20">
-      <div class="text-3xl font-black text-white mb-6 flex items-baseline gap-2">
-        {{ tariff.price_per_hour }} <span class="text-[#C252E1]">₽</span>
-        <span class="text-xs text-[#E0D9F6]/40 font-normal font-mono">/ ЧАС</span>
+    <div class="tariff-price-section">
+      <div class="tariff-price">
+        {{ tariff.price_per_hour }} <span class="tariff-price-currency">₽</span>
+        <span class="tariff-price-period">/ ЧАС</span>
       </div>
 
-      <div class="flex gap-3">
-  <a href="{% url 'places:list' %}"
-     class="btn w-full py-3 text-xs shadow-none hover:shadow-[0_0_15px_#C252E1]">
-    Выбрать
-  </a>
+      <div class="tariff-actions">
+        <a href="{% url 'places:list' %}" class="btn tariff-btn">Выбрать</a>
 
-  {% if request.user.is_superuser %}
-    <!-- РЕДАКТИРОВАТЬ -->
-    <a href="{% url 'tariffs:edit' tariff.id %}"
-       class="px-4 py-2 border border-[#6ECBF5]/50 text-[#6ECBF5] rounded
-              hover:bg-[#6ECBF5] hover:text-black transition-all
-              flex items-center justify-center"
-       title="Редактировать">
-      ред.
-    </a>
-
-    <!-- УДАЛИТЬ -->
-    <a href="{% url 'tariffs:delete' tariff.id %}"
-       class="px-4 py-2 border border-red-500/50 text-red-400 rounded
-              hover:bg-red-500 hover:text-white transition-all
-              flex items-center justify-center"
-       title="Удалить">
-      ✕
-    </a>
-  {% endif %}
-</div>
-
+        {% if request.user.is_superuser %}
+          <a href="{% url 'tariffs:edit' tariff.id %}" class="tariff-edit-btn" title="Редактировать">ред.</a>
+          <a href="{% url 'tariffs:delete' tariff.id %}" class="tariff-delete-btn" title="Удалить">✕</a>
+        {% endif %}
+      </div>
     </div>
 
   </div>
 {% empty %}
-  <div class="col-span-full glass-card p-12 text-center text-[#6ECBF5]/40 border-dashed border-[#586AE2]/30">
-    <p class="font-mono uppercase tracking-widest">Тарифы не инициализированы</p>
+  <div class="tariff-empty">
+    <p>Тарифы не инициализированы</p>
   </div>
 {% endfor %}
 
-<!-- ПАГИНАТОР -->
 {% with page_obj=tariffs %}
-{% if page_obj.has_other_pages %}
-<div class="flex justify-center items-center gap-2 mt-12 text-xs font-bold">
+  {% if page_obj.has_other_pages %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="pagination-link">в начало</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">←</a>
+      {% endif %}
 
-  {% if page_obj.has_previous %}
-    <a href="?page=1"
-       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
-      в начало
-    </a>
-    <a href="?page={{ page_obj.previous_page_number }}"
-       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
-      ←
-    </a>
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="pagination-current">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">→</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">в конец</a>
+      {% endif %}
+    </div>
   {% endif %}
-
-  {% for num in page_obj.paginator.page_range %}
-    {% if num == page_obj.number %}
-      <span class="px-3 py-2 bg-[#C252E1] text-white font-bold rounded">
-        {{ num }}
-      </span>
-    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-      <a href="?page={{ num }}"
-         class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition rounded">
-        {{ num }}
-      </a>
-    {% endif %}
-  {% endfor %}
-
-  {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}"
-       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
-      →
-    </a>
-    <a href="?page={{ page_obj.paginator.num_pages }}"
-       class="px-3 py-2 border border-[#586AE2]/40 text-[#6ECBF5] hover:bg-[#586AE2]/20 transition">
-      в конец
-    </a>
-  {% endif %}
-
-</div>
-{% endif %}
 {% endwith %}
-
 
 </div>
 {% endblock %}

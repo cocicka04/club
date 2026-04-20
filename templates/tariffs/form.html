@@ -1,56 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="max-w-3xl mx-auto">
+<section class="form-container">
 
-  <!-- Заголовок -->
-  <div class="glass-card p-6 mb-8">
-    <h1>
-    {{ title|default:"Создание тарифа" }}
-    </h1>
-    <p class="text-[#6ECBF5] mt-2">
-      Настройка стоимости и категории тарифа
-    </p>
-  </div>
+  <div class="glass-card form-card">
+    <div class="form-header-bar"></div>
+    <h2 class="form-title">{{ title|default:"Создание тарифа" }}</h2>
+    <p class="text-center mb-6">{{ subtitle|default:"Настройка стоимости и категории тарифа" }}</p>
 
-  <!-- Форма -->
-  <form method="post" class="space-y-8">
-    {% csrf_token %}
+    <form method="post" class="booking-form">
+      {% csrf_token %}
 
-    <div class="glass-card p-6 space-y-6">
-      <div>
+      <div class="form-group">
         <label class="form-label">Категория ПК</label>
         {{ form.category }}
       </div>
 
-      <div>
+      <div class="form-group">
         <label class="form-label">Название тарифа</label>
         {{ form.name }}
       </div>
 
-      <div>
+      <div class="form-group">
         <label class="form-label">Цена за час (₽)</label>
         {{ form.price_per_hour }}
       </div>
 
-      <div>
+      <div class="form-group">
         <label class="form-label">Описание</label>
         {{ form.description }}
       </div>
-    </div>
 
-    <!-- Кнопки -->
-    <div class="flex justify-between items-center">
-      <a href="{% url 'tariffs:list' %}"
-         class="text-[#E0D9F6] hover:text-[#6ECBF5] transition">
-        ← Назад к тарифам
-      </a>
+      <div class="flex justify-between items-center mt-8">
+        <a href="{% url 'tariffs:list' %}" class="form-footer-link">← Назад к тарифам</a>
+        <button type="submit" class="btn btn-lg">Сохранить</button>
+      </div>
 
-      <button type="submit" class="btn text-lg px-10">
-        Сохранить
-      </button>
-    </div>
-
-  </form>
+    </form>
+  </div>
 </section>
 {% endblock %}

@@ -1,5 +1,5 @@
 # This file must be used with "source bin/activate" *from bash*
-# You cannot run it directly
+# you cannot run it directly
 
 deactivate () {
     # reset old environment variables
@@ -36,6 +36,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
+<<<<<<< HEAD
 # on Windows, a path can contain colons and backslashes and has to be converted:
 case "$(uname)" in
     CYGWIN*|MSYS*|MINGW*)
@@ -49,6 +50,10 @@ case "$(uname)" in
         export VIRTUAL_ENV='C:\Users\babck\OneDrive\Документы\GitHub\club\venv'
         ;;
 esac
+=======
+VIRTUAL_ENV="C:\Users\Alef Computers\Documents\GitHub\club\venv"
+export VIRTUAL_ENV
+>>>>>>> 89aa9dbad125c515deacee7b7fdbc49066bcda4d
 
 _OLD_VIRTUAL_PATH="$PATH"
 PATH="$VIRTUAL_ENV/"Scripts":$PATH"
