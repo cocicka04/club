@@ -305,7 +305,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(90deg, var(--royal-blue), var(--neon-purple));
+  background: linear-gradient(90deg, var(--neon-purple), var(--royal-blue), var(--neon-cyan), var(--neon-purple));
   color: white !important;
   font-weight: 700;
   font-family: 'Orbitron', sans-serif;
@@ -317,6 +317,8 @@ body {
   cursor: pointer;
   text-align: center;
   text-decoration: none;
+  background-size: 300% 100%;
+  animation: buttonGradientShift 5s ease-in-out infinite;
 }
 
 .btn:hover {
@@ -435,8 +437,9 @@ body .glass-card {
 }
 
 .hero-content {
-  position: relative;
-  z-index: 10;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -448,6 +451,7 @@ body .glass-card {
   max-width: 1100px;
   margin: top 3px;
 }
+
 
 @media (max-width: 768px) {
   .hero-content {
@@ -494,69 +498,22 @@ body .glass-card {
   gap: 1.5rem;
   justify-content: center;
 }
+/* Карусель тарифов (оставил как было) */
+@media (min-width: 640px) {
+  .hero-buttons {
+    flex-direction: row;
+  }
+}
 
 /* Keyframes */
 @keyframes slide {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-
-/* ========== HERO SLIDER CAROUSEL (НОВОЕ — ИСПРАВЛЕНО) ========== */
-.hero-slider {
-  position: relative;
-  overflow: hidden;
-  min-height: 560px;
-  border-radius: 1.5rem;
-  margin-bottom: 5rem;
-  box-shadow: 0 0 50px rgba(42, 35, 86, 0.8);
-  border: 1px solid rgba(88, 106, 226, 0.3);
-  background: rgba(42, 35, 86, 0.4);
-  backdrop-filter: blur(4px);
-}
-
 .hero-track {
   display: flex;
   height: 100%;
   animation: slide 20s linear infinite;
-}
-
-.hero-slide {
-  flex-shrink: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-}
-
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(10, 8, 26, 0.4);
-  z-index: 5;
-  pointer-events: none;
-}
-
-.hero-gradient-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(to bottom, rgba(21, 18, 43, 0.8), transparent);
-  z-index: 5;
-  pointer-events: none;
-}
-
-.hero-gradient-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to top, var(--bg-deep), transparent);
-  z-index: 5;
-  pointer-events: none;
 }
 
 /* ========== FEATURES GRID (добавлено, чтобы не слетело) ========== */
@@ -616,12 +573,7 @@ body .glass-card {
   margin-bottom: 0.75rem;
 }
 
-/* Карусель тарифов (оставил как было) */
-@media (min-width: 640px) {
-  .hero-buttons {
-    flex-direction: row;
-  }
-}
+
 
 .carousel-fade::before,
 .carousel-fade::after {
@@ -1345,3 +1297,159 @@ width: 100%;
   border-color: var(--neon-purple);
   box-shadow: 0 0 10px rgba(194, 82, 225, 0.3);
 }}
+
+
+
+@keyframes textGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-gradient-text {
+  background-size: 200% auto !important; 
+  animation: textGradientShift 4s ease-in-out infinite;
+}
+
+@keyframes buttonGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 5px rgba(110, 203, 245, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(110, 203, 245, 0.6); }
+  100% { box-shadow: 0 0 5px rgba(110, 203, 245, 0.2); }
+}
+
+
+@keyframes slideUpRightFade {
+  0% {
+    opacity: 0;
+    transform: translate(-40px, 60px);   }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);  }
+}
+
+.grid.md\:grid-cols-3 > div.glass-card {
+  opacity: 0; 
+  animation: slideUpRightFade 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.grid.md\:grid-cols-3 > div.glass-card:nth-child(1) {
+  animation-delay: 1s;
+}
+.grid.md\:grid-cols-3 > div.glass-card:nth-child(2) {
+  animation-delay: 1.2s;
+}
+.grid.md\:grid-cols-3 > div.glass-card:nth-child(3) {
+  animation-delay: 1.4s; 
+}
+
+@keyframes slowNebula {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.ambient-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    -45deg,
+    rgba(88, 106, 226, 0.15),
+    rgba(194, 82, 225, 0.08),
+    rgba(21, 18, 43, 1)
+  );
+  background-size: 400% 400%;
+  animation: slowNebula 25s ease-in-out infinite; 
+  pointer-events: none;
+}
+
+/* === КАРУСЕЛЬ В ХЕДЕРЕ === */
+/* === HERO === */
+
+.hero-slider {
+  position: relative;
+  height: 700px;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  background: rgba(21, 18, 43, 0.4);
+  margin-bottom: 30px;
+  box-shadow: 0 0 30px rgba(194, 82, 225, 0.15);
+}
+
+/* трек */
+.hero-track {
+  display: flex;
+  height: 100%;
+  width: 200%; 
+  animation: heroScroll 30s linear infinite;
+}
+
+/* слайд */
+.hero-slide {
+  width: 50%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* мягкая склейка */
+.hero-slide::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 150px;
+  height: 100%;
+  background: linear-gradient(to right, transparent, #0a081a);
+}
+
+/* затемнение */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 8, 26, 0.6);
+  z-index: 2;
+}
+
+/* градиенты */
+.hero-gradient-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 180px;
+  background: linear-gradient(to bottom, #0a081a, transparent);
+  z-index: 3;
+}
+
+.hero-gradient-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 180px;
+  background: linear-gradient(to top, #0a081a, transparent);
+  z-index: 3;
+}
+
+/* контент */
+
+
+/* анимация */
+@keyframes heroScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
