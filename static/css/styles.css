@@ -1370,7 +1370,6 @@ width: 100%;
 }
 
 /* === КАРУСЕЛЬ В ХЕДЕРЕ === */
-/* === HERO === */
 
 .hero-slider {
   position: relative;
@@ -1389,6 +1388,15 @@ width: 100%;
   height: 100%;
   width: 200%; 
   animation: heroScroll 30s linear infinite;
+}
+/* анимация */
+@keyframes heroScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* слайд */
@@ -1439,17 +1447,4 @@ width: 100%;
   height: 180px;
   background: linear-gradient(to top, #0a081a, transparent);
   z-index: 3;
-}
-
-/* контент */
-
-
-/* анимация */
-@keyframes heroScroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
 }
