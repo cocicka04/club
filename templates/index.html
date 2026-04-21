@@ -14,6 +14,8 @@
     <!-- дубликаты для бесшовности -->
     <div class="hero-slide" style="background-image: url('/media/carousel/carousel1.jpg')"></div>
     <div class="hero-slide" style="background-image: url('/media/carousel/carousel2.png')"></div>
+    <div class="hero-slide" style="background-image: url('/media/carousel/carousel3.png')"></div>
+    <div class="hero-slide" style="background-image: url('/media/carousel/carousel4.png')"></div>
   </div>
 
   <!-- затемнение -->
@@ -28,7 +30,7 @@
   <!-- контент -->
   <div class="hero-content">
     <h1 class="text-6xl md:text-8xl font-black text-white mb-6 tracking-tighter uppercase brand-font drop-shadow-[0_0_10px_rgba(194,82,225,0.8)]">
-      WELCOME TO 
+      WELCOME <p>TO</p> 
       <span class="animated-gradient-text text-transparent bg-clip-text bg-gradient-to-r from-[#C252E1] via-[#586AE2] to-[#6ECBF5]">CATALYST</span>
     </h1>
 
@@ -36,11 +38,15 @@
       Погрузись в цифровую реальность. Мощное железо, неоновая атмосфера и абсолютный комфорт.
     </p>
 
-    <div class="flex flex-col sm:flex-row gap-6 justify-center">
+    <div class="flex flex-col gap-6 justify-center items-center">
       <a href="{% url 'places:list' %}" class="btn text-lg px-10 py-4">
         Забронировать ПК
       </a>
-
+      <a href="#tariffs" class="btn-outline text-lg px-10 py-4 flex items-center gap-2">
+        <span class="jump-arrow">↓</span>
+        К тарифам
+        <span class="jump-arrow">↓</span>
+      </a>
     </div>
   </div>
 </section>
@@ -78,7 +84,7 @@
 </section>
 
 <!-- Секция Тарифы (Карусель) -->
-<section class="mt-20">
+<section id="tariffs" class="mt-20">
   <div class="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-[#586AE2]/30 pb-6">
     <div class="relative mb-4 md:mb-0">
       <div class="absolute -left-4 top-0 w-1 h-full bg-[#C252E1] shadow-[0_0_15px_#C252E1]"></div>

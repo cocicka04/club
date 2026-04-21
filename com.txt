@@ -1,4 +1,5 @@
 python -m venv venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 venv\Scripts\activate
 pip install -r req.txt
 python manage.py runserver
