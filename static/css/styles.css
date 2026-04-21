@@ -458,12 +458,24 @@ body {
   justify-content: center;
 }
 
+/* Keyframes должны быть определены вне медиа-запроса */
+@keyframes slide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 @media (min-width: 640px) {
   .hero-buttons {
     flex-direction: row;
   }
-  100% {
-    transform: translateX(-50%);
+}
+
+@media (min-width: 640px) {
+  .hero-buttons {
+    flex-direction: row;
+  }
+  .hero-slider {
+    animation: slide 20s linear infinite;
   }
 }
 
