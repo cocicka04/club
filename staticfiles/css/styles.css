@@ -394,6 +394,111 @@ body {
 }
 
 /* ========== HERO SECTION ========== */
+/* ========== HERO SECTION (старый) ========== */
+.hero-section {
+  position: relative;
+  padding: 6rem 0;
+  text-align: center;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  margin-bottom: 5rem;
+  box-shadow: 0 0 50px rgba(42, 35, 86, 0.8);
+  border: 1px solid rgba(88, 106, 226, 0.3);
+  background: rgba(42, 35, 86, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(42, 35, 86, 0.5), #15122b);
+}
+
+.hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1% 3rem;
+  min-height: 560px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
+@media (max-width: 768px) {
+  .hero-content {
+    min-height: 500px;
+    padding: 5rem 1rem;
+  }
+}
+
+.hero-title {
+  font-size: 3.75rem;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 10px rgba(194, 82, 225, 0.8);
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 6rem;
+  }
+}
+
+.hero-title-gradient {
+  background: linear-gradient(135deg, var(--neon-purple), var(--royal-blue), var(--neon-cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-subtitle {
+  color: var(--text-main);
+  max-width: 42rem;
+  margin: 0 auto 2.5rem;
+  font-size: 1.25rem;
+  line-height: 1.625;
+}
+
+.hero-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+}
+/* Карусель тарифов (оставил как было) */
+@media (min-width: 640px) {
+  .hero-buttons {
+    flex-direction: row;
+  }
+}
+
+/* Keyframes */
+@keyframes slide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.hero-track {
+  display: flex;
+  height: 100%;
+  animation: slide 20s linear infinite;
+}
+
+
+
+
+
+
 .hero-section {
   position: relative;
   padding: 6rem 0;

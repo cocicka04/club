@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <div class="profile-container">
   
-  <aside class="profile-sidebar glass-card">
-    
-    <form method="post" enctype="multipart/form-data" id="avatar-form" class="profile-avatar">
+  <aside class="profile-sidebar">
+    <form method="post" enctype="multipart/form-data" id="avatar-form">
       {% csrf_token %}
-      <label for="avatar-input" class="avatar-wrapper">
+      <label for="avatar-input" class="avatar-wrapper" title="Сменить аватар">
         <div class="avatar-gradient">
           {% if user.profile.avatar %}
             <img src="{{ user.profile.avatar.url }}" class="avatar-img">
@@ -21,105 +21,91 @@
     </form>
 
     <h2 class="profile-username">{{ user.username }}</h2>
-    <div class="profile-info">
-      <p class="profile-email-label">Email: <span class="profile-email-value">{{ user.email }}</span></p>
-    </div>
+    <p class="profile-email-sub">e-mail: {{ user.email }}</p>
+
   </aside>
 
   <div class="profile-content">
     
-    <section>
-      <h3 class="profile-section-title">
-        <span class="section-title-accent"></span>
-        АКТИВНЫЕ СЕССИИ
-      </h3>
-      
-      <div class="active-sessions">
+    <section class="content-section">
+      <div class="section-header">
+        <div class="section-accent"></div>
+        <h3 class="section-title">ТЕКУЩИЕ СЕССИИ</h3>
+      </div>
+
+      <div class="sessions-wrapper">
         {% for b in active %}
-          <div class="glass-card session-card">
-            <div class="session-online-badge">ONLINE</div>
-            
-            <div class="session-content">
-              <div>
-                <h4 class="session-place">Терминал #{{ b.place.number }} <span class="session-category">({{ b.place.title }})</span></h4>
-                <p class="session-time">
-                  <span class="session-time-highlight">{{ b.start_time|date:"d.m H:i" }}</span> — {{ b.end_time|date:"d.m H:i" }}
-                </p>
-                <p class="session-price">К оплате: <span class="session-price-value">{{ b.total_price }} ₽</span></p>
-              </div>
-              
-              <div class="session-buttons">
-                <a href="{% url 'booking:extend' b.id %}" class="btn session-extend-btn">Продлить</a>
-                <a href="{% url 'booking:cancel' b.id %}" class="session-cancel-btn">Отмена</a>
-              </div>
+          <div class="data-item">
+            <div class="item-main-info">
+              <span class="item-title">Терминал #{{ b.place.number }} ({{ b.place.title }})</span>
+              <span class="item-subtitle">{{ b.start_time|date:"d.m H:i" }} — {{ b.end_time|date:"d.m H:i" }}</span>
+            </div>
+            <div class="session-actions">
+              <a href="{% url 'booking:extend' b.id %}" class="btn-session-extend">Продлить</a>
+              <a href="{% url 'booking:cancel' b.id %}" class="btn-session-cancel">Отмена</a>
+            </div>
+            <div class="item-status-badge status-active">
+              ONLINE
             </div>
           </div>
         {% empty %}
-          <div class="glass-card empty-sessions">
-            <p class="empty-sessions-text">Нет активных сессий.</p>
-            <a href="{% url 'places:list' %}" class="empty-sessions-link">Занять место</a>
+          <div style="text-align: center; padding: 20px; opacity: 0.4; font-size: 0.9rem;">
+            Нет активных сессий
           </div>
         {% endfor %}
       </div>
     </section>
 
-    
-    <section>
-      <h3 class="history-title">История сессий</h3>
-      <div class="glass-card history-list">
+    <section class="content-section">
+      <div class="section-header">
+        <div class="section-accent" style="background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan);"></div>
+        <h3 class="section-title">история сессий</h3>
+      </div>
+
+      <div class="history-wrapper">
         {% for b in completed %}
-          <div class="history-item">
-            <div class="history-info">
-              <div class="history-icon">
-                <svg class="history-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <p class="history-place">{{ b.place.title }}</p>
-                <p class="history-date">{{ b.start_time|date:"d.m.Y" }}</p>
-              </div>
+          <div class="data-item">
+            <div class="item-main-info">
+              <span class="item-title">{{ b.place.title }}</span>
+              <span class="item-subtitle">{{ b.start_time|date:"d E Y" }} • {{ b.total_price }} ₽</span>
             </div>
-            <div class="history-details">
-              <span class="history-price">{{ b.total_price }} ₽</span>
-              <span class="history-status
-                {% if b.status == 'finished' %}status-finished
-                {% elif b.status == 'canceled' %}status-canceled
-                {% else %}status-default{% endif %}">
-                {{ b.get_status_display }}
-              </span>
-            </div>
+            <span class="item-status-badge {% if b.status == 'finished' %}status-finished{% elif b.status == 'canceled' %}status-canceled{% else %}status-default{% endif %}">
+              {{ b.get_status_display }}
+            </span>
           </div>
         {% empty %}
-          <div class="empty-history">История чиста.</div>
+          <div style="text-align: center; padding: 20px; opacity: 0.4; font-size: 0.9rem;">
+            История операций пуста
+          </div>
         {% endfor %}
       </div>
-    </section>
-  </div>
 
-  {% with page_obj=completed %}
-    {% if page_obj.has_other_pages %}
-      <div class="pagination">
-        {% if page_obj.has_previous %}
-          <a href="?page=1" class="pagination-link">в начало</a>
-          <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">←</a>
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-          {% if num == page_obj.number %}
-            <span class="pagination-current">{{ num }}</span>
-          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+      {% with page_obj=completed %}
+        {% if page_obj.has_other_pages %}
+        <div class="pagination" style="margin-top: 30px; display: flex; justify-content: center; gap: 10px;">
+          {% if page_obj.has_previous %}
+            <a href="?page=1" class="pagination-link">«</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">‹</a>
           {% endif %}
-        {% endfor %}
 
-        {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">→</a>
-          <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">в конец</a>
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="pagination-current">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">»</a>
+          {% endif %}
+        </div>
         {% endif %}
-      </div>
-    {% endif %}
-  {% endwith %}
-  
+      {% endwith %}
+    </section>
+
+  </div>
 </div>
+
 {% endblock %}

@@ -34,13 +34,13 @@
     {% if request.user.is_superuser %}
     <div class="news-actions">
       <button type="button" onclick="toggleEdit({{ n.id }})" class="action-icon" title="Редактировать">
-        ред.
+        Ред.
       </button>
-    
+    <span class="admin-divider">|</span>
       <form method="post" action="{% url 'news_delete' n.id %}" onsubmit="return confirm('Удалить эту новость?')" style="display: inline;">
         {% csrf_token %}
         <button type="submit" class="action-icon action-icon-delete" title="Удалить">
-          удалить
+          Удалить
         </button>
       </form>
     </div>
