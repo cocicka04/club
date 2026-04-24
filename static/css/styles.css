@@ -218,7 +218,101 @@ body {
   box-shadow: 0 0 15px var(--neon-purple);
 }
 
+
+/* ========== MOBILE MENU OVERLAY ========== */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.mobile-menu.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mobile-menu-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 8, 26, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+.mobile-menu-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(21, 18, 43, 0.98);
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.mobile-menu-link,
+.mobile-auth-username,
+.mobile-auth-logout,
+.mobile-auth-login,
+.mobile-auth-register {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  padding: 0.85rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.mobile-menu-link:hover,
+.mobile-auth-username:hover,
+.mobile-auth-logout:hover,
+.mobile-auth-login:hover,
+.mobile-auth-register:hover {
+  background: rgba(194, 82, 225, 0.15);
+  color: var(--neon-purple);
+  padding-left: 1.25rem;
+}
+
+/* Кнопка на мобильных */
 .mobile-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+/* Скрываем кнопку и показываем десктоп на больших экранах */
+@media (min-width: 768px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+  
+  .nav-desktop {
+    display: flex !important;
+  }
+  
+  .mobile-menu {
+    display: none !important;
+  }
+}
+/*.mobile-menu-btn {
   display: block;
   background: none;
   border: none;
@@ -272,7 +366,7 @@ body {
 
 .mobile-nav-link:hover {
   color: var(--neon-purple);
-}
+}*/
 
 .mobile-divider {
   border: none;
@@ -397,6 +491,8 @@ body {
   backdrop-filter: blur(12px) !important;
   border: 1px solid var(--glass-border) !important;
   border-radius: 0.75rem !important;
+  width: 100%;
+  min-width: 0;
 }
 
 body .glass-card {
@@ -499,7 +595,7 @@ body .glass-card {
 }
 
 .hero-title {
-  font-size: 3.75rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: white;
   margin-bottom: 1.5rem;
@@ -548,7 +644,8 @@ body .glass-card {
 /* ========== FEATURES GRID ========== */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.5rem, 2vw, 1.5rem);
   gap: 1.5rem;
   padding: 0 1rem;
   max-width: 1280px;
@@ -573,8 +670,8 @@ body .glass-card {
 .features-grid .glass-card:nth-child(3) { animation-delay: 0.5s; }
 
 .feature-icon {
-  width: 4rem;
-  height: 4rem;
+  width: clamp(2.5rem, 5vw, 4rem);
+  height: clamp(2.5rem, 5vw, 4rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -600,7 +697,7 @@ body .glass-card {
 }
 
 .feature-title {
-  font-size: 1.5rem;
+  font-size: clamp(0.9rem, 2.2vw, 1.5rem);
   font-weight: 700;
   color: white;
   margin-bottom: 0.75rem;
@@ -610,6 +707,7 @@ body .glass-card {
 }
 
 .feature-desc {
+  font-size: clamp(0.75rem, 2vw, 1rem);
   color: var(--text-main);
   line-height: 1.5;
   margin-left: 0.75rem;
@@ -2122,5 +2220,21 @@ body .glass-card {
   .news-short-text,
   .news-full-text {
     font-size: 0.95rem;
+  }
+}
+
+/* ========== SMART SCALE FOR MOBILE ========== */
+@media (max-width: 768px) {
+  html {
+    font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (768 - 320)));
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  /* чтобы всё сжималось, а не ломалось */
+  * {
+    max-width: 100%;
   }
 }

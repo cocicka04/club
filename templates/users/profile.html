@@ -67,7 +67,7 @@
           <div class="data-item">
             <div class="item-main-info">
               <span class="item-title">{{ b.place.title }}</span>
-              <span class="item-subtitle">{{ b.start_time|date:"d E Y" }} • {{ b.total_price }} ₽</span>
+              <span class="item-subtitle">{{ b.start_time|date:"d E Y" }} • {{ b.total_price }} &nbsp;₽</span>
             </div>
             <span class="item-status-badge {% if b.status == 'finished' %}status-finished{% elif b.status == 'canceled' %}status-canceled{% else %}status-default{% endif %}">
               {{ b.get_status_display }}

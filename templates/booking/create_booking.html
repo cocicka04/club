@@ -18,7 +18,7 @@
         {% if place %}
           <div class="selected-place">
             <span class="selected-place-text">{{ place.title }} (#{{ place.number }})</span>
-            <span class="selected-place-price">{{ place.tariff.price_per_hour }} ₽/ч</span>
+            <span class="selected-place-price">{{ place.tariff.price_per_hour }} &nbsp;₽/ч</span>
           </div>
           <input type="hidden" name="place" value="{{ place.id }}">
           <input type="hidden" id="fixed-price" value="{{ place.tariff.price_per_hour }}">
@@ -26,7 +26,7 @@
           <select name="place" id="id_place" class="form-select">
             {% for p in places %}
               <option value="{{ p.id }}" data-price="{{ p.tariff.price_per_hour }}">
-                {{ p.title }} — {{ p.number }} ({{ p.tariff.price_per_hour }} ₽/ч)
+                {{ p.title }} — {{ p.number }} ({{ p.tariff.price_per_hour }} &nbsp;₽/ч)
               </option>
             {% endfor %}
           </select>
@@ -46,7 +46,7 @@
 
       <div class="total-card">
         <span class="total-label">ИТОГО К ОПЛАТЕ</span>
-        <span class="total-value"><span id="total-price">0</span> ₽</span>
+        <span class="total-value"><span id="total-price">0</span> &nbsp;₽</span>
       </div>
 
       <button class="btn btn-full booking-submit" type="submit">ПОДТВЕРДИТЬ БРОНЬ</button>
