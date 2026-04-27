@@ -3,11 +3,16 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from users.models import News
 from django.core.paginator import Paginator
+from tariffs.models import Tariff
 
 def home(request):
+    tariffs = Tariff.objects.select_related('category').order_by('-id')
+
     context = {
         "now": timezone.now(),
+        "tariffs": tariffs
     }
+
     return render(request, "index.html", context)
 
 def news_page(request):

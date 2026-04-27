@@ -1468,6 +1468,36 @@ body .glass-card {
   box-shadow: 0 0 25px rgba(194, 82, 225, 0.5);
 }
 
+/*=====редактирование профиля=======*/
+.editable-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.edit-btn {
+  background: none;
+  border: none;
+  color: #6ECBF5;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.edit-input {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid #586AE2;
+  padding: 5px 10px;
+  border-radius: 6px;
+  color: white;
+}
+
+.hidden {
+  display: none;
+}
+
+
 .profile-username {
   font-family: 'Orbitron', sans-serif;
   font-size: 1.3rem;

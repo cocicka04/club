@@ -11,6 +11,9 @@ from .tokens import account_activation_token
 from booking.models import Booking
 from booking.utils import finish_expired_bookings
 from django.core.paginator import Paginator
+from django.http import JsonResponse
+import json
+
 
 def is_superuser(user):
     return user.is_superuser
@@ -100,3 +103,16 @@ def profile(request):
         'active': active,
         'completed': completed,
     })
+
+
+def update_profile(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        request.user.username = data.get("username", request.user.username)
+        request.user.email = data.get("email", request.user.email)
+        request.user.save()
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False})

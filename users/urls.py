@@ -10,4 +10,5 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('profile/', views.profile, name='profile'),
     path('activate/<uidb64>/<token>/', views.activate, name='activate'),
+    path('update-profile/', views.update_profile, name='update_profile'),
 ]

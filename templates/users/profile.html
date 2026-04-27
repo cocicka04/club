@@ -20,8 +20,44 @@
       </label>
     </form>
 
-    <h2 class="profile-username">{{ user.username }}</h2>
-    <p class="profile-email-sub">e-mail: {{ user.email }}</p>
+<div class="profile-edit-block">
+
+  <!-- USERNAME -->
+  <div class="editable-field">
+    <span class="profile-username" id="username-text">
+      {{ user.username }}
+    </span>
+
+    <input type="text" id="username-input" 
+           value="{{ user.username }}" 
+           class="edit-input hidden">
+
+    <button type="button" class="edit-btn" onclick="editField('username')">
+      🖍
+    </button>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="editable-field">
+    <span class="profile-email-sub" id="email-text">
+      e-mail: {{ user.email }}
+    </span>
+
+    <input type="email" id="email-input" 
+           value="{{ user.email }}" 
+           class="edit-input hidden">
+
+    <button type="button" class="edit-btn" onclick="editField('email')">
+      🖍
+    </button>
+  </div>
+
+  <!-- КНОПКА СОХРАНЕНИЯ -->
+  <button onclick="saveProfile()" class="btn mt-4 hidden" id="save-btn">
+    Сохранить
+  </button>
+
+</div>
 
   </aside>
 
@@ -107,5 +143,36 @@
 
   </div>
 </div>
+
+<script>
+function editField(field) {
+  document.getElementById(field + '-text').classList.add('hidden');
+  document.getElementById(field + '-input').classList.remove('hidden');
+  document.getElementById('save-btn').classList.remove('hidden');
+}
+
+function saveProfile() {
+  const username = document.getElementById('username-input').value;
+  const email = document.getElementById('email-input').value;
+
+  fetch("{% url 'users:update_profile' %}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": "{{ csrf_token }}"
+    },
+    body: JSON.stringify({
+      username: username,
+      email: email
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    }
+  });
+}
+</script>
 
 {% endblock %}
