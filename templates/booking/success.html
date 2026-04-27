@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="flex items-center justify-center min-h-[80vh] px-4">
+  <div class="glass-card p-10 text-center max-w-2xl w-full">
+
+    <h1 class="text-3xl md:text-5xl font-black text-white mb-6 uppercase">
+      Бронирование подтверждено
+    </h1>
+
+    <p class="text-[#E0D9F6] text-lg mb-8 leading-relaxed">
+      Вы забронировали место номер 
+      <span class="text-[#6ECBF5] font-bold">#{{ booking.place.number }}</span>
+      <br><br>
+      на период с 
+      <span class="text-[#6ECBF5]">{{ booking.start_time|date:"H:i" }}</span>
+      по 
+      <span class="text-[#6ECBF5]">{{ booking.end_time|date:"H:i" }}</span>
+    </p>
+
+    <div class="my-10">
+      <div class="text-5xl md:text-7xl font-black tracking-widest text-white">
+            <div class="my-10">
+            <p class="text-[#6ECBF5] uppercase text-sm mb-4">Ваш QR-код</p>
+
+            <img src="data:image/png;base64,{{ qr_code }}" 
+                class="mx-auto rounded-xl shadow-lg"
+                style="max-width: 220px;">
+                <p style="opacity:0.5; font-size:12px; margin: 6px;">
+                резервный код: {{ booking.code }}
+                </p>
+            </div>
+      </div>
+    </div>
+
+    <p class="text-[#E0D9F6]/70 text-sm max-w-md mx-auto">
+      Покажите QR-код или назовите резервный код администратору и он сопроводит вас до места
+    </p>
+
+    <div class="mt-10 flex justify-between gap-4">
+
+    <a href="{% url 'places:list' %}" 
+        class="btn px-6 py-3 w-1/2 text-center">
+        К списку зон
+    </a>
+
+    <a href="{% url 'users:profile' %}" 
+        class="btn px-6 py-3 w-1/2 text-center">
+        В профиль
+    </a>
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

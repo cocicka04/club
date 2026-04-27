@@ -18,6 +18,7 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 body {
@@ -41,9 +42,11 @@ body {
 }
 
 .container-main {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 clamp(12px, 4vw, 40px);
+
 }
 
 @media (min-width: 768px) {
@@ -493,6 +496,15 @@ body {
   border-radius: 0.75rem !important;
   width: 100%;
   min-width: 0;
+  padding: clamp(12px, 2vw, 20px);
+  border-radius: 14px;
+}
+.glass-card h3 {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+}
+
+.glass-card p {
+  font-size: clamp(0.85rem, 2vw, 1rem);
 }
 
 body .glass-card {
@@ -511,7 +523,8 @@ body .glass-card {
 /* ========== HERO SLIDER ========== */
 .hero-slider {
   position: relative;
-  height: 700px;
+  width: 100%;
+  height: clamp(400px, 60vh, 700px);
   overflow: hidden;
   border-radius: 24px;
   border: 1px solid var(--glass-border);
@@ -595,7 +608,7 @@ body .glass-card {
 }
 
 .hero-title {
-  font-size: 1.5rem;
+  font-size: clamp(1.8rem, 5vw, 3rem);
   font-weight: 900;
   color: white;
   margin-bottom: 1.5rem;
@@ -607,7 +620,7 @@ body .glass-card {
 
 @media (min-width: 768px) {
   .hero-title {
-    font-size: 6rem;
+    font-size: clamp(1.8rem, 5vw, 3rem);
   }
 }
 
@@ -624,7 +637,7 @@ body .glass-card {
   color: var(--text-main);
   max-width: 42rem;
   margin: 0 auto 2.5rem;
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
   line-height: 1.625;
 }
 
@@ -653,10 +666,12 @@ body .glass-card {
   margin-right: auto;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .features-grid {
     gap: 0.75rem;
     padding: 0 0.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    transform-origin: top center;
   }
 }
 
@@ -679,6 +694,14 @@ body .glass-card {
   border-radius: 50%;
   margin-left: 0.75rem;
   margin-top: 0.75rem;
+}
+@media (max-width: 768px) {
+  .feature-icon {
+    gap: 0.75rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    transform-origin: top center;
+    margin-left: 0 !important;
+  }
 }
 
 .feature-icon-purple {
@@ -705,6 +728,14 @@ body .glass-card {
   font-family: 'Orbitron', sans-serif;
   text-align: left;
 }
+@media (max-width: 768px) {
+  .feature-title {
+    gap: 0.75rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    transform-origin: top center;
+    margin-left: 0 !important;
+  }
+}
 
 .feature-desc {
   font-size: clamp(0.75rem, 2vw, 1rem);
@@ -715,13 +746,22 @@ body .glass-card {
   margin-bottom: 0.75rem;
 }
 
+@media (max-width: 768px) {
+  .feature-desc {
+    gap: 0.75rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    transform-origin: top center;
+    margin-left: 0 !important;
+  }
+}
+
 /* ========== TARIFFS CAROUSEL ========== */
 .carousel-fade::before,
 .carousel-fade::after {
   content: "";
   position: absolute;
   top: 0;
-  width: 80px;
+  width: 40px;
   height: 100%;
   z-index: 5;
   pointer-events: none;
@@ -729,14 +769,41 @@ body .glass-card {
 
 .carousel-fade::before {
   left: 0;
-  background: linear-gradient(to right, #0a081a, transparent);
+  background: linear-gradient(to right, rgba(10, 8, 26, 0.9), transparent);
 }
 
 .carousel-fade::after {
   right: 0;
-  background: linear-gradient(to left, #0a081a, transparent);
+  background: linear-gradient(to left, rgba(10, 8, 26, 0.9), transparent);
+}
+/* Улучшенная адаптивность карусели тарифов */
+#tariffCarousel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
+#tariffCarousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Адаптивные карточки тарифов */
+.tariff-card {
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 640px) {
+  .glass-card {
+    border-radius: 12px;
+  }
+  
+  #tariffs .text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  #tariffs .text-xl {
+    font-size: 1.15rem;
+  }
+}
 /* ========== SECTION HEADERS ========== */
 .section-header {
   display: flex;
@@ -744,6 +811,7 @@ body .glass-card {
   align-items: flex-end;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
+  padding: 0 clamp(12px, 4vw, 40px);
   border-bottom: 1px solid rgba(88, 106, 226, 0.3);
 }
 
@@ -764,7 +832,7 @@ body .glass-card {
 }
 
 .section-title {
-  font-size: 2rem;
+  font-size: clamp(1.3rem, 3vw, 2rem);
   font-weight: 900;
   color: white;
   text-transform: uppercase;
@@ -781,14 +849,16 @@ body .glass-card {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   margin-top: 0.5rem;
+  text-align: left;
 }
 
 /* ========== TARIFFS GRID ========== */
 .tariffs-grid, .places-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 2vw, 20px);
   margin-bottom: 3rem;
+  padding: 0 clamp(10px, 4vw, 40px);
 }
 
 .tariff-card {
@@ -899,12 +969,44 @@ body .glass-card {
   color: white;
   box-shadow: 0 0 10px rgba(255, 70, 85, 0.8);
 }
+/* ========== тариф мобилка ========== */
+@media (max-width: 768px) {
+
+  .tariffs-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .glass-card {
+    padding: 12px;
+    border-radius: 10px;
+    width: 100%;
+     min-width: 0;
+  }
+
+  .tariff-title {
+    font-size: clamp(0.8rem, 3vw, 1rem);
+  }
+
+  .tariff-price {
+    font-size: clamp(1rem, 4vw, 1.4rem);
+  }
+
+  .tariff-desc {
+    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+  }
+
+  .tariff-btn {
+    font-size: 0.7rem;
+    padding: 6px;
+  }
+}
 
 /* ========== PLACES CARDS ========== */
 .place-card {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .place-image-wrapper {
@@ -1010,6 +1112,10 @@ body .glass-card {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  flex: 1;
+}
+.place-content > div:last-child {
+  margin-top: auto;
 }
 
 .place-title-row {
@@ -1039,6 +1145,11 @@ body .glass-card {
   font-size: 0.875rem;
   color: rgba(224, 217, 246, 0.7);
   margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* сколько строк */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .place-specs {
@@ -1612,6 +1723,10 @@ body .glass-card {
   color: #ff4646;
 }
 
+.session-actions {
+  position: relative;
+  z-index: 2;
+}
 .btn-session-extend {
   color: #6ECBF5;
   text-decoration: none;
@@ -1624,7 +1739,7 @@ body .glass-card {
 }
 
 /* ========== АДАПТИВ ========== */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .profile-container {
     grid-template-columns: 1fr;
   }
@@ -1795,7 +1910,7 @@ body .glass-card {
 }
 
 /* ========== АДАПТИВ ДЛЯ ABOUT ========== */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .about-grid {
     gap: 1.5rem;
   }
@@ -1970,7 +2085,7 @@ body .glass-card {
 }
 
 /* ========== АДАПТИВ ДЛЯ CONTACTS ========== */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .contacts-grid {
     gap: 1.5rem;
   }
@@ -2266,5 +2381,215 @@ body .glass-card {
   /* чтобы всё сжималось, а не ломалось */
   * {
     max-width: 100%;
+  }
+}
+
+/* ========== QR-CODE ========== */
+
+.btn-qr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 10px;
+  background: rgba(110, 203, 245, 0.15);
+  border: 1px solid rgba(110, 203, 245, 0.4);
+  color: #6ECBF5;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.btn-qr:hover {
+  background: rgba(110, 203, 245, 0.3);
+  transform: scale(1.05);
+}
+
+.btn-qr img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Мобилка: кнопка не сжимается в точку */
+@media (max-width: 480px) {
+  .btn-qr {
+    padding: 8px 10px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .btn-qr img {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* Модальное окно QR */
+.qr-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.qr-modal.hidden {
+  display: none !important;
+}
+
+.qr-modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.qr-modal-content {
+  background: rgba(21, 18, 43, 0.95);
+  border: 1px solid rgba(194, 82, 225, 0.3);
+  padding: 30px 20px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  position: relative;
+  transform: translateY(60px);
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.qr-modal.show .qr-modal-content {
+    opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Мобилка: меньше отступы, но всё по центру */
+@media (max-width: 480px) {
+  .qr-modal-content {
+    padding: 25px 15px;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 360px) {
+  .qr-modal-content {
+    padding: 20px 12px;
+    max-width: 260px;
+  }
+}
+
+.qr-img {
+  width: clamp(140px, 50vw, 220px);
+  max-width: 100%;
+  height: auto;
+  margin: 20px auto;
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .qr-img {
+    width: clamp(120px, 60vw, 180px);
+    margin: 15px auto;
+  }
+}
+
+.qr-title {
+  font-size: 1.1rem;
+  color: #6ECBF5;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 5px;
+}
+
+@media (max-width: 480px) {
+  .qr-title {
+    font-size: 1rem;
+  }
+}
+
+.qr-code-text {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  color: var(--text-main);
+  word-break: break-all;
+}
+
+@media (max-width: 480px) {
+  .qr-code-text {
+    font-size: 0.75rem;
+  }
+}
+
+.qr-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  cursor: pointer;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s;
+  background: none;
+  border: none;
+}
+
+.qr-close:hover {
+  color: white;
+}
+
+/* Анимация закрытия — улетает вверх */
+.qr-modal.hiding .qr-modal-content {
+  transform: translateY(-80px);
+  opacity: 0;
+  transition: transform 0.3s ease-in, opacity 0.3s ease-in;
+}
+
+/*адаптива+*/
+.grid {
+  display: grid;
+  gap: clamp(12px, 2vw, 24px);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.zone-card, .place-card {
+  width: 100%;
+  padding: clamp(12px, 2vw, 20px);
+}
+
+.zone-list, .places-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 2vw, 20px);
+}
+
+@media (max-width: 900px) {
+  .zone-list, .places-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .zone-list, .places-grid {
+    grid-template-columns: 1fr;
   }
 }

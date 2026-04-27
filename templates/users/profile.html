@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
 <div class="profile-container">
@@ -83,6 +84,9 @@
             <div class="item-status-badge status-active">
               ONLINE
             </div>
+          <button class="btn-qr" style="margin: 20px;" onclick="openQR('{{ b.id }}', '{{ b.code }}', event)">
+            <img src="{% static 'qr-code.png' %}" alt="QR" style="width: 20px; height: 20px; vertical-align: middle;">
+          </button>
           </div>
         {% empty %}
           <div style="text-align: center; padding: 20px; opacity: 0.4; font-size: 0.9rem;">
@@ -144,6 +148,20 @@
   </div>
 </div>
 
+<div id="qr-modal" class="qr-modal hidden">
+  <div class="qr-modal-content">
+
+    <span class="qr-close" onclick="closeQR()">×</span>
+
+    <p class="qr-title">Ваш QR-код</p>
+
+    <img id="qr-image" src="" class="qr-img" style="border-radius: 15px;">
+
+    <p id="qr-code-text" class="qr-code-text"></p>
+    <p>Покажите QR-код или назовите резервный код администратору и он сопроводит вас до места</p>
+  </div>
+</div>
+
 <script>
 function editField(field) {
   document.getElementById(field + '-text').classList.add('hidden');
@@ -175,4 +193,60 @@ function saveProfile() {
 }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<script>
+function openQR(id, code, event) {
+  if (event) event.stopPropagation(); // чтобы клик по кнопке не всплывал
+
+  const modal = document.getElementById('qr-modal');
+  const img = document.getElementById('qr-image');
+  const text = document.getElementById('qr-code-text');
+
+  const data = `Booking #${id} | Code: ${code}`;
+
+  QRCode.toDataURL(data, function (err, url) {
+    if (err) {
+      text.innerText = "Ошибка генерации QR";
+      return;
+    }
+    img.src = url;
+  });
+
+  text.innerText = "Резервный код: " + code;
+
+  // Убираем hidden, добавляем show для анимации
+  modal.classList.remove('hidden');
+  // Принудительный reflow
+  void modal.offsetWidth;
+  modal.classList.add('show');
+}
+
+function closeQR() {
+  const modal = document.getElementById('qr-modal');
+  
+  // Анимация улетания вверх
+  modal.classList.add('hiding');
+  modal.classList.remove('show');
+  
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    modal.classList.remove('hiding');
+  }, 350);
+}
+
+// Закрытие по клику на фон
+document.getElementById('qr-modal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeQR();
+  }
+});
+
+// Закрытие по Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeQR();
+  }
+});
+</script>
 {% endblock %}

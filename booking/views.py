@@ -6,6 +6,9 @@ from places.models import Place
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
+import qrcode
+from io import BytesIO
+import base64
 
 def is_place_available(place, start, end):
     return not Booking.objects.filter(
@@ -31,14 +34,12 @@ def create_booking(request, place_id=None):
         form = BookingForm(request.POST)
         if form.is_valid():
             booking = form.save(commit=False)
-            booking.user = request.user
 
             if place:
                 booking.place = place
             else:
                 booking.place = form.cleaned_data.get('place')
 
-            # 🔥 ВОТ ЗДЕСЬ КЛЮЧЕВАЯ ПРОВЕРКА
             conflicts = Booking.objects.filter(
                 place=booking.place,
                 status=Booking.STATUS_ACTIVE,
@@ -47,10 +48,10 @@ def create_booking(request, place_id=None):
             )
 
             if conflicts.exists():
-                form.add_error(None, "В выбранный интервал место уже занято.")
+                form.add_error(None, "На это время место уже занято.")
             else:
-                booking.save()
-                return redirect('users:profile')
+                booking = form.save(user=request.user)
+                return redirect('booking:success', booking.id)
     else:
         initial = {}
         if place:
@@ -84,7 +85,6 @@ def cancel_booking(request, booking_id):
 
     booking.status = Booking.STATUS_CANCELED
     booking.save()
-
     return redirect('users:profile')
 
 @login_required
@@ -122,3 +122,20 @@ def extend_booking(request, booking_id):
         'booking/create_booking.html',
         {'form': form, 'place': b.place}
     )
+
+@login_required
+def booking_success(request, pk):
+    booking = get_object_or_404(Booking, pk=pk, user=request.user)
+
+    qr_data = f"Booking #{booking.id} | Place {booking.place.number} | Code {booking.code}"
+
+    qr = qrcode.make(qr_data)
+
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render(request, 'booking/success.html', {
+        'booking': booking,
+        'qr_code': qr_base64
+    })

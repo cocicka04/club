@@ -54,7 +54,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # email backend для dev (вывод в консоль)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для тестов
-DEFAULT_FROM_EMAIL = 'no-reply@catalystclub.ru'
+DEFAULT_FROM_EMAIL = 'support@catalystclub.ru'
 
 
 LOGIN_URL = 'users:login'
@@ -129,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
