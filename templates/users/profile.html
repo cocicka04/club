@@ -74,15 +74,12 @@
         {% for b in active %}
           <div class="data-item">
             <div class="item-main-info">
-              <span class="item-title">Терминал #{{ b.place.number }} ({{ b.place.title }})</span>
+              <span class="item-title">Место #{{ b.place.number }} ({{ b.place.title }})</span>
               <span class="item-subtitle">{{ b.start_time|date:"d.m H:i" }} — {{ b.end_time|date:"d.m H:i" }}</span>
             </div>
             <div class="session-actions">
               <a href="{% url 'booking:extend' b.id %}" class="btn-session-extend">Продлить</a>
               <a href="{% url 'booking:cancel' b.id %}" class="btn-session-cancel">Отмена</a>
-            </div>
-            <div class="item-status-badge status-active">
-              ONLINE
             </div>
           <button class="btn-qr" style="margin: 20px;" onclick="openQR('{{ b.id }}', '{{ b.code }}', event)">
             <img src="{% static 'qr-code.png' %}" alt="QR" style="width: 20px; height: 20px; vertical-align: middle;">
@@ -124,7 +121,7 @@
         {% if page_obj.has_other_pages %}
         <div class="pagination" style="margin-top: 30px; display: flex; justify-content: center; gap: 10px;">
           {% if page_obj.has_previous %}
-            <a href="?page=1" class="pagination-link">«</a>
+            <a href="?page=1" class="pagination-link">в начало</a>
             <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">‹</a>
           {% endif %}
 
@@ -138,7 +135,7 @@
 
           {% if page_obj.has_next %}
             <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">›</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">»</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">в конец</a>
           {% endif %}
         </div>
         {% endif %}

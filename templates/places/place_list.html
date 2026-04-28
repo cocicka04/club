@@ -7,10 +7,39 @@
     <h1 class="section-title">Игровые зоны</h1>
     <p class="section-subtitle">Select your battle station</p>
   </div>
+<div class="search-container">
+  <div class="search-input-box" id="search-trigger">
+    <input type="text" id="main-search" placeholder="Поиск места..." autocomplete="off">
+    <div class="search-suggestions" id="suggestions"></div>
+    <span class="search-icon" >🔍︎</span>
+  </div>
+  <div class="search-dropdown" id="search-dropdown">
+    <div class="search-dropdown-inner">
+      <div class="search-filters">
+        <h4>Фильтры</h4>
+        <select id="filter-tariff" style="border-radius: 6px;">
+          <option value="">Все тарифы</option>
+          {% for t in tariffs %}
+            <option value="{{ t.id }}"
+              {% if request.GET.tariff == t.id|stringformat:"s" %}selected{% endif %}>
+              {{ t.name }}
+            </option>
+          {% endfor %}
+        </select>
+        <input type="number" id="filter-min" style="border-radius: 6px;" placeholder="Цена от">
+        <input type="number" id="filter-max" style="border-radius: 6px;" placeholder="Цена до">
+        <button onclick="resetFilters()" class="btn-outline">Сбросить фильтры</button>
+        <button onclick="applyFilters()" class="btn">Показать все результаты</button>
+      </div>
+      <div class="search-results" id="search-results">
+      </div>
+    </div>
+  </div>
+</div>
 
   {% if request.user.is_superuser %}
     <a href="{% url 'places:create' %}" class="btn-outline">
-      + Добавить зону
+      +&nbsp;Добавить зону
     </a>
   {% endif %}
 </section>
@@ -43,7 +72,7 @@
           {% else %}
             <div class="status-free">
                <span class="status-free-dot"></span>
-               FREE
+               ONLINE
             </div>
           {% endif %}
         </div>
@@ -97,7 +126,7 @@
     </div>
   {% empty %}
     <div class="tariff-empty">
-      <p>Нет доступных станций для отображения</p>
+      <p>Нет доступных мест для отображения</p>
     </div>
   {% endfor %}
 </div>
@@ -106,24 +135,133 @@
   {% if page_obj.has_other_pages %}
     <div class="pagination">
       {% if page_obj.has_previous %}
-        <a href="?page=1" class="pagination-link">в начало</a>
-        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">←</a>
+        <a href="?page=1&search={{ request.GET.search }}&tariff={{ request.GET.tariff }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}" class="pagination-link">
+          в начало
+        </a>
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&tariff={{ request.GET.tariff }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}" class="pagination-link">
+          ‹
+        </a>
       {% endif %}
-
       {% for num in page_obj.paginator.page_range %}
         {% if num == page_obj.number %}
           <span class="pagination-current">{{ num }}</span>
-        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-          <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
-        {% endif %}
-      {% endfor %}
-
+        {% elif num <= 2 %} 
+          <a href="?page={{ num }}&search={{ request.GET.search }}&tariff={{ request.GET.tariff }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}" class="pagination-link">
+            {{ num }}
+          </a>
+        {% elif num > page_obj.paginator.num_pages|add:'-2' %}
+          <a href="?page={{ num }}&search={{ request.GET.search }}&tariff={{ request.GET.tariff }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}" class="pagination-link">
+            {{ num }}
+          </a>
+        {% elif num >= page_obj.number|add:'-1' and num <= page_obj.number|add:'1' %}
+          <a href="?page={{ num }}&search={{ request.GET.search }}&tariff={{ request.GET.tariff }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}" class="pagination-link">
+            {{ num }}
+          </a>
+        {% elif num == 3 and page_obj.number > 4 %}
+          <span class="pagination-dots">...</span>
+        {% elif num == page_obj.paginator.num_pages|add:'-2' and page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+          <span class="pagination-dots">...</span>
+      {% endif %}
+    {% endfor %}
       {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">→</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">в конец</a>
+        <a href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&tariff={{ request.GET.tariff }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}" class="pagination-link">
+          ›
+        </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&search={{ request.GET.search }}&tariff={{ request.GET.tariff }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}" class="pagination-link">
+          в конец
+        </a>
       {% endif %}
     </div>
   {% endif %}
 {% endwith %}
+
+<script>
+  const dropdown = document.getElementById('search-dropdown');
+  const trigger = document.getElementById('search-trigger');
+  const input = document.getElementById('main-search');
+
+  trigger.addEventListener('click', () => {
+    dropdown.classList.add('show');
+    input.focus();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-container')) {
+      dropdown.classList.remove('show');
+    }
+  });
+  input.addEventListener('input', loadResults);
+  document.getElementById('filter-tariff').addEventListener('change', loadResults);
+  document.getElementById('filter-min').addEventListener('input', loadResults);
+  document.getElementById('filter-max').addEventListener('input', loadResults);
+
+  function resetFilters() {
+    document.getElementById('filter-tariff').value = "";
+    document.getElementById('filter-min').value = "";
+    document.getElementById('filter-max').value = "";
+    input.value = "";
+    loadResults();
+  }
+
+  function loadResults() {
+    const search = input.value;
+    const tariff = document.getElementById('filter-tariff').value;
+    const min = document.getElementById('filter-min').value;
+    const max = document.getElementById('filter-max').value;
+
+    fetch(`/places/ajax/?search=${search}&tariff=${tariff}&min_price=${min}&max_price=${max}`)
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('search-results').innerHTML = html;
+      });
+  }
+</script>
+<script>
+const suggestionsBox = document.getElementById('suggestions');
+
+input.addEventListener('input', () => {
+  const value = input.value;
+
+  if (!value) {
+    suggestionsBox.style.display = 'none';
+    return;
+  }
+
+  fetch(`/places/ajax/?search=${value}`)
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('search-results').innerHTML = html;
+
+      // простые подсказки
+      suggestionsBox.innerHTML = `
+        <div onclick="applySuggestion('${value}')">${value}</div>
+      `;
+      suggestionsBox.style.display = 'block';
+    });
+});
+
+function applySuggestion(text) {
+  input.value = text;
+  suggestionsBox.style.display = 'none';
+  loadResults();
+}
+</script>
+<script>
+function applyFilters() {
+  const search = document.getElementById('main-search').value;
+  const tariff = document.getElementById('filter-tariff').value;
+  const min = document.getElementById('filter-min').value;
+  const max = document.getElementById('filter-max').value;
+
+  let url = '/places/?';
+
+  if (search) url += `search=${encodeURIComponent(search)}&`;
+  if (tariff) url += `tariff=${tariff}&`;
+  if (min) url += `min_price=${min}&`;
+  if (max) url += `max_price=${max}&`;
+
+  window.location.href = url;
+}
+</script>
 
 {% endblock %}

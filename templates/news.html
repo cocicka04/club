@@ -89,7 +89,7 @@
     <div class="pagination">
       {% if news.has_previous %}
         <a href="?page=1" class="pagination-link">в начало</a>
-        <a href="?page={{ news.previous_page_number }}" class="pagination-link">←</a>
+        <a href="?page={{ news.previous_page_number }}" class="pagination-link">‹</a>
       {% endif %}
 
       {% for num in news.paginator.page_range %}
@@ -101,7 +101,7 @@
       {% endfor %}
 
       {% if news.has_next %}
-        <a href="?page={{ news.next_page_number }}" class="pagination-link">→</a>
+        <a href="?page={{ news.next_page_number }}" class="pagination-link">›</a>
         <a href="?page={{ news.paginator.num_pages }}" class="pagination-link">в конец</a>
       {% endif %}
     </div>

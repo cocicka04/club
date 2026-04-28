@@ -5,30 +5,41 @@ from .models import Place
 from .forms import PlaceForm
 from booking.models import Booking
 from django.utils import timezone
+from tariffs.models import Tariff
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+
 
 from django.core.paginator import Paginator
 
 def place_list(request):
-    places_qs = Place.objects.select_related(
-        'category', 'tariff'
-    ).order_by('number')
+    places = Place.objects.select_related('tariff', 'category').all()
 
-    for place in places_qs:
-        place.active_booking = Booking.objects.filter(
-            place=place,
-            status=Booking.STATUS_ACTIVE,
-            end_time__gt=timezone.now()
-        ).order_by('end_time').first()
+    search = request.GET.get('search')
+    if search:
+        places = places.filter(title__icontains=search)
 
-    paginator = Paginator(places_qs, 9)  # ← 9 станций на страницу
+    tariff = request.GET.get('tariff')
+    if tariff:
+        places = places.filter(tariff_id=tariff)
+
+    min_price = request.GET.get('min_price')
+    if min_price:
+        places = places.filter(tariff__price_per_hour__gte=min_price)
+
+    max_price = request.GET.get('max_price')
+    if max_price:
+        places = places.filter(tariff__price_per_hour__lte=max_price)
+
+    paginator = Paginator(places, 9)
     page_number = request.GET.get('page')
-    places = paginator.get_page(page_number)
+    page_obj = paginator.get_page(page_number)
 
     return render(request, 'places/place_list.html', {
-        'places': places
+        'places': page_obj, 
+        'tariffs': Tariff.objects.all()
     })
-
-
 
 
 def place_detail(request, pk):
@@ -83,3 +94,28 @@ def place_delete(request, pk):
     place = get_object_or_404(Place, pk=pk)
     place.delete()
     return redirect('places:list')
+
+def place_search_ajax(request):
+    places = Place.objects.select_related('tariff', 'category').all()
+
+    search = request.GET.get('search')
+    if search:
+        places = places.filter(title__icontains=search)
+
+    tariff = request.GET.get('tariff')
+    if tariff:
+        places = places.filter(tariff_id=tariff)
+
+    min_price = request.GET.get('min_price')
+    if min_price:
+        places = places.filter(tariff__price_per_hour__gte=min_price)
+
+    max_price = request.GET.get('max_price')
+    if max_price:
+        places = places.filter(tariff__price_per_hour__lte=max_price)
+
+    html = render_to_string('places/place_cards.html', {
+        'places': places
+    })
+
+    return HttpResponse(html)

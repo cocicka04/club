@@ -9,6 +9,7 @@ from django.db.models import Q
 import qrcode
 from io import BytesIO
 import base64
+from django.core.paginator import Paginator
 
 def is_place_available(place, start, end):
     return not Booking.objects.filter(
