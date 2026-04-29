@@ -8,7 +8,13 @@
           <img src="{{ place.image.url }}" class="place-image">
         {% endif %}
       </div>
-
+      <div class="place-status">
+        {% if place.is_busy %}
+          <div class="status-busy">BUSY</div>
+        {% else %}
+          <div class="status-free">ONLINE</div>
+        {% endif %}
+      </div>
       <div class="place-content">
         <div class="place-title">{{ place.title }}</div>
         <div class="place-specs">

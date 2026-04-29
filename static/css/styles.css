@@ -975,7 +975,6 @@ body .glass-card {
   top: 110%;
   left: 0;
   width: 100%;
-
   background: rgba(10,8,26,0.98);
   border-radius: 14px;
   transform: translateY(-15px);
@@ -1210,8 +1209,14 @@ body .glass-card {
   height: 100%;
   cursor: pointer;
   transition: 0.25s;
-
+  position: relative;
 }
+
+/* 🔥 overlay ссылка */
+.place-overlay-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;}
 
 .place-image-wrapper {
   position: relative;
@@ -1440,6 +1445,8 @@ body .glass-card {
   justify-content: center;
   gap: 0.5rem;
   font-size: 0.75rem;
+  position: relative;
+  z-index: 2;
 }
 .admin-edit-link { color: var(--neon-cyan); text-decoration: none; }
 .admin-delete-link { color: #ff4655; text-decoration: none; }
@@ -2952,4 +2959,69 @@ body .glass-card {
   border-radius: 6px;
   background: linear-gradient(90deg, var(--royal-blue), var(--neon-purple));
   color: white;
+}
+
+/* ========== STATUS DOTS в place_detail========== */
+/* контейнеры */
+.detail-unavailable,
+.detail-free-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* базовая точка */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: relative;
+}
+
+/* 🔴 занято */
+.status-dot.busy {
+  background: #ff4d4d;
+  box-shadow: 0 0 6px rgba(255, 77, 77, 0.6);
+}
+
+/* 🟢 свободно */
+.status-dot.free {
+  background: #4dff88;
+  box-shadow: 0 0 6px rgba(77, 255, 136, 0.6);
+}
+
+/* 🔥 ПУЛЬС (анимация) */
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0.6;
+  transform: scale(1);
+  animation: pulse 1.8s infinite;
+}
+
+/* цвет пульса */
+.status-dot.busy::after {
+  background: rgba(255, 77, 77, 0.4);
+}
+
+.status-dot.free::after {
+  background: rgba(77, 255, 136, 0.4);
+}
+
+/* сама анимация */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }

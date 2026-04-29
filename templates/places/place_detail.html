@@ -23,17 +23,17 @@
       <div class="detail-image-gradient"></div>
 
       <div class="detail-status">
-         {% if active_booking %}
+        {% if active_booking %}
             <div class="status-busy">
                 <span class="status-busy-dot"></span>
                 BUSY
             </div>
-         {% else %}
+        {% else %}
             <div class="status-free">
                 <span class="status-free-dot"></span>
                 ONLINE
             </div>
-         {% endif %}
+        {% endif %}
       </div>
     </div>
 
@@ -98,9 +98,19 @@
         </div>
       </div>
       
-      {% if active_booking %}
+      {% if free_from and free_to %}
+        <div class="detail-free-slot">
+          <span class="status-dot free"></span>
+          <span>
+            Свободно с {{ free_from|date:"H:i" }} до {{ free_to|date:"H:i" }}
+          </span>
+        </div>
+      {% elif final_end_time %}
         <div class="detail-unavailable">
-             <p class="unavailable-text">Место забронировано до {{ active_booking.end_time|date:"H:i" }}</p>
+          <span class="status-dot busy"></span>
+          <span>
+            Занято до {{ final_end_time|date:"H:i" }}
+          </span>
         </div>
       {% endif %}
       
@@ -114,22 +124,19 @@
               </div>
             </div>
             
-            <div class="detail-buttons">
-                {% if not active_booking %}
-                    <a href="{% url 'booking:create_with_place' place.id %}" class="btn detail-book-btn">
-                        Забронировать
-                    </a>
-                {% else %}
-                    <button disabled class="detail-disabled-btn">Недоступно</button>
-                {% endif %}
+          <div class="detail-buttons">
+              <a href="{% url 'booking:create_with_place' place.id %}" class="btn detail-book-btn">
+                  Забронировать
+              </a>
 
-                {% if request.user.is_superuser %}
-                    <div class="detail-admin-buttons">
-                        <a href="{% url 'places:edit' place.id %}" class="admin-edit-link">ред.</a>
-                        <a href="{% url 'places:delete' place.id %}" class="admin-delete-link">удалить</a>
-                    </div>
-                {% endif %}
-            </div>
+              {% if request.user.is_superuser %}
+                  <div class="detail-admin-buttons">
+                      <a href="{% url 'places:edit' place.id %}" class="admin-edit-link">Ред.</a>
+                      <span class="admin-divider">|</span>
+                      <a href="{% url 'places:delete' place.id %}" class="admin-delete-link">Удалить</a>
+                  </div>
+              {% endif %}
+          </div>
         </div>
       </div>
 

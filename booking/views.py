@@ -64,13 +64,82 @@ def create_booking(request, place_id=None):
         form = BookingForm(initial=initial)
 
     places = Place.objects.all()
+    existing_booking = None
+    free_from = None
+    free_to = None
+
+    MIN_GAP = timedelta(hours=1)
+
+    if place:
+        now = timezone.now()
+
+        bookings = Booking.objects.filter(
+            place=place,
+            status=Booking.STATUS_ACTIVE,
+            end_time__gt=now
+        ).order_by('start_time')
+
+        if not bookings.exists():
+            free_from = now
+            free_to = now + timedelta(hours=24)
+
+        else:
+            first_booking = bookings.first()
+            if first_booking.start_time > now:
+                gap = first_booking.start_time - now
+
+                if gap >= MIN_GAP:
+                    free_from = now
+                    free_to = first_booking.start_time
+                else:
+                    chain_end = first_booking.end_time
+
+                    for booking in bookings[1:]:
+                        if booking.start_time <= chain_end:
+                            chain_end = max(chain_end, booking.end_time)
+                        else:
+                            gap = booking.start_time - chain_end
+
+                            if gap >= MIN_GAP:
+                                free_from = chain_end
+                                free_to = booking.start_time
+                                break
+                            else:
+                                chain_end = booking.end_time
+
+                    if not free_from:
+                        existing_booking = chain_end
+            else:
+                chain_end = first_booking.end_time
+
+                for booking in bookings[1:]:
+                    if booking.start_time <= chain_end:
+                        chain_end = max(chain_end, booking.end_time)
+                    else:
+                        gap = booking.start_time - chain_end
+
+                        if gap >= MIN_GAP:
+                            free_from = chain_end
+                            free_to = booking.start_time
+                            break
+                        else:
+                            chain_end = booking.end_time
+
+                if not free_from:
+                    existing_booking = chain_end
+                else:
+                    existing_booking = chain_end
+
     return render(
         request,
         'booking/create_booking.html',
         {
             'form': form,
             'place': place,
-            'places': places
+            'places': places,
+            'existing_booking': existing_booking,
+            'free_from': free_from,
+            'free_to': free_to
         }
     )
 

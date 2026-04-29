@@ -42,6 +42,22 @@
           {{ form.hours }}
         </div>
       </div>
+{% if free_from and free_to %}
+  <div class="detail-free-slot">
+    <span class="status-dot free"></span>
+    <span>
+      Свободно с {{ free_from|date:"H:i" }} до {{ free_to|date:"H:i" }}
+    </span>
+  </div>
+
+{% elif existing_booking %}
+  <div class="detail-unavailable">
+    <span class="status-dot busy"></span>
+    <span>
+      Занято до {{ existing_booking|date:"H:i" }}
+    </span>
+  </div>
+{% endif %}
 
       <div class="total-card">
         <span class="total-label">ИТОГО К ОПЛАТЕ: </span>
