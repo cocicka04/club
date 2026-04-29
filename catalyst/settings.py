@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "booking",
     "ai",
 ]
+GIGACHAT_API_KEY = "MDE5ZGQ5NWItNjg4Ni03MmMyLThhMjQtZjUyOTQzM2NjYTIzOjQ2ODBlMjIxLTg0NTMtNDMxZS05OGM2LTI5OTRmMGE2OGQ5ZQ=="
 
 # шаблоны, static
 STATIC_URL = '/static/'

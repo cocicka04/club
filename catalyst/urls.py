@@ -31,7 +31,7 @@ urlpatterns = [
     path('news/delete/<int:pk>/', views.news_delete, name='news_delete'),
     path('about/', views.about, name='about'),
     path('contacts/', views.contacts, name='contacts'),
-    
+    path('ai/', include(('ai.urls', 'ai'))),
 ]
 
 if settings.DEBUG:

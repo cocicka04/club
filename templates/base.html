@@ -102,6 +102,22 @@
   </div>
 </footer>
 
+<!-- ========== AI CHAT WIDGET ========== -->
+<div id="ai-chat-btn" class="ai-chat-btn">💬</div>
+
+<div id="ai-chat" class="ai-chat hidden">
+  <div class="ai-chat-header">
+    <span>🤖 Catalyst AI</span>
+    <button onclick="toggleChat()">✖</button>
+  </div>
+  <div id="ai-messages" class="ai-messages">
+    <div class="ai-message ai-bot">👋 Привет! Я ИИ-бариста Catalyst. Спроси, что выпить или съесть перед игрой!</div>
+  </div>
+  <div class="ai-input">
+    <input type="text" id="ai-input" placeholder="Напиши сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
+    <button onclick="sendMessage()">➤</button>
+  </div>
+</div>
 <script>
   const btn = document.getElementById('mobile-menu-btn');
   const menu = document.getElementById('mobile-menu');
@@ -110,6 +126,55 @@
     menu.classList.toggle('show');
   });
 </script>
+<script>
+  const chat = document.getElementById("ai-chat");
 
+  document.getElementById("ai-chat-btn").onclick = () => {
+    chat.classList.toggle("hidden");
+  };
+
+  function toggleChat() {
+    chat.classList.add("hidden");
+  }
+
+  function sendMessage() {
+    const input = document.getElementById("ai-input");
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addMessage("user", msg);
+
+    fetch("/ai/barista/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ query: msg })
+    })
+    .then(res => res.json())
+    .then(data => {
+      addMessage("bot", data.reply || "Не понял запрос.");
+    })
+    .catch(() => {
+      addMessage("bot", "Ошибка связи с ИИ.");
+    });
+
+    input.value = "";
+  }
+
+  function addMessage(sender, text) {
+    const box = document.getElementById("ai-messages");
+    const div = document.createElement("div");
+    div.className = sender === "user" ? "ai-message ai-user" : "ai-message ai-bot";
+    div.innerHTML = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+/* авто открытие через 10 сек */
+setTimeout(() => {
+  chat.classList.remove("hidden");
+}, 10000);
+</script>
 </body>
 </html>
