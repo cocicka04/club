@@ -9,9 +9,9 @@ from tariffs.models import Tariff
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-
-
 from django.core.paginator import Paginator
+from django.utils import timezone
+from booking.models import Booking
 
 def place_list(request):
     places = Place.objects.select_related('tariff', 'category').all()
@@ -32,12 +32,21 @@ def place_list(request):
     if max_price:
         places = places.filter(tariff__price_per_hour__lte=max_price)
 
+    # 🔥 ВОТ ГЛАВНЫЙ ФИКС
+    now = timezone.now()
+    for place in places:
+        place.is_busy = Booking.objects.filter(
+            place=place,
+            status=Booking.STATUS_ACTIVE,
+            end_time__gt=now
+        ).exists()
+
     paginator = Paginator(places, 9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'places/place_list.html', {
-        'places': page_obj, 
+        'places': page_obj,
         'tariffs': Tariff.objects.all()
     })
 

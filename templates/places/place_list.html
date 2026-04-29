@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-
+{% now "Y-m-d H:i:s" as now %}
 <section class="section-header">
   <div class="section-header-left">
     <div class="section-header-accent"></div>
@@ -64,7 +64,7 @@
         </div>
 
         <div class="place-status">
-          {% if place.active_booking %}
+          {% if place.is_busy %}
             <div class="status-busy">
                <span class="status-busy-dot"></span>
                BUSY
