@@ -2971,7 +2971,6 @@ body .glass-card {
   font-size: 14px;
 }
 
-/* базовая точка */
 .status-dot {
   width: 10px;
   height: 10px;
@@ -2979,19 +2978,16 @@ body .glass-card {
   position: relative;
 }
 
-/* 🔴 занято */
 .status-dot.busy {
   background: #ff4d4d;
   box-shadow: 0 0 6px rgba(255, 77, 77, 0.6);
 }
 
-/* 🟢 свободно */
 .status-dot.free {
   background: #4dff88;
   box-shadow: 0 0 6px rgba(77, 255, 136, 0.6);
 }
 
-/* 🔥 ПУЛЬС (анимация) */
 .status-dot::after {
   content: "";
   position: absolute;
@@ -3002,7 +2998,6 @@ body .glass-card {
   animation: pulse 1.8s infinite;
 }
 
-/* цвет пульса */
 .status-dot.busy::after {
   background: rgba(255, 77, 77, 0.4);
 }
@@ -3024,4 +3019,38 @@ body .glass-card {
   100% {
     opacity: 0;
   }
+}
+
+/*цены при бронировании*/
+.price-old {
+  text-decoration: line-through;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.price-new {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: white;
+}
+
+.price-discount {
+  font-size: 0.8rem;
+  color: #6ECBF5;
+  margin-top: 4px;
+}
+
+.info-label {
+  display: block;
+  text-align: center;
+  margin: 20px 0 0 0;
+  padding: 10px 12px;
+  background: rgba(110, 203, 245, 0.08);
+  border: 1px dashed rgba(110, 203, 245, 0.25);
+  border-radius: 8px;
+  color: var(--neon-cyan);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }

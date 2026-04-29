@@ -2,7 +2,7 @@
 {% block content %}
 <div class="booking-container">
   <div class="booking-header">
-    <h1 class="booking-title" style="text-align: center;">Настройка параметров доступа</h1>
+    <h1 class="form-title" style="text-align: center;">Создание бронирования</h1>
   </div>
 
   <div class="glass-card booking-card">
@@ -13,7 +13,7 @@
       {{ form.non_field_errors }}
 
       <div class="form-group">
-        <label class="form-label">ТЕРМИНАЛ</label>
+        <label class="form-label">Зона</label>
         {% if place %}
           <div class="selected-place">
             <span class="selected-place-text">{{ place.title }} (#{{ place.number }})</span>
@@ -42,29 +42,41 @@
           {{ form.hours }}
         </div>
       </div>
-{% if free_from and free_to %}
-  <div class="detail-free-slot">
-    <span class="status-dot free"></span>
-    <span>
-      Свободно с {{ free_from|date:"H:i" }} до {{ free_to|date:"H:i" }}
-    </span>
-  </div>
 
-{% elif existing_booking %}
-  <div class="detail-unavailable">
-    <span class="status-dot busy"></span>
-    <span>
-      Занято до {{ existing_booking|date:"H:i" }}
-    </span>
-  </div>
-{% endif %}
+      {% if free_from and free_to %}
+        <div class="detail-free-slot">
+          <span class="status-dot free"></span>
+          <span>
+            Свободно с {{ free_from|date:"H:i" }} до {{ free_to|date:"H:i" }}
+          </span>
+        </div>
 
+      {% elif existing_booking %}
+        <div class="detail-unavailable">
+          <span class="status-dot busy"></span>
+          <span>
+            Занято до {{ existing_booking|date:"H:i" }}
+          </span>
+        </div>
+      {% endif %}
+      
       <div class="total-card">
-        <span class="total-label">ИТОГО К ОПЛАТЕ: </span>
-        <span class="total-value"><span id="total-price">0</span> &nbsp;₽</span>
+        <div class="price-old" id="old-price">0 ₽</div>
+
+        <div class="price-new">
+          <span id="total-price">0</span> ₽
+        </div>
+
+        <div class="price-discount" id="discount-label">
+          СКИДКА: 0%
+        </div>
       </div>
 
       <button class="btn btn-full booking-submit" type="submit">ПОДТВЕРДИТЬ БРОНЬ</button>
+
+      <div class="body">
+        <label class="info-label">Оплата производится за стойкой администратора</label>
+      </div>
     </form>
   </div>
 </div>
@@ -72,10 +84,12 @@
 <script>
 document.addEventListener('DOMContentLoaded', function(){
   const hoursInput = document.querySelector('input[name="hours"]');
+  const startInput = document.querySelector('input[name="start_time"]');
   const placeSelect = document.querySelector('select[name="place"]');
   const fixedPriceInput = document.getElementById('fixed-price');
   const totalEl = document.getElementById('total-price');
-
+  const oldEl = document.getElementById('old-price');
+  const discountEl = document.getElementById('discount-label');
   function getPrice(){
     if(fixedPriceInput) return parseFloat(fixedPriceInput.value);
     if(placeSelect){
@@ -84,16 +98,42 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     return 0;
   }
+  function getDiscount(hours, startTime){
+    let discount = 0;
+    if(hours >= 3){
+      discount += 10;
+    }
+    if(startTime){
+      const date = new Date(startTime);
+      const hour = date.getHours();
 
-  function updatePrice(){
-    const hours = parseInt(hoursInput ? hoursInput.value : 1) || 1;
-    const price = getPrice();
-    const total = (price * hours).toFixed(0);
-    totalEl.textContent = total;
+      if(hour >= 22 || hour < 8){
+        discount += 5;
+      }
+    }
+    return discount;
   }
-
+function updatePrice(){
+  const hours = parseInt(hoursInput?.value || 1);
+  const price = getPrice();
+  const startTime = startInput?.value;
+  const base = price * hours;
+  const discount = getDiscount(hours, startTime);
+  const final = base * (1 - discount / 100);
+  totalEl.textContent = final.toFixed(0);
+  if(discount > 0){
+    oldEl.style.display = "block";
+    discountEl.style.display = "block";
+    oldEl.textContent = base.toFixed(0) + " ₽";
+    discountEl.textContent = "СКИДКА: " + discount + "%";
+  }else{
+    oldEl.style.display = "none";
+    discountEl.style.display = "none";
+  }
+}
   if(hoursInput) hoursInput.addEventListener('input', updatePrice);
   if(placeSelect) placeSelect.addEventListener('change', updatePrice);
+  if(startInput) startInput.addEventListener('change', updatePrice);
   updatePrice();
 });
 </script>

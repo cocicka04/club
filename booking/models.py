@@ -34,9 +34,24 @@ class Booking(models.Model):
     end_time = models.DateTimeField(verbose_name='Окончание бронирования')
 
     total_price = models.DecimalField(
-        max_digits=8,
+    max_digits=10,
+    decimal_places=2,
+    default=0,
+    verbose_name='Итоговая стоимость'
+    )
+
+    original_price = models.DecimalField(
+        max_digits=10,
         decimal_places=2,
-        verbose_name='Итоговая стоимость'
+        default=0,
+        verbose_name='Цена без скидки'
+    )
+
+    discount_percent = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0,
+        verbose_name='Скидка (%)'
     )
 
     status = models.CharField(

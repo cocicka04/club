@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "places",
     "tariffs",
     "booking",
+    "ai",
 ]
 
 # шаблоны, static

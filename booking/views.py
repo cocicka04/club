@@ -10,6 +10,8 @@ import qrcode
 from io import BytesIO
 import base64
 from django.core.paginator import Paginator
+from decimal import Decimal
+
 
 def is_place_available(place, start, end):
     return not Booking.objects.filter(
@@ -35,7 +37,47 @@ def create_booking(request, place_id=None):
         form = BookingForm(request.POST)
         if form.is_valid():
             booking = form.save(commit=False)
+            start = booking.start_time
+            end = booking.end_time
 
+            # длительность в часах
+            duration = (end - start).total_seconds() / 3600
+
+            price_per_hour = booking.place.tariff.price_per_hour
+
+            total_price = Decimal("0")
+            original_price = Decimal("0")
+
+            current_time = start
+
+            while current_time < end:
+                next_hour = current_time + timedelta(hours=1)
+
+                hour_price = price_per_hour
+                original_price += hour_price
+
+                # проверка ночного времени
+                if current_time.hour >= 22 or current_time.hour < 8:
+                    hour_price *= Decimal("0.95")  # -5%
+
+                total_price += hour_price
+                current_time = next_hour
+
+
+            # скидка за длительность
+            discount_percent = Decimal("0")
+
+            if duration >= 3:
+                discount_percent += Decimal("10")
+
+            if discount_percent > 0:
+                total_price = total_price * (Decimal("1") - discount_percent / Decimal("100"))
+
+
+            # сохраняем
+            booking.total_price = total_price
+            booking.original_price = original_price
+            booking.discount_percent = discount_percent
             if place:
                 booking.place = place
             else:
@@ -51,7 +93,8 @@ def create_booking(request, place_id=None):
             if conflicts.exists():
                 form.add_error(None, "На это время место уже занято.")
             else:
-                booking = form.save(user=request.user)
+                booking.user = request.user
+                booking.save()  # ← ВАЖНО: один save
                 return redirect('booking:success', booking.id)
     else:
         initial = {}
