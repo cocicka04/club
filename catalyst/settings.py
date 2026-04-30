@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "places",
     "tariffs",
     "booking",
-    "ai",
 ]
 GIGACHAT_API_KEY = "MDE5ZGQ5NWItNjg4Ni03MmMyLThhMjQtZjUyOTQzM2NjYTIzOjQ2ODBlMjIxLTg0NTMtNDMxZS05OGM2LTI5OTRmMGE2OGQ5ZQ=="
 

@@ -4,15 +4,18 @@ from django.utils import timezone
 from users.models import News
 from django.core.paginator import Paginator
 from tariffs.models import Tariff
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render, redirect, get_object_or_404
+from booking.models import Booking
+from places.models import Place
+from django.contrib.auth.models import User
 
 def home(request):
     tariffs = Tariff.objects.select_related('category').order_by('-id')
-
     context = {
         "now": timezone.now(),
         "tariffs": tariffs
     }
-
     return render(request, "index.html", context)
 
 def news_page(request):
@@ -21,10 +24,7 @@ def news_page(request):
     paginator = Paginator(news, 5) 
     page_number = request.GET.get('page')
     news = paginator.get_page(page_number)
-
-
     if request.method == 'POST' and request.user.is_superuser:
-
         # СОЗДАНИЕ
         if 'create' in request.POST:
             News.objects.create(
@@ -32,7 +32,6 @@ def news_page(request):
                 text=request.POST.get('text', '')[:1000]
             )
             return redirect('news')
-
         # РЕДАКТИРОВАНИЕ
         if 'edit' in request.POST:
             item = get_object_or_404(News, pk=request.POST.get('news_id'))
@@ -40,7 +39,6 @@ def news_page(request):
             item.text = request.POST.get('text', '')[:1000]
             item.save()
             return redirect('news')
-
     return render(request, 'news.html', {
         'news': news
     })
@@ -51,10 +49,18 @@ def news_delete(request, pk):
     News.objects.filter(pk=pk).delete()
     return redirect('news')
 
-
 def contacts(request):
     return render(request, 'contacts.html')
 
 def about(request):
     return render(request, 'about.html')
 
+@staff_member_required
+def admin_dashboard(request):
+    context = {
+        "bookings": Booking.objects.all().order_by('-start_time'),
+        "places": Place.objects.all(),
+        "tariffs": Tariff.objects.all(),
+        "users": User.objects.all()
+    }
+    return render(request, "users/dashboard.html", context)

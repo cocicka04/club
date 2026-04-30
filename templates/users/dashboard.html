@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-main flex-grow-main admin-page">
+  <h1 class="admin-page-title">Панель администратора</h1>
+
+  <div class="admin-layout">
+    
+    <aside class="admin-sidebar glass-card">
+      <h3 class="admin-sidebar-title">Навигация</h3>
+      <ul class="admin-nav-list">
+        
+        <li class="admin-nav-item">
+          <button class="admin-nav-link active" data-tab="tab-bookings">📅 Бронирования</button>
+        </li>
+        
+        <li class="admin-nav-item">
+          <button class="admin-nav-link" data-tab="tab-places">💻 Зоны</button>
+          <a href="{% url 'places:create' %}" class="admin-add-icon" title="Добавить зону">+</a>
+        </li>
+        
+        <li class="admin-nav-item">
+          <button class="admin-nav-link" data-tab="tab-tariffs">💰 Тарифы</button>
+          <a href="{% url 'tariffs:create' %}" class="admin-add-icon" title="Добавить тариф">+</a>
+        </li>
+        
+        <li class="admin-nav-item">
+          <button class="admin-nav-link" data-tab="tab-users">👤 Пользователи</button>
+        </li>
+        
+      </ul>
+    </aside>
+
+    <main class="admin-content glass-card">
+
+      <section id="tab-bookings" class="admin-section active">
+        <div class="admin-section-header">
+          <h2 class="admin-section-title">📅 Бронирования</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-theme-table">
+            <thead>
+              <tr>
+                <th>Пользователь</th>
+                <th>Зона</th>
+                <th>Начало</th>
+                <th>Конец</th>
+                <th>Статус</th>
+              </tr>
+            </thead>
+            <tbody>
+{% for b in bookings %}
+<tr>
+  <td class="font-bold">{{ b.user.username }}</td>
+  <td>{{ b.place.title }}</td>
+  <td>{{ b.start_time|date:"d.m.Y H:i" }}</td>
+  <td>{{ b.end_time|date:"d.m.Y H:i" }}</td>
+  <td>
+    <span class="item-status-badge 
+      {% if b.status == 'active' %}status-active
+      {% elif b.status == 'finished' %}status-finished
+      {% elif b.status == 'canceled' %}status-canceled
+      {% endif %}">
+      {{ b.get_status_display }}
+    </span>
+  </td>
+</tr>
+{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tab-places" class="admin-section">
+        <div class="admin-section-header">
+          <h2 class="admin-section-title">💻 Зоны</h2>
+          <a href="{% url 'places:create' %}" class="btn btn-sm">Добавить зону</a>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-theme-table">
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Категория</th>
+                <th class="text-right">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in places %}
+              <tr>
+                <td class="font-bold text-cyan">{{ p.title }}</td>
+                <td><span class="place-category">{{ p.category.name }}</span></td>
+                <td class="admin-action-cell">
+                  <div class="admin-action-links">
+                    <a href="{% url 'places:edit' p.id %}" class="action-icon" title="Редактировать">✏️</a>
+                    <a href="{% url 'places:delete' p.id %}" class="action-icon action-icon-delete" title="Удалить">🗑️</a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tab-tariffs" class="admin-section">
+        <div class="admin-section-header">
+          <h2 class="admin-section-title">💰 Тарифы</h2>
+          <a href="{% url 'tariffs:create' %}" class="btn btn-sm">Добавить тариф</a>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-theme-table">
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Цена</th>
+                <th class="text-right">Действия
+
+
+</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in tariffs %}
+              <tr>
+                <td class="font-bold">{{ t.name }}</td>
+                <td class="text-purple font-bold">{{ t.price_per_hour }} ₽</td>
+                <td class="admin-action-cell">
+                  <div class="admin-action-links">
+                    <a href="{% url 'tariffs:edit' t.id %}" class="action-icon" title="Редактировать">✏️</a>
+                    <a href="{% url 'tariffs:delete' t.id %}" class="action-icon action-icon-delete" title="Удалить">🗑️</a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tab-users" class="admin-section">
+        <div class="admin-section-header">
+          <h2 class="admin-section-title">👤 Пользователи</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-theme-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in users %}
+              <tr>
+                <td class="font-bold text-cyan">{{ u.username }}</td>
+                <td class="opacity-70">{{ u.email }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const navLinks = document.querySelectorAll('.admin-nav-link');
+    const sections = document.querySelectorAll('.admin-section');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Убираем active у всех кнопок и скрываем все секции
+        navLinks.forEach(l => l.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+
+        // Добавляем active нажатой кнопке и показываем нужную секцию
+        this.classList.add('active');
+        const targetId = this.getAttribute('data-tab');
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+  });
+</script>
+
+{% endblock %}

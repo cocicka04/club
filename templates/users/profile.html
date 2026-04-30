@@ -20,7 +20,6 @@
         <input type="file" name="avatar" id="avatar-input" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="document.getElementById('avatar-form').submit()">
       </label>
     </form>
-
 <div class="profile-edit-block">
 
   <!-- USERNAME -->
@@ -31,12 +30,15 @@
 
     <input type="text" id="username-input" 
            value="{{ user.username }}" 
-           class="edit-input hidden">
+           class="edit-input hidden"
+           maxlength="30"
+           required>
 
     <button type="button" class="edit-btn" onclick="editField('username')">
       🖍
     </button>
   </div>
+  <div id="username-error" style="color: #ff4655; font-size: 0.75rem; display: none; margin-bottom: 8px;"></div>
 
   <!-- EMAIL -->
   <div class="editable-field">
@@ -46,18 +48,24 @@
 
     <input type="email" id="email-input" 
            value="{{ user.email }}" 
-           class="edit-input hidden">
+           class="edit-input hidden"
+           required>
 
     <button type="button" class="edit-btn" onclick="editField('email')">
       🖍
     </button>
   </div>
+  <div id="email-error" style="color: #ff4655; font-size: 0.75rem; display: none; margin-bottom: 8px;"></div>
 
   <!-- КНОПКА СОХРАНЕНИЯ -->
   <button onclick="saveProfile()" class="btn mt-4 hidden" id="save-btn">
     Сохранить
   </button>
-
+  {% if request.user.is_superuser %}
+    <a href="{% url 'dashboard' %}" class="btn admin-btn">
+      Панель администратора
+    </a>
+  {% endif %}
 </div>
 
   </aside>
@@ -165,11 +173,54 @@ function editField(field) {
   document.getElementById(field + '-text').classList.add('hidden');
   document.getElementById(field + '-input').classList.remove('hidden');
   document.getElementById('save-btn').classList.remove('hidden');
+  // Скрываем ошибку при редактировании
+  const err = document.getElementById(field + '-error');
+  if (err) err.style.display = 'none';
+}
+
+function validateEmail(email) {
+  // Проверка наличия @ и точки в домене
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
 }
 
 function saveProfile() {
-  const username = document.getElementById('username-input').value;
-  const email = document.getElementById('email-input').value;
+  const usernameInput = document.getElementById('username-input');
+  const emailInput = document.getElementById('email-input');
+  const username = usernameInput.value.trim();
+  const email = emailInput.value.trim();
+  
+  let valid = true;
+
+  // Валидация username
+  const usernameError = document.getElementById('username-error');
+  if (!username) {
+    usernameError.innerText = 'Имя пользователя не может быть пустым';
+    usernameError.style.display = 'block';
+    valid = false;
+  } else if (username.length < 3) {
+    usernameError.innerText = 'Имя пользователя должно содержать минимум 3 символа';
+    usernameError.style.display = 'block';
+    valid = false;
+  } else {
+    usernameError.style.display = 'none';
+  }
+
+  // Валидация email
+  const emailError = document.getElementById('email-error');
+  if (!email) {
+    emailError.innerText = 'Email не может быть пустым';
+    emailError.style.display = 'block';
+    valid = false;
+  } else if (!validateEmail(email)) {
+    emailError.innerText = 'Введите корректный email (содержит @ и точку)';
+    emailError.style.display = 'block';
+    valid = false;
+  } else {
+    emailError.style.display = 'none';
+  }
+
+  if (!valid) return;
 
   fetch("{% url 'users:update_profile' %}", {
     method: "POST",
@@ -186,6 +237,8 @@ function saveProfile() {
   .then(data => {
     if (data.success) {
       location.reload();
+    } else {
+      alert('Ошибка при сохранении');
     }
   });
 }

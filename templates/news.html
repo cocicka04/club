@@ -2,7 +2,7 @@
 {% block content %}
 
 <section class="news-container">
-
+  <h1 class="news-page-title">Новости</h1>
   {% if request.user.is_superuser %}
   <form method="post" class="glass-card news-create-form">
     {% csrf_token %}
