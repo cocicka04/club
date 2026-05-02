@@ -39,6 +39,10 @@ def create_booking(request, place_id=None):
             booking = form.save(commit=False)
             start = booking.start_time
             end = booking.end_time
+            duration = (end - start).total_seconds() / 3600
+
+            if duration > 24:
+                form.add_error('end_time', 'Нельзя бронировать более чем на 24 часа')
 
             # длительность в часах
             duration = (end - start).total_seconds() / 3600
@@ -91,7 +95,7 @@ def create_booking(request, place_id=None):
             )
 
             if conflicts.exists():
-                form.add_error(None, "На это время место уже занято.")
+                form.add_error('start_time', "На это время место уже занято")
             else:
                 booking.user = request.user
                 booking.save()  # ← ВАЖНО: один save

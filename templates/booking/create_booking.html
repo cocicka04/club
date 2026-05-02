@@ -47,7 +47,7 @@
         <div class="detail-free-slot">
           <span class="status-dot free"></span>
           <span>
-            Свободно с {{ free_from|date:"H:i" }} до {{ free_to|date:"H:i" }}
+            Свободно с {{ free_from|date:"d.m H:i" }} до {{ free_to|date:"d.m H:i" }}
           </span>
         </div>
 
@@ -55,7 +55,7 @@
         <div class="detail-unavailable">
           <span class="status-dot busy"></span>
           <span>
-            Занято до {{ existing_booking|date:"H:i" }}
+            Занято до {{ existing_booking|date:"d.m H:i" }}
           </span>
         </div>
       {% endif %}
@@ -71,7 +71,11 @@
           СКИДКА: 0%
         </div>
       </div>
-
+      {% if form.start_time.errors %}
+        <div class="form-error">
+          {{ form.start_time.errors.0 }}
+        </div>
+      {% endif %}
       <button class="btn btn-full booking-submit" type="submit">ПОДТВЕРДИТЬ БРОНЬ</button>
 
       <div class="body">
@@ -136,5 +140,29 @@ function updatePrice(){
   if(startInput) startInput.addEventListener('change', updatePrice);
   updatePrice();
 });
+const hoursInput = document.getElementById("id_hours");
+
+if (hoursInput) {
+  hoursInput.addEventListener("input", function () {
+    if (this.value > 24) {
+      this.value = 24;
+
+      showBookingError("Нельзя бронировать более чем на 24 часа");
+    }
+  });
+}
+
+function showBookingError(text) {
+  let error = document.getElementById("booking-error");
+
+  if (!error) {
+    error = document.createElement("div");
+    error.id = "booking-error";
+    error.className = "form-error";
+    hoursInput.parentNode.appendChild(error);
+  }
+
+  error.innerText = text;
+}
 </script>
 {% endblock %}

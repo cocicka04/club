@@ -102,17 +102,17 @@
         <div class="detail-free-slot">
           <span class="status-dot free"></span>
           <span>
-            Свободно с {{ free_from|date:"H:i" }} до {{ free_to|date:"H:i" }}
+            Свободно с {{ free_from|date:"d.m H:i" }} до {{ free_to|date:"d.m H:i" }}
           </span>
         </div>
-      {% elif final_end_time %}
-        <div class="detail-unavailable">
-          <span class="status-dot busy"></span>
-          <span>
-            Занято до {{ final_end_time|date:"H:i" }}
-          </span>
-        </div>
-      {% endif %}
+        {% elif final_end_time %}
+          <div class="detail-unavailable">
+            <span class="status-dot busy"></span>
+            <span>
+              Занято до {{ final_end_time|date:"d.m H:i" }}
+            </span>
+          </div>
+        {% endif %}
       
       <div class="detail-price-section">
         <div class="detail-price-row">
