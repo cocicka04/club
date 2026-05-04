@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from . import ai_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,6 +33,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contacts/', views.contacts, name='contacts'),
     path("dashboard/", views.admin_dashboard, name="dashboard"),
+    path('api/ai-chat/', ai_views.ai_chat, name='ai_chat'),
 ]
 
 if settings.DEBUG:

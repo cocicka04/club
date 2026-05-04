@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+SILENCED_SYSTEM_CHECKS = ['fields.E210']
 # Application definition
 
 INSTALLED_APPS = [

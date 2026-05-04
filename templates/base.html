@@ -102,13 +102,131 @@
   </div>
 </footer>
 
+<!-- ========== AI CHAT BOT ========== -->
+<!-- Кнопка открытия -->
+<button class="ai-chat-btn" onclick="toggleAIChat()" title="ИИ-консультант Catalyst">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+</button>
+
+<!-- Окно чата -->
+<div id="ai-chat-window" class="ai-chat-window hidden">
+  <div class="ai-chat-header">
+    <span>
+      <span style="font-size: 1.4rem;">🤖</span> Catalyst AI
+    </span>
+    <button class="ai-chat-close" onclick="toggleAIChat()">✕</button>
+  </div>
+  
+  <div class="ai-chat-messages" id="ai-chat-messages">
+    <div class="ai-message bot">
+      👋 Привет! Я ИИ-консультант Catalyst. Могу помочь подобрать ПК, рассказать про тарифы, свободные места и ответить на вопросы о клубе.
+    </div>
+  </div>
+  
+  <div class="ai-chat-input">
+    <textarea 
+      id="ai-chat-input" 
+      placeholder="Напиши свой вопрос..." 
+      onkeydown="handleAIKeyPress(event)" 
+      oninput="autoResizeTextarea(this)"></textarea>
+    <button class="ai-chat-send-btn" onclick="sendAIMessage()">➤</button>
+  </div>
+</div>
+
 <script>
+  // Мобильное меню
   const btn = document.getElementById('mobile-menu-btn');
   const menu = document.getElementById('mobile-menu');
+  if (btn && menu) {
+    btn.addEventListener('click', () => {
+      menu.classList.toggle('show');
+    });
+  }
 
-  btn.addEventListener('click', () => {
-    menu.classList.toggle('show');
-  });
+  // AI Chat
+  const chatWindow = document.getElementById('ai-chat-window');
+  const chatMessages = document.getElementById('ai-chat-messages');
+  const chatInput = document.getElementById('ai-chat-input');
+
+  function toggleAIChat() {
+    chatWindow.classList.toggle('hidden');
+    if (!chatWindow.classList.contains('hidden')) {
+      chatInput.focus();
+    }
+  }
+
+  // Функция для авторасширения поля ввода
+  function autoResizeTextarea(el) {
+    el.style.height = '48px'; // Сбрасываем до начальной высоты
+    el.style.height = el.scrollHeight + 'px'; // Растягиваем по контенту
+  }
+
+  function handleAIKeyPress(event) {
+    // Отправляем сообщение по Enter (если не зажат Shift для переноса строки)
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault(); // Предотвращаем добавление новой строки при отправке
+      sendAIMessage();
+    }
+  }
+
+  function sendAIMessage() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    // Показываем сообщение пользователя
+    addAIMessage('user', msg);
+    
+    // Очищаем и сбрасываем размер textarea после отправки
+    chatInput.value = '';
+    chatInput.style.height = '48px';
+
+    // Показываем индикатор загрузки
+    const typingDiv = addAIMessage('bot', '⏳ Анализирую данные...');
+
+    fetch('/api/ai-chat/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ message: msg })
+    })
+    .then(res => res.json())
+    .then(data => {
+      // Удаляем "Анализирую..."
+      typingDiv.remove();
+      addAIMessage('bot', data.reply || '🤖 Мои нейросети перегружены. Попробуй переформулировать запрос.');
+    })
+    .catch(() => {
+      typingDiv.remove();
+      addAIMessage('bot', '🤖 Ошибка подключения к серверу Catalyst. Попробуй позже.');
+    });
+  }
+
+function formatAIText(text) {
+  // **жирный текст**
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  // переносы строк
+  text = text.replace(/\n/g, '<br>');
+
+  return text;
+}
+
+function addAIMessage(sender, text) {
+  const div = document.createElement('div');
+  div.className = 'ai-message ' + (sender === 'user' ? 'user' : 'bot');
+
+  if (sender === 'bot') {
+    div.innerHTML = formatAIText(text);
+  } else {
+    div.textContent = text;
+  }
+
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return div;
+}
 </script>
 
 </body>

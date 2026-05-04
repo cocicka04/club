@@ -756,55 +756,6 @@ body .glass-card {
   }
 }
 
-/* ========== TARIFFS CAROUSEL ========== */
-.carousel-fade::before,
-.carousel-fade::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: 40px;
-  height: 100%;
-  z-index: 5;
-  pointer-events: none;
-}
-
-.carousel-fade::before {
-  left: 0;
-  background: linear-gradient(to right, rgba(10, 8, 26, 0.9), transparent);
-}
-
-.carousel-fade::after {
-  right: 0;
-  background: linear-gradient(to left, rgba(10, 8, 26, 0.9), transparent);
-}
-/* Улучшенная адаптивность карусели тарифов */
-#tariffCarousel {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-#tariffCarousel::-webkit-scrollbar {
-  display: none;
-}
-
-/* Адаптивные карточки тарифов */
-.tariff-card {
-  transition: all 0.3s ease;
-}
-
-@media (max-width: 640px) {
-  .glass-card {
-    border-radius: 12px;
-  }
-  
-  #tariffs .text-2xl {
-    font-size: 1.5rem;
-  }
-  
-  #tariffs .text-xl {
-    font-size: 1.15rem;
-  }
-}
 /* ========== SECTION HEADERS ========== */
 .section-header {
   display: flex;
@@ -1060,152 +1011,146 @@ body .glass-card {
   }
 }
 
-/* ========== TARIFFS GRID ========== */
-.tariffs-grid, .places-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(10px, 2vw, 20px);
-  margin-bottom: 3rem;
-  padding: 0 clamp(10px, 4vw, 40px);
+/* ========== TARIFF FORM ========== */
+.max-w-2xl.mx-auto .glass-card {
+  background: rgba(21, 18, 43, 0.8) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(194, 82, 225, 0.3) !important;
+  border-radius: 16px !important;
+  padding: 2.5rem !important;
 }
 
-.tariff-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1.5rem;
+.max-w-2xl.mx-auto .glass-card form label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--neon-cyan) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.max-w-2xl.mx-auto .glass-card form input[type="text"],
+.max-w-2xl.mx-auto .glass-card form input[type="number"],
+.max-w-2xl.mx-auto .glass-card form select,
+.max-w-2xl.mx-auto .glass-card form textarea {
+  width: 100%;
+  background: rgba(10, 8, 26, 0.8);
+  border: 1px solid rgba(88, 106, 226, 0.4);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  margin-top: 0.25rem;
+}
+
+.max-w-2xl.mx-auto .glass-card form input:focus,
+.max-w-2xl.mx-auto .glass-card form select:focus,
+.max-w-2xl.mx-auto .glass-card form textarea:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(110, 203, 245, 0.25);
+}
+
+.max-w-2xl.mx-auto .glass-card form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.max-w-2xl.mx-auto .glass-card form select option {
+  background: #0a081a;
+  color: white;
+  padding: 8px;
+}
+
+/* Кнопка сохранения */
+.max-w-2xl.mx-auto .glass-card form button[type="submit"] {
+  background: linear-gradient(135deg, var(--neon-purple), var(--royal-blue));
+  color: white;
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(194, 82, 225, 0.3);
+}
+
+.max-w-2xl.mx-auto .glass-card form button[type="submit"]:hover {
+  box-shadow: 0 0 25px rgba(194, 82, 225, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Кнопка отмены */
+.max-w-2xl.mx-auto .glass-card form a[href*="tariffs"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(110, 203, 245, 0.5);
+  color: var(--neon-cyan);
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
   transition: all 0.3s ease;
 }
 
-.tariff-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
+.max-w-2xl.mx-auto .glass-card form a[href*="tariffs"]:hover {
+  background: rgba(110, 203, 245, 0.15);
+  box-shadow: 0 0 15px rgba(110, 203, 245, 0.3);
 }
 
-.tariff-name {
-  font-size: 1.5rem;
-  font-weight: 900;
-  font-family: 'Orbitron', sans-serif;
-  color: white;
+/* Ошибки */
+.max-w-2xl.mx-auto .glass-card form .text-red-400 {
+  color: #ff7070 !important;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+  padding-left: 0.25rem;
+  border-left: 2px solid #ff4655;
 }
 
-.tariff-badge {
-  padding: 0.25rem 0.5rem;
-  background: rgba(88, 106, 226, 0.1);
-  border: 1px solid rgba(88, 106, 226, 0.3);
-  border-radius: 4px;
-  font-size: 0.65rem;
-  color: var(--neon-cyan);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+/* Заголовок */
+.max-w-2xl.mx-auto h1 {
+  font-family: 'Orbitron', sans-serif !important;
+  position: relative;
+  padding-left: 1.5rem;
 }
 
-.tariff-desc {
-  font-size: 0.875rem;
-  color: rgba(224, 217, 246, 0.6);
-  border-left: 2px solid rgba(88, 106, 226, 0.3);
-  padding-left: 0.75rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
+.max-w-2xl.mx-auto h1::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--neon-purple);
+  box-shadow: 0 0 15px var(--neon-purple);
+  border-radius: 2px;
 }
 
-.tariff-price-section {
-  border-top: 1px solid rgba(88, 106, 226, 0.2);
-  padding-top: 1.5rem;
-  margin-top: auto;
-}
-
-.tariff-price {
-  font-size: 2rem;
-  font-weight: 900;
-  color: white;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
-.tariff-price-currency { color: var(--neon-purple); }
-.tariff-price-period {
-  font-size: 0.75rem;
-  color: rgba(224, 217, 246, 0.4);
-  font-weight: 400;
-  font-family: monospace;
-}
-
-.tariff-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.tariff-btn {
-  flex: 1;
-  font-size: 0.875rem;
-  padding: 0.5rem;
-}
-
-.tariff-edit-btn, .tariff-delete-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  text-decoration: none;
-  transition: all 0.3s;
-}
-
-.tariff-edit-btn {
-  border: 1px solid rgba(110, 203, 245, 0.5);
-  color: var(--neon-cyan);
-}
-.tariff-edit-btn:hover {
-  background: var(--neon-cyan);
-  color: var(--bg-deep);
-  box-shadow: 0 0 10px var(--neon-cyan);
-}
-
-.tariff-delete-btn {
-  border: 1px solid rgba(255, 70, 85, 0.5);
-  color: #ff4655;
-}
-.tariff-delete-btn:hover {
-  background: #ff4655;
-  color: white;
-  box-shadow: 0 0 10px rgba(255, 70, 85, 0.8);
-}
-/* ========== тариф мобилка ========== */
-@media (max-width: 768px) {
-
-  .tariffs-grid {
-    grid-template-columns: repeat(3, 1fr);
+/* Адаптив */
+@media (max-width: 480px) {
+  .max-w-2xl.mx-auto .glass-card {
+    padding: 1.5rem !important;
   }
-
-  .glass-card {
-    padding: 12px;
-    border-radius: 10px;
+  .max-w-2xl.mx-auto .glass-card form .flex {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .max-w-2xl.mx-auto .glass-card form button[type="submit"],
+  .max-w-2xl.mx-auto .glass-card form a[href*="tariffs"] {
     width: 100%;
-     min-width: 0;
-  }
-
-  .tariff-title {
-    font-size: clamp(0.8rem, 3vw, 1rem);
-  }
-
-  .tariff-price {
-    font-size: clamp(1rem, 4vw, 1.4rem);
-  }
-
-  .tariff-desc {
-    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
-  }
-
-  .tariff-btn {
-    font-size: 0.7rem;
-    padding: 6px;
+    text-align: center;
   }
 }
 
@@ -1489,19 +1434,45 @@ body .glass-card {
 
 .place-detail-image {
   position: relative;
-  min-height: 300px;
+  width: 100%;
+  aspect-ratio: 16 / 9;  /* ← фиксированное соотношение сторон */
+  max-height: 450px;      /* ← ограничение по высоте */
+  overflow: hidden;
 }
 
 .detail-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover;      /* ← обрезает лишнее, не растягивает */
+  object-position: center;
+}
+
+.detail-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    #15122b,
+    #15122b 10px,
+    #0a081a 10px,
+    #0a081a 20px
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .detail-image-gradient {
   position: absolute;
   inset: 0;
   background: linear-gradient(to right, rgba(21, 18, 43, 1), transparent);
+}
+
+/* Статус на картинке */
+.detail-status {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
 .detail-content {
@@ -1530,12 +1501,37 @@ body .glass-card {
   margin-bottom: 0.5rem;
 }
 
+.detail-category-badge {
+  font-size: 0.8rem;
+  color: var(--neon-purple);
+  text-transform: uppercase;
+  border: 1px solid rgba(194, 82, 225, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.detail-id {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: monospace;
+}
+
 .detail-title {
   font-size: 2.5rem;
   font-weight: 900;
   color: white;
   font-family: 'Orbitron', sans-serif;
   text-transform: uppercase;
+}
+
+.detail-description {
+  margin-bottom: 1rem;
+}
+
+.detail-desc-text {
+  color: rgba(224, 217, 246, 0.7);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .detail-specs {
@@ -1570,6 +1566,7 @@ body .glass-card {
   background: rgba(110, 203, 245, 0.1);
   padding: 0.5rem;
   border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .spec-info { display: flex; flex-direction: column; }
@@ -1581,14 +1578,47 @@ body .glass-card {
 }
 .spec-value { font-size: 1rem; font-weight: 700; color: white; }
 
+/* Статусы */
+.detail-free-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: rgba(77, 255, 136, 0.1);
+  border: 1px solid rgba(77, 255, 136, 0.3);
+  color: #88ffbb;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.detail-unavailable {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: rgba(255, 77, 77, 0.1);
+  border: 1px solid rgba(255, 77, 77, 0.3);
+  color: #ff7070;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.detail-price-section {
+  margin-top: auto;
+}
+
 .detail-price-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-top: auto;
   padding-top: 2rem;
   border-top: 1px solid rgba(88, 106, 226, 0.2);
 }
+
 @media (max-width: 768px) {
   .detail-price-row {
     padding-top: 1.5rem;
@@ -1615,10 +1645,49 @@ body .glass-card {
   margin-bottom: 0.25rem;
 }
 
-.price-value { font-size: 2.5rem; font-weight: 900; color: white; line-height: 1; }
-.detail-buttons { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; }
-.detail-book-btn { padding: 1rem 2rem; font-size: 1.125rem; }
+.price-value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+}
 
+.price-currency {
+  color: var(--neon-purple);
+  font-size: 2rem;
+}
+
+.detail-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.detail-book-btn {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+.detail-admin-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .detail-content {
+    padding: 1.5rem;
+  }
+  .detail-title {
+    font-size: 1.8rem;
+  }
+  .detail-specs {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
 /* ========== PAGINATION ========== */
 .pagination {
   display: flex;
@@ -1718,6 +1787,8 @@ body .glass-card {
   align-items: center;
   padding: 40px 15px;
 }
+
+/* Формы логина/регистрации — узкие */
 .form-card {
   width: 100%;
   max-width: 420px;
@@ -1726,20 +1797,27 @@ body .glass-card {
   display: flex;
   flex-direction: column;
 }
+
+/* Форма мест — широкая */
+.form-container .glass-card.form-card {
+  max-width: 800px;
+  padding: 40px;
+}
+
 @media (max-width: 480px) {
   .form-card {
     padding: 20px 15px;
     max-width: 95%;
   }
-    .form-group input {
+  .form-group input {
     font-size: 0.85rem;
     padding: 9px 10px;
   }
-
   .form-footer-text {
     font-size: 0.8rem;
   }
 }
+
 .form-footer {
   margin-top: 20px;
   padding-top: 15px;
@@ -1752,16 +1830,6 @@ body .glass-card {
 .form-footer-text {
   font-size: 0.9rem;
   color: var(--text-main);
-}
-.form-group input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(194, 82, 225, 0.3);
-  background: rgba(21, 18, 43, 0.8);
-  color: white;
-  font-size: 0.9rem;
 }
 
 .form-header-bar {
@@ -1799,31 +1867,52 @@ body .glass-card {
   letter-spacing: 0.05em;
 }
 
+.form-group h3.form-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Поля ввода */
 .form-group input[type="text"],
 .form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="datetime-local"],
 .form-group select,
 .form-group textarea {
   width: 100%;
   background: rgba(10, 8, 26, 0.8);
-  border: 1px solid rgba(88, 106, 226, 0.3);
+  border: 1px solid rgba(88, 106, 226, 0.4);
   color: white;
   padding: 0.75rem 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
   font-family: 'Rajdhani', sans-serif;
   font-size: 1rem;
   transition: all 0.3s ease;
 }
 
+.form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--neon-purple);
-  box-shadow: 0 0 10px rgba(194, 82, 225, 0.3);
-}
-.form-group input:focus {
-  outline: none;
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 8px rgba(110, 203, 245, 0.4);
+  box-shadow: 0 0 10px rgba(110, 203, 245, 0.25);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-group select option {
+  background: #0a081a;
+  color: white;
+}
+
+.form-group input[type="file"] {
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0.5rem 0;
 }
 
 .form-error {
@@ -1845,6 +1934,27 @@ body .glass-card {
 
 .form-footer-link:hover {
   text-shadow: 0 0 8px var(--neon-cyan);
+}
+
+/* Сетка в 2 колонки для формы мест */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .col-span-2 {
+    grid-column: span 1;
+  }
 }
 
 .link {
@@ -3135,6 +3245,31 @@ body .glass-card {
   box-shadow: 0 0 15px var(--neon-purple);
   border-radius: 2px;
 }
+@media (max-width: 768px) {
+
+  .admin-page-title {
+    font-size: 1.6rem; /* уменьшаем */
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+
+    /* 💥 ВАЖНО — перенос текста */
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.3;
+  }
+
+  .admin-page-title::before {
+    width: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .admin-page-title {
+    font-size: 1.3rem; /* ещё меньше для маленьких экранов */
+    padding-left: 0.8rem;
+  }
+}
 
 .admin-layout {
   display: grid;
@@ -3369,4 +3504,257 @@ body .glass-card {
 .status-cancelled {
     background: rgba(255, 60, 60, 0.15);
     color: #ff3c3c;
+}
+/* ========== AI CHAT BOT UI ========== */
+.ai-chat-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+  border: none;
+  color: white;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(194, 82, 225, 0.4);
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.ai-chat-btn:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 0 30px rgba(110, 203, 245, 0.6);
+}
+
+/* Окно чата */
+.ai-chat-window {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  width: 380px;
+  height: 600px;
+  max-height: 80vh;
+  background: rgba(10, 8, 26, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(194, 82, 225, 0.4);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(88, 106, 226, 0.1);
+  overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ai-chat-window.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(40px) scale(0.95);
+}
+
+/* Шапка чата */
+.ai-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(21, 18, 43, 0.9);
+  border-bottom: 1px solid rgba(110, 203, 245, 0.2);
+  flex-shrink: 0;
+}
+
+.ai-chat-header span {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  color: white;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-chat-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.ai-chat-close:hover {
+  color: #ff4655;
+}
+
+/* Область сообщений */
+.ai-chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scroll-behavior: smooth;
+}
+
+/* Стилизация скроллбара для области сообщений */
+.ai-chat-messages::-webkit-scrollbar { width: 6px; }
+.ai-chat-messages::-webkit-scrollbar-track { background: transparent; }
+.ai-chat-messages::-webkit-scrollbar-thumb { background: rgba(88, 106, 226, 0.3); border-radius: 10px; }
+
+/* Сообщения (убрали обрезку и скролл) */
+.ai-message {
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  line-height: 1.5em;
+  border-radius: 14px;
+  max-width: 85%;
+  word-wrap: break-word;
+  animation: messageSlideIn 0.3s ease forwards;
+}
+
+/* Сообщение бота */
+.ai-message.bot {
+  align-self: flex-start;
+  background: rgba(21, 18, 43, 0.8);
+  border: 1px solid rgba(194, 82, 225, 0.3);
+  color: var(--text-main);
+  border-bottom-left-radius: 4px;
+}
+
+/* Сообщение пользователя */
+.ai-message.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--royal-blue), var(--neon-purple));
+  color: white;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 15px rgba(194, 82, 225, 0.2);
+}
+
+/* Поле ввода (теперь это textarea с авторостом) */
+.ai-chat-input {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  background: rgba(21, 18, 43, 0.9);
+  border-top: 1px solid rgba(110, 203, 245, 0.2);
+  flex-shrink: 0;
+  align-items: flex-end;
+}
+
+.ai-chat-input textarea {
+  flex: 1;
+  background: rgba(10, 8, 26, 0.8);
+  border: 1px solid rgba(88, 106, 226, 0.4);
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5em;
+  resize: none;
+  height: 48px;
+  min-height: 48px;
+  max-height: 96px;
+  overflow-y: auto;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ai-chat-input textarea:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(110, 203, 245, 0.2);
+}
+
+.ai-chat-input textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+.ai-message strong {
+  font-weight: 700;
+  color: #6ecbf5;
+  text-shadow: 0 0 8px rgba(110,203,245,0.6);
+}
+/* Блок с кнопками-ссылками в ответах бота */
+.ai-links-block {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ai-link-btn {
+  display: inline-block;
+  padding: 8px 14px;
+  background: rgba(110, 203, 245, 0.15);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 8px;
+  color: var(--neon-cyan) !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  align-self: flex-start;
+}
+
+.ai-link-btn:hover {
+  background: var(--neon-cyan);
+  color: #0a081a !important;
+  box-shadow: 0 0 12px rgba(110, 203, 245, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Стилизация скроллбара для поля ввода */
+.ai-chat-input textarea::-webkit-scrollbar { width: 4px; }
+.ai-chat-input textarea::-webkit-scrollbar-track { background: transparent; }
+.ai-chat-input textarea::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 4px; }
+
+/* Кнопка отправки */
+.ai-chat-send-btn {
+  background: var(--neon-cyan);
+  color: #0a081a;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.ai-chat-send-btn:hover {
+  background: white;
+  box-shadow: 0 0 15px var(--neon-cyan);
+  transform: scale(1.05);
+}
+
+@keyframes messageSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- АДАПТИВ ПОД МОБИЛЬНЫЕ УСТРОЙСТВА --- */
+@media (max-width: 480px) {
+  .ai-chat-window {
+    width: calc(100% - 40px);
+    height: 60vh;
+    bottom: 90px;
+    right: 20px;
+  }
+
+  .ai-chat-btn {
+    bottom: 20px;
+    right: 20px;
+  }
 }
