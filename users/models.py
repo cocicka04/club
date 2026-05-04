@@ -12,7 +12,9 @@ def create_profile(sender, instance, created, **kwargs):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='avatars/', blank=True,null=True)
-
+    confirmation_code = models.CharField(max_length=32, blank=True, default='')
+    reset_code = models.CharField(max_length=6, blank=True, default='')
+    email_confirmed = models.BooleanField(default=False)
     class Meta:
         verbose_name = "Профиль пользователя"
         verbose_name_plural = "Профили пользователей"

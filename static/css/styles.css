@@ -1823,7 +1823,9 @@ body .glass-card {
   padding-top: 15px;
   border-top: 1px solid rgba(194, 82, 225, 0.2);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   text-align: center;
 }
 
@@ -3202,7 +3204,7 @@ body .glass-card {
   font-size: 0.75rem;
   margin-top: 4px;
   margin-left: 2px;
-  opacity: 0;
+  opacity: 1;
   transition: 0.2s;
 }
 

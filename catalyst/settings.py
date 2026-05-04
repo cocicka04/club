@@ -12,6 +12,15 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'tttatta404@gmail.com'
+DEFAULT_FROM_EMAIL = 'Catalyst <support@catalyst.com>'
+EMAIL_HOST_PASSWORD = 'zfqzxhxzmqwprwlh'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -53,16 +62,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# email backend для dev (вывод в консоль)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для тестов
-DEFAULT_FROM_EMAIL = 'support@catalystclub.ru'
-
 
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'places:list'
 LOGOUT_REDIRECT_URL = 'users:login'
-
-
 
 
 MIDDLEWARE = [

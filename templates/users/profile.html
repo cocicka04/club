@@ -71,6 +71,27 @@
   </aside>
 
   <div class="profile-content">
+    {% if not user.profile.email_confirmed %}
+    <div class="email-confirm-banner glass-card" style="margin-bottom: 20px; padding: 15px 20px; border: 1px solid rgba(110, 203, 245, 0.4); background: rgba(110, 203, 245, 0.08);">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: var(--neon-cyan); font-weight: 600;">
+          Подтвердите ваш email
+        </span>
+        <button onclick="showEmailConfirm()" class="btn btn-sm" style="margin: 0;">Активировать почту</button>
+      </div>
+    </div>
+
+    <div id="email-confirm-form" class="glass-card hidden" style="margin-bottom: 20px; padding: 20px;">
+      <h3 style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; margin-bottom: 15px;">Подтверждение email</h3>
+      <p style="margin-bottom: 15px; font-size: 0.9rem;">Нажмите кнопку, чтобы отправить код подтверждения на <strong>{{ user.email }}</strong></p>
+      <button onclick="sendConfirmCode()" class="btn btn-sm" id="send-code-btn">Отправить код</button>
+      <div id="code-input-block" class="hidden" style="margin-top: 15px;">
+        <input type="text" id="confirm-code" placeholder="Введите код" class="edit-input" style="width: 150px; margin-right: 10px;">
+        <button onclick="confirmEmail()" class="btn btn-sm">Подтвердить</button>
+      </div>
+      <p id="confirm-status" style="margin-top: 10px; font-size: 0.85rem;"></p>
+    </div>
+    {% endif %}
     
     <section class="content-section">
       <div class="section-header">
@@ -299,5 +320,64 @@ document.addEventListener('keydown', function(e) {
     closeQR();
   }
 });
+function showEmailConfirm() {
+  document.getElementById('email-confirm-form').classList.toggle('hidden');
+}
+
+function sendConfirmCode() {
+  const btn = document.getElementById('send-code-btn');
+  const status = document.getElementById('confirm-status');
+  btn.disabled = true;
+  btn.textContent = 'Отправка...';
+  status.textContent = '';
+
+  fetch("{% url 'send_confirm_code' %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: JSON.stringify({})
+  })
+  .then(res => res.json())
+  .then(data => {
+    btn.disabled = false;
+    btn.textContent = 'Отправить код';
+    if (data.success) {
+      document.getElementById('code-input-block').classList.remove('hidden');
+      status.textContent = '✅ Код отправлен на почту!';
+      status.style.color = '#6ecbf5';
+    } else {
+      status.textContent = '❌ Ошибка отправки';
+      status.style.color = '#ff4655';
+    }
+  });
+}
+
+function confirmEmail() {
+  const code = document.getElementById('confirm-code').value.trim();
+  const status = document.getElementById('confirm-status');
+  if (!code) return;
+
+  fetch("{% url 'confirm_email_code' %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: JSON.stringify({ code: code })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      status.textContent = '✅ Почта подтверждена!';
+      status.style.color = '#6ef5a0';
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      status.textContent = '❌ ' + (data.error || 'Неверный код');
+      status.style.color = '#ff4655';
+    }
+  });
+}
 </script>
 {% endblock %}

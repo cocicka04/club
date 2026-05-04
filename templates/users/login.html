@@ -13,7 +13,7 @@
       {% if form.non_field_errors %}
         <div class="form-error">
           {% for error in form.non_field_errors %}
-            ⚠ Неверный логин или пароль.
+            Неверный логин или пароль.
           {% endfor %}
         </div>
       {% endif %}
@@ -31,7 +31,10 @@
       <button class="btn btn-full" type="submit">ВОЙТИ В СИСТЕМУ</button>
     </form>
 
-    <div class="form-footer" >
+    <div class="form-footer">
+      <p class="form-footer-text">
+        <a href="{% url 'password_reset' %}" class="form-footer-link">Забыли пароль?</a>
+      </p>
       <p class="form-footer-text">
         Не зарегистрированы?
         <a href="{% url 'users:register' %}" class="form-footer-link">Регистрация</a>

@@ -1,9 +1,7 @@
 import os
 import django
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'catalyst.settings')
 django.setup()
-
 from django.utils import timezone
 from typing import Dict
 from gigachat import GigaChat
