@@ -1230,40 +1230,67 @@ body .glass-card {
   font-family: 'Orbitron', sans-serif;
 }
 
-.place-status {
+/* ========== СТАТУСЫ МЕСТ (BUSY / ONLINE) ========== */
+
+/* Контейнер статуса */
+.place-status,
+.detail-status {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  z-index: 5;
 }
 
-.status-busy, .status-free {
-  display: flex;
+/* Сами блоки статуса BUSY и ONLINE */
+.status-busy,
+.status-free {
+  display: flex !important;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  background: rgba(10, 8, 26, 0.8);
-  backdrop-filter: blur(4px);
+  letter-spacing: 0.15em;
+  background: rgba(10, 8, 26, 0.9) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+  line-height: 1;
 }
 
-.status-busy { border: 1px solid #ff4655; color: #ff4655; }
-.status-free { border: 1px solid var(--neon-cyan); color: var(--neon-cyan); }
+/* BUSY - красный */
+.status-busy {
+  border: 1px solid #ff4655 !important;
+  color: #ff4655 !important;
+  box-shadow: 0 0 12px rgba(255, 70, 85, 0.3);
+}
 
-.status-busy-dot, .status-free-dot {
+/* ONLINE - голубой */
+.status-free {
+  border: 1px solid var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+  box-shadow: 0 0 12px rgba(110, 203, 245, 0.3);
+}
+
+/* Точки-индикаторы */
+.status-busy-dot,
+.status-free-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
+/* Точка BUSY */
 .status-busy-dot {
   background: #ff4655;
   box-shadow: 0 0 8px #ff4655;
   animation: pulse-red 2s infinite;
 }
 
+/* Точка ONLINE */
 .status-free-dot {
   background: var(--neon-cyan);
   box-shadow: 0 0 8px var(--neon-cyan);

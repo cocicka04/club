@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-main flex-grow-main admin-page">
+  <h1 class="admin-page-title">ПАНЕЛЬ СОТРУДНИКА</h1>
+
+  <div class="admin-layout">
+    
+    <aside class="admin-sidebar glass-card">
+      <h3 class="admin-sidebar-title">Действия</h3>
+      <ul class="admin-nav-list">
+        <li class="admin-nav-item">
+          <button class="admin-nav-link active" data-tab="tab-active">🟢 Активные сессии</button>
+        </li>
+        <li class="admin-nav-item">
+          <button class="admin-nav-link" data-tab="tab-search">🔍 Найти пользователя</button>
+        </li>
+        <li class="admin-nav-item">
+          <a href="{% url 'places:list' %}" class="admin-nav-link">💻 Список зон</a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="admin-content glass-card">
+
+      <!-- АКТИВНЫЕ СЕССИИ -->
+      <section id="tab-active" class="admin-section active">
+        <div class="admin-section-header">
+          <h2 class="admin-section-title">🟢 Активные сессии</h2>
+          <span style="color: var(--neon-cyan);">{{ active_sessions.count }} активных</span>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="admin-theme-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Код</th>
+                <th>Пользователь</th>
+                <th>Место</th>
+                <th>Начало</th>
+                <th>Конец</th>
+                <th class="text-right">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in active_sessions %}
+              <tr>
+                <td class="font-bold" style="color: var(--neon-cyan);">#{{ b.id }}</td>
+                <td style="font-family: monospace; color: var(--neon-purple);">{{ b.code }}</td>
+                <td class="font-bold">{{ b.user.username }}</td>
+                <td>{{ b.place.title }}</td>
+                <td>{{ b.start_time|date:"d.m H:i" }}</td>
+                <td>{{ b.end_time|date:"d.m H:i" }}</td>
+                <td class="admin-action-cell">
+                  <div class="admin-action-links">
+                    <button onclick="alert('QR: {{ b.code }}')" class="action-icon" title="QR">📱</button>
+                    <a href="{% url 'booking:extend' b.id %}" class="action-icon" title="Продлить">⏱</a>
+                    <a href="{% url 'booking:cancel' b.id %}" class="action-icon action-icon-delete" title="Отменить" onclick="return confirm('Отменить бронь #{{ b.id }}?')">✕</a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 30px; opacity: 0.5;">Нет активных сессий</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ПОИСК ПОЛЬЗОВАТЕЛЯ -->
+      <section id="tab-search" class="admin-section">
+        <div class="admin-section-header">
+          <h2 class="admin-section-title">🔍 Найти пользователя</h2>
+        </div>
+        
+        <div class="search-input-box" style="margin-bottom: 20px;">
+          <input type="text" id="user-search" placeholder="Введите имя пользователя..." 
+                 oninput="searchUsers()"
+                 style="width: 100%; background: transparent; border: none; outline: none; color: white;">
+          <span class="search-icon">🔍</span>
+        </div>
+        
+        <div id="search-results" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.admin-nav-link[data-tab]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById(this.getAttribute('data-tab')).classList.add('active');
+    });
+  });
+
+  function searchUsers() {
+    const query = document.getElementById('user-search').value.trim();
+    const container = document.getElementById('search-results');
+    
+    if (query.length < 2) { container.innerHTML = ''; return; }
+
+    fetch(`/users/cashier/search/?q=${encodeURIComponent(query)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.results.length === 0) {
+          container.innerHTML = '<p style="opacity: 0.5;">Ничего не найдено</p>';
+          return;
+        }
+        container.innerHTML = data.results.map(user => `
+          <div class="glass-card" style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span style="font-weight: 700; color: var(--neon-cyan);">${user.username}</span>
+              <span style="margin-left: 12px; opacity: 0.7;">${user.email}</span>
+            </div>
+          </div>
+        `).join('');
+      });
+  }
+</script>
+
+{% endblock %}

@@ -32,7 +32,7 @@
         
         <li class="admin-nav-item">
           <button class="admin-nav-link" data-tab="tab-users">👤 Пользователи</button>
-          <a href="{% url 'admin_user_create' %}" class="admin-add-icon" title="Добавить пользователя">+</a>
+          <a href="#" class="admin-add-icon" title="Добавить пользователя" onclick="event.preventDefault(); openUserCreateModal();">+</a>
         </li>
         
       </ul>
@@ -47,7 +47,6 @@
           <a href="{% url 'places:list' %}" class="btn btn-sm">Создать бронирование</a>
         </div>
 
-        <!-- Поиск и фильтры -->
         <div class="filter-bar" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
           <input type="text" id="booking-search" placeholder="🔍 Поиск по ID, коду, юзеру, месту..." 
                 style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(194,82,225,0.3); background: rgba(21,18,43,0.7); color: white; flex: 2; min-width: 200px;"
@@ -72,18 +71,17 @@
           <button onclick="resetBookingFilters()" class="btn-outline" style="padding: 8px 16px; white-space: nowrap;">Сбросить</button>
         </div>
 
-        <!-- Таблица -->
         <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
-          <table class="admin-theme-table" style="min-width: 900px;">
+          <table class="admin-theme-table" id="table-bookings" style="min-width: 900px;">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>User</th>
-                <th>Код</th>
-                <th>Место</th>
-                <th>Начало</th>
-                <th>Конец</th>
-                <th>Статус</th>
+                <th data-sort="id" class="sortable" onclick="sortTable('table-bookings', 0)">ID ▸</th>
+                <th data-sort="user" class="sortable" onclick="sortTable('table-bookings', 1)">User ▸</th>
+                <th data-sort="code" class="sortable" onclick="sortTable('table-bookings', 2)">Код ▸</th>
+                <th data-sort="place" class="sortable" onclick="sortTable('table-bookings', 3)">Место ▸</th>
+                <th data-sort="start" class="sortable" onclick="sortTable('table-bookings', 4)">Начало ▸</th>
+                <th data-sort="end" class="sortable" onclick="sortTable('table-bookings', 5)">Конец ▸</th>
+                <th data-sort="status" class="sortable" onclick="sortTable('table-bookings', 6)">Статус ▸</th>
                 <th class="text-right">Действия</th>
               </tr>
             </thead>
@@ -107,9 +105,9 @@
               </td>
               <td class="admin-action-cell">
                 <div class="admin-action-links">
-                  <a href="{% url 'admin_booking_edit' b.id %}" class="action-icon" title="Редактировать">✏️</a>
+                  <a href="{% url 'admin_booking_edit' b.id %}" class="action-icon" title="Редактировать">🖍</a>
                   {% if b.status == 'active' %}
-                  <a href="{% url 'admin_booking_delete' b.id %}" class="action-icon action-icon-delete" onclick="return confirm('Отменить бронирование #{{ b.id }}?')">🗑️</a>
+                  <a href="{% url 'admin_booking_delete' b.id %}" class="action-icon action-icon-delete" onclick="return confirm('Отменить бронирование #{{ b.id }}?')">✕</a>
                   {% endif %}
                 </div>
               </td>
@@ -123,7 +121,6 @@
           </table>
         </div>
 
-        <!-- Пагинация -->
         {% if bookings.has_other_pages %}
         <div class="pagination" style="margin-top: 25px;">
           {% if bookings.has_previous %}
@@ -154,11 +151,11 @@
           <a href="{% url 'places:create' %}" class="btn btn-sm">Добавить зону</a>
         </div>
         <div class="table-responsive">
-          <table class="admin-theme-table">
+          <table class="admin-theme-table" id="table-places">
             <thead>
               <tr>
-                <th>Название</th>
-                <th>Категория</th>
+                <th class="sortable" onclick="sortTable('table-places', 0)">Название ▸</th>
+                <th class="sortable" onclick="sortTable('table-places', 1)">Категория ▸</th>
                 <th class="text-right">Действия</th>
               </tr>
             </thead>
@@ -169,8 +166,8 @@
                 <td><span class="place-category">{{ p.category.name }}</span></td>
                 <td class="admin-action-cell">
                   <div class="admin-action-links">
-                    <a href="{% url 'places:edit' p.id %}" class="action-icon" title="Редактировать">✏️</a>
-                    <a href="{% url 'places:delete' p.id %}" class="action-icon action-icon-delete" title="Удалить">🗑️</a>
+                    <a href="{% url 'places:edit' p.id %}" class="action-icon" title="Редактировать">🖍</a>
+                    <a href="{% url 'places:delete' p.id %}" class="action-icon action-icon-delete" title="Удалить">✕</a>
                   </div>
                 </td>
               </tr>
@@ -187,11 +184,11 @@
           <a href="{% url 'tariffs:create' %}" class="btn btn-sm">Добавить тариф</a>
         </div>
         <div class="table-responsive">
-          <table class="admin-theme-table">
+          <table class="admin-theme-table" id="table-tariffs">
             <thead>
               <tr>
-                <th>Название</th>
-                <th>Цена</th>
+                <th class="sortable" onclick="sortTable('table-tariffs', 0)">Название ▸</th>
+                <th class="sortable" onclick="sortTable('table-tariffs', 1)">Цена ▸</th>
                 <th class="text-right">Действия</th>
               </tr>
             </thead>
@@ -202,8 +199,8 @@
                 <td class="text-purple font-bold">{{ t.price_per_hour }} ₽</td>
                 <td class="admin-action-cell">
                   <div class="admin-action-links">
-                    <a href="{% url 'tariffs:edit' t.id %}" class="action-icon" title="Редактировать">✏️</a>
-                    <a href="{% url 'tariffs:delete' t.id %}" class="action-icon action-icon-delete" title="Удалить">🗑️</a>
+                    <a href="{% url 'tariffs:edit' t.id %}" class="action-icon" title="Редактировать">🖍</a>
+                    <a href="{% url 'tariffs:delete' t.id %}" class="action-icon action-icon-delete" title="Удалить">✕</a>
                   </div>
                 </td>
               </tr>
@@ -220,10 +217,10 @@
           <a href="{% url 'tariffs:category_create' %}" class="btn btn-sm">Добавить категорию</a>
         </div>
         <div class="table-responsive">
-          <table class="admin-theme-table">
+          <table class="admin-theme-table" id="table-categories">
             <thead>
               <tr>
-                <th>Название</th>
+                <th class="sortable" onclick="sortTable('table-categories', 0)">Название ▸</th>
                 <th class="text-right">Действия</th>
               </tr>
             </thead>
@@ -233,8 +230,8 @@
                 <td class="font-bold text-cyan">{{ c.name }}</td>
                 <td class="admin-action-cell">
                   <div class="admin-action-links">
-                    <a href="{% url 'tariffs:category_edit' c.id %}" class="action-icon">✏️</a>
-                    <a href="{% url 'tariffs:category_delete' c.id %}" class="action-icon action-icon-delete" onclick="return confirm('Удалить категорию?')">🗑️</a>
+                    <a href="{% url 'tariffs:category_edit' c.id %}" class="action-icon">🖍</a>
+                    <a href="{% url 'tariffs:category_delete' c.id %}" class="action-icon action-icon-delete" onclick="return confirm('Удалить категорию?')">✕</a>
                   </div>
                 </td>
               </tr>
@@ -248,14 +245,15 @@
       <section id="tab-users" class="admin-section">
         <div class="admin-section-header">
           <h2 class="admin-section-title">👤 Пользователи</h2>
-          <a href="{% url 'admin_user_create' %}" class="btn btn-sm">Добавить пользователя</a>
+          <button onclick="openUserCreateModal()" class="btn btn-sm">Добавить пользователя</button>
         </div>
         <div class="table-responsive">
-          <table class="admin-theme-table">
+          <table class="admin-theme-table" id="table-users">
             <thead>
               <tr>
-                <th>Username</th>
-                <th>Email</th>
+                <th class="sortable" onclick="sortTable('table-users', 0)">Username ▸</th>
+                <th class="sortable" onclick="sortTable('table-users', 1)">Email ▸</th>
+                <th class="sortable" onclick="sortTable('table-users', 2)">Роль ▸</th>
                 <th class="text-right">Действия</th>
               </tr>
             </thead>
@@ -264,10 +262,13 @@
               <tr>
                 <td class="font-bold text-cyan">{{ u.username }}</td>
                 <td class="opacity-70">{{ u.email }}</td>
+                <td>
+                  <span class="item-status-badge status-active">{{ u.profile.get_role_display }}</span>
+                </td>
                 <td class="admin-action-cell">
                   <div class="admin-action-links">
-                    <a href="{% url 'admin_user_edit' u.id %}" class="action-icon" title="Редактировать">✏️</a>
-                    <a href="{% url 'admin_user_delete' u.id %}" class="action-icon action-icon-delete" onclick="return confirm('Удалить пользователя?')">🗑️</a>
+                    <button onclick="openUserEditModal({{ u.id }}, '{{ u.username }}', '{{ u.email }}', '{{ u.profile.role }}')" class="action-icon" title="Редактировать">🖍</button>
+                    <a href="{% url 'admin_user_delete' u.id %}" class="action-icon action-icon-delete" onclick="return confirm('Удалить пользователя?')">✕</a>
                   </div>
                 </td>
               </tr>
@@ -276,12 +277,105 @@
           </table>
         </div>
       </section>
-
     </main>
+  </div>
+    <!-- ======================== МОДАЛЬНОЕ ОКНО: СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ ======================== -->
+  <div id="user-create-modal" class="qr-modal hidden">
+    <div class="qr-modal-content" style="max-width: 420px; width: 90%; text-align: left; padding: 30px 25px;">
+      <span class="qr-close" onclick="closeUserCreateModal()">×</span>
+      <h3 class="form-title" style="margin-top: 0; margin-bottom: 20px; font-size: 1.5rem;">НОВЫЙ ПОЛЬЗОВАТЕЛЬ</h3>
+      
+      <form id="user-create-form" onsubmit="createUser(event)">
+        {% csrf_token %}
+        
+        <div class="form-group" style="padding: 1rem;">
+          <label class="form-label">Логин</label>
+          <input type="text" name="username" id="create-username" 
+                class="edit-input" style="width: 100%;" 
+                maxlength="12" minlength="3" required
+                oninput="validateCreateUsername()">
+          <p id="create-username-error" class="field-error" style="display: none;"></p>
+        </div>
+
+        <div class="form-group" style="padding: 1rem;">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" id="create-email" 
+                class="edit-input" style="width: 100%;" 
+                minlength="5" required
+                oninput="validateCreateEmail()">
+          <p id="create-email-error" class="field-error" style="display: none;"></p>
+        </div>
+
+        <div class="form-group" style="padding: 1rem;">
+          <label class="form-label">Пароль</label>
+          <input type="password" name="password1" id="create-password1" 
+                class="edit-input" style="width: 100%;" 
+                minlength="6" required>
+        </div>
+
+        <div class="form-group" style="padding: 1rem;">
+          <label class="form-label">Повтор пароля</label>
+          <input type="password" name="password2" id="create-password2" 
+                class="edit-input" style="width: 100%;" 
+                minlength="6" required>
+          <p id="create-password-error" class="field-error" style="display: none;"></p>
+        </div>
+        <div class="form-group" style="padding: 1rem;">
+          <label class="form-label">Роль</label>
+          <select id="create-role" class="edit-input" style="width: 100%; background: rgba(10,8,26,0.8); border: 1px solid rgba(88,106,226,0.4); color: white; padding: 0.75rem 1rem; border-radius: 8px;">
+            <option value="user">Пользователь</option>
+            <option value="cashier">Сотрудник за стойкой</option>
+            <option value="admin">Администратор</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-full">СОЗДАТЬ АККАУНТ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================== МОДАЛЬНОЕ ОКНО: РЕДАКТИРОВАНИЕ ПОЛЬЗОВАТЕЛЯ ======================== -->
+  <div id="user-edit-modal" class="qr-modal hidden">
+    <div class="qr-modal-content" style="max-width: 420px; width: 90%; text-align: left; padding: 30px 25px;">
+      <span class="qr-close" onclick="closeUserEditModal()">×</span>
+      <h3 class="form-title" style="margin-top: 0; margin-bottom: 20px; font-size: 1.5rem;">РЕДАКТИРОВАНИЕ</h3>
+      
+      <form id="user-edit-form" onsubmit="updateUser(event)">
+        {% csrf_token %}
+        <input type="hidden" id="edit-user-id">
+        
+        <div class="form-group" style="padding: 1rem;">
+          <label class="form-label">Логин</label>
+          <input type="text" id="edit-username" 
+                class="edit-input" style="width: 100%;" 
+                maxlength="12" minlength="3" required
+                oninput="validateEditUsername()">
+          <p id="edit-username-error" class="field-error" style="display: none;"></p>
+        </div>
+
+        <div class="form-group" style="padding: 1rem;">
+          <label class="form-label">Email</label>
+          <input type="email" id="edit-email" 
+                class="edit-input" style="width: 100%;" 
+                minlength="5" required
+                oninput="validateEditEmail()">
+          <p id="edit-email-error" class="field-error" style="display: none;"></p>
+        </div>
+        <div class="form-group" style="padding: 1rem;">
+          <label class="form-label">Роль</label>
+          <select id="edit-role" class="edit-input" style="width: 100%; background: rgba(10,8,26,0.8); border: 1px solid rgba(88,106,226,0.4); color: white; padding: 0.75rem 1rem; border-radius: 8px;">
+            <option value="user">Пользователь</option>
+            <option value="cashier">Сотрудник</option>
+            <option value="admin">Администратор</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-full">СОХРАНИТЬ</button>
+      </form>
+    </div>
   </div>
 </div>
 
 <script>
+  // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
   document.addEventListener("DOMContentLoaded", function() {
     const navLinks = document.querySelectorAll('.admin-nav-link');
     const sections = document.querySelectorAll('.admin-section');
@@ -298,33 +392,377 @@
         document.getElementById(targetId).classList.add('active');
       });
     });
+
+    // Добавляем иконки сортировки во все заголовки с классом sortable
+    document.querySelectorAll('th.sortable').forEach(th => {
+      if (!th.querySelector('.sort-icon')) {
+        const icon = document.createElement('span');
+        icon.className = 'sort-icon';
+        icon.textContent = ' ↕';
+        icon.style.opacity = '0.3';
+        icon.style.marginLeft = '4px';
+        th.appendChild(icon);
+      }
+    });
   });
+
+  // ========== ФИЛЬТРЫ БРОНИРОВАНИЙ ==========
   function applyBookingFilters() {
-  const search = document.getElementById('booking-search').value;
-  const user = document.getElementById('booking-user-filter').value;
-  const place = document.getElementById('booking-place-filter').value;
-  const dateFrom = document.getElementById('booking-date-from').value;
-  const dateTo = document.getElementById('booking-date-to').value;
+    const search = document.getElementById('booking-search').value;
+    const user = document.getElementById('booking-user-filter').value;
+    const place = document.getElementById('booking-place-filter').value;
+    const dateFrom = document.getElementById('booking-date-from').value;
+    const dateTo = document.getElementById('booking-date-to').value;
 
-  let url = window.location.pathname + '?';
-  if (search) url += 'search=' + encodeURIComponent(search) + '&';
-  if (user) url += 'user=' + encodeURIComponent(user) + '&';
-  if (place) url += 'place=' + encodeURIComponent(place) + '&';
-  if (dateFrom) url += 'date_from=' + encodeURIComponent(dateFrom) + '&';
-  if (dateTo) url += 'date_to=' + encodeURIComponent(dateTo) + '&';
+    let url = window.location.pathname + '?';
+    if (search) url += 'search=' + encodeURIComponent(search) + '&';
+    if (user) url += 'user=' + encodeURIComponent(user) + '&';
+    if (place) url += 'place=' + encodeURIComponent(place) + '&';
+    if (dateFrom) url += 'date_from=' + encodeURIComponent(dateFrom) + '&';
+    if (dateTo) url += 'date_to=' + encodeURIComponent(dateTo) + '&';
 
-  window.location.href = url;
-}
+    window.location.href = url;
+  }
 
-function resetBookingFilters() {
-  document.getElementById('booking-search').value = '';
-  document.getElementById('booking-user-filter').value = '';
-  document.getElementById('booking-place-filter').value = '';
-  document.getElementById('booking-date-from').value = '';
-  document.getElementById('booking-date-to').value = '';
-  window.location.href = window.location.pathname;
-}
+  function resetBookingFilters() {
+    document.getElementById('booking-search').value = '';
+    document.getElementById('booking-user-filter').value = '';
+    document.getElementById('booking-place-filter').value = '';
+    document.getElementById('booking-date-from').value = '';
+    document.getElementById('booking-date-to').value = '';
+    window.location.href = window.location.pathname;
+  }
 
+  // ========== СОРТИРОВКА ТАБЛИЦ ==========
+  const sortStates = {};
+
+  function sortTable(tableId, columnIndex) {
+    const table = document.getElementById(tableId);
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Пропускаем строку "не найдены" (где всего одна ячейка)
+    const dataRows = rows.filter(row => row.querySelectorAll('td').length > 1);
+    if (dataRows.length === 0) return;
+
+    // Определяем направление сортировки
+    const key = tableId + '_' + columnIndex;
+    if (!sortStates[key]) sortStates[key] = 'asc';
+    else sortStates[key] = sortStates[key] === 'asc' ? 'desc' : 'asc';
+    const direction = sortStates[key];
+
+    // Обновляем иконки во ВСЕХ заголовках ЭТОЙ таблицы
+    const headers = table.querySelectorAll('th.sortable');
+    headers.forEach((th, i) => {
+      const icon = th.querySelector('.sort-icon');
+      if (!icon) return;
+      
+      if (i === columnIndex) {
+        icon.textContent = direction === 'asc' ? ' ▲' : ' ▼';
+        icon.style.opacity = '1';
+        icon.style.color = 'var(--neon-cyan)';
+      } else {
+        icon.textContent = ' ↕';
+        icon.style.opacity = '0.3';
+        icon.style.color = '';
+      }
+    });
+
+    // Сортируем
+    dataRows.sort((a, b) => {
+      let aVal = a.querySelectorAll('td')[columnIndex]?.textContent.trim() || '';
+      let bVal = b.querySelectorAll('td')[columnIndex]?.textContent.trim() || '';
+
+      // Убираем # и пробелы для чистоты
+      aVal = aVal.replace(/^#\s*/, '');
+      bVal = bVal.replace(/^#\s*/, '');
+
+      // Пробуем как числа
+      const aNum = parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+      const bNum = parseFloat(bVal.replace(/[^0-9.-]/g, ''));
+
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return direction === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+
+      // Как строки
+      return direction === 'asc' 
+        ? aVal.localeCompare(bVal, 'ru') 
+        : bVal.localeCompare(aVal, 'ru');
+    });
+
+    // Перемещаем строки в правильном порядке
+    dataRows.forEach(row => tbody.appendChild(row));
+  }
+
+  // ========== МОДАЛЬНЫЕ ОКНА ПОЛЬЗОВАТЕЛЕЙ ==========
+
+  // --- СОЗДАНИЕ ---
+  function openUserCreateModal() {
+    document.getElementById('user-create-modal').classList.remove('hidden');
+    void document.getElementById('user-create-modal').offsetWidth;
+    document.getElementById('user-create-modal').classList.add('show');
+  }
+
+  function closeUserCreateModal() {
+    const modal = document.getElementById('user-create-modal');
+    modal.classList.add('hiding');
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('hiding');
+      document.getElementById('user-create-form').reset();
+    }, 350);
+  }
+
+  // --- РЕДАКТИРОВАНИЕ ---
+  function openUserEditModal(id, username, email, role) {
+    document.getElementById('edit-user-id').value = id;
+    document.getElementById('edit-username').value = username;
+    document.getElementById('edit-email').value = email;
+    document.getElementById('edit-role').value = role || 'user';
+    hideFieldErrorById('edit-username-error');
+    hideFieldErrorById('edit-email-error');
+    
+    document.getElementById('user-edit-modal').classList.remove('hidden');
+    void document.getElementById('user-edit-modal').offsetWidth;
+    document.getElementById('user-edit-modal').classList.add('show');
+  }
+
+  function closeUserEditModal() {
+    const modal = document.getElementById('user-edit-modal');
+    modal.classList.add('hiding');
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('hiding');
+    }, 350);
+  }
+
+  // --- ЗАКРЫТИЕ ПО ФОНУ И ESC ---
+  document.getElementById('user-create-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeUserCreateModal();
+  });
+  document.getElementById('user-edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeUserEditModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeUserCreateModal();
+      closeUserEditModal();
+    }
+  });
+
+  // --- ВАЛИДАЦИЯ ДЛЯ СОЗДАНИЯ ---
+  function validateCreateUsername() {
+    const input = document.getElementById('create-username');
+    let value = input.value.replace(/[^A-Za-zА-Яа-я0-9_]/g, '');
+    input.value = value.slice(0, 12);
+    
+    const err = document.getElementById('create-username-error');
+    if (value.length === 0) {
+      showFieldErrorById('create-username-error', 'Имя не может быть пустым');
+    } else if (value.length < 3) {
+      showFieldErrorById('create-username-error', 'Минимум 3 символа');
+    } else {
+      hideFieldErrorById('create-username-error');
+    }
+  }
+
+  function validateCreateEmail() {
+    const input = document.getElementById('create-email');
+    input.value = input.value.toLowerCase();
+    const email = input.value.trim();
+    
+    const err = document.getElementById('create-email-error');
+    if (email.length === 0) {
+      showFieldErrorById('create-email-error', 'Email не может быть пустым');
+    } else if (email.length < 5 || !email.includes('@') || !email.includes('.')) {
+      showFieldErrorById('create-email-error', 'Введите корректный email');
+    } else {
+      hideFieldErrorById('create-email-error');
+    }
+  }
+
+  // --- ВАЛИДАЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ ---
+  function validateEditUsername() {
+    const input = document.getElementById('edit-username');
+    let value = input.value.replace(/[^A-Za-z0-9_]/g, '');
+    input.value = value.slice(0, 12);
+    
+    const err = document.getElementById('edit-username-error');
+    if (value.length === 0) {
+      showFieldErrorById('edit-username-error', 'Имя не может быть пустым');
+    } else if (value.length < 3) {
+      showFieldErrorById('edit-username-error', 'Минимум 3 символа');
+    } else {
+      hideFieldErrorById('edit-username-error');
+    }
+  }
+
+  function validateEditEmail() {
+    const input = document.getElementById('edit-email');
+    input.value = input.value.toLowerCase();
+    const email = input.value.trim();
+    
+    const err = document.getElementById('edit-email-error');
+    if (email.length === 0) {
+      showFieldErrorById('edit-email-error', 'Email не может быть пустым');
+    } else if (email.length < 5 || !email.includes('@') || !email.includes('.')) {
+      showFieldErrorById('edit-email-error', 'Введите корректный email');
+    } else {
+      hideFieldErrorById('edit-email-error');
+    }
+  }
+
+  // --- ВСПОМОГАТЕЛЬНЫЕ ---
+  function showFieldErrorById(id, message) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerText = message;
+      el.style.display = 'block';
+    }
+  }
+
+  function hideFieldErrorById(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = 'none';
+      el.innerText = '';
+    }
+  }
+
+    // --- ОТПРАВКА ФОРМ ---
+    function createUser(event) {
+    event.preventDefault();
+    
+    validateCreateUsername();
+    validateCreateEmail();
+    
+    const password1 = document.getElementById('create-password1').value;
+    const password2 = document.getElementById('create-password2').value;
+    const passwordError = document.getElementById('create-password-error');
+    
+    if (password1.length < 6) {
+      passwordError.innerText = 'Пароль должен быть минимум 6 символов';
+      passwordError.style.display = 'block';
+      return;
+    }
+    if (password1 !== password2) {
+      passwordError.innerText = 'Пароли не совпадают';
+      passwordError.style.display = 'block';
+      return;
+    }
+    passwordError.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('username', document.getElementById('create-username').value.trim());
+    formData.append('email', document.getElementById('create-email').value.trim());
+    formData.append('password1', password1);
+    formData.append('password2', password2);
+    formData.append('role', document.getElementById('create-role').value);
+
+    fetch("/users/admin/user/create/", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        if (data.errors) {
+          Object.keys(data.errors).forEach(field => {
+            if (field === 'password1' || field === 'password2') {
+              const el = document.getElementById('create-password-error');
+              if (el) {
+                el.innerText = data.errors[field][0];
+                el.style.display = 'block';
+              }
+            } else {
+              const el = document.getElementById('create-' + field + '-error');
+              if (el) {
+                el.innerText = data.errors[field][0];
+                el.style.display = 'block';
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+    function updateUser(event) {
+    event.preventDefault();
+    
+    validateEditUsername();
+    validateEditEmail();
+
+    const formData = new FormData();
+    formData.append('user_id', document.getElementById('edit-user-id').value);
+    formData.append('username', document.getElementById('edit-username').value.trim());
+    formData.append('email', document.getElementById('edit-email').value.trim());
+    formData.append('role', document.getElementById('edit-role').value);
+
+    fetch("/users/admin/user/edit/", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        if (data.errors) {
+          Object.keys(data.errors).forEach(field => {
+            const el = document.getElementById('edit-' + field + '-error');
+            if (el) {
+              el.innerText = data.errors[field][0];
+              el.style.display = 'block';
+            }
+          });
+        }
+      }
+    });
+  }
 </script>
+
+<style>
+  .sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+  }
+  .sortable:hover {
+    color: var(--neon-purple);
+    text-shadow: 0 0 8px rgba(194, 82, 225, 0.5);
+  }
+  /* Сортируемые заголовки таблиц */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+th.sortable:hover {
+  color: var(--neon-purple) !important;
+  text-shadow: 0 0 8px rgba(194, 82, 225, 0.4);
+}
+
+.sort-icon {
+  display: inline-block;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+}
+</style>
 
 {% endblock %}

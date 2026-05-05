@@ -1,22 +1,43 @@
 {% for place in places %}
   <a href="{% url 'places:detail' place.id %}" class="place-card-link">
-
-    <div class="glass-card place-card">
-
+    <div class="glass-card place-card search-card">
       <div class="place-image-wrapper">
         {% if place.image %}
           <img src="{{ place.image.url }}" class="place-image">
-        {% endif %}
-      </div>
-      <div class="place-status">
-        {% if place.is_busy %}
-          <div class="status-busy">BUSY</div>
         {% else %}
-          <div class="status-free">ONLINE</div>
+          <div class="place-image-placeholder">
+            <span class="placeholder-text">NO SIGNAL</span>
+          </div>
         {% endif %}
-      </div>
+        <div class="place-image-gradient"></div>
+        <div class="place-number-badge">
+          <span class="place-number">#{{ place.number }}</span>
+        </div>
+        <div class="place-status">
+          {% if place.active_booking %}
+            <div class="status-busy">
+              <span class="status-busy-dot"></span>
+              BUSY
+            </div>
+          {% else %}
+            <div class="status-free">
+              <span class="status-free-dot"></span>
+              ONLINE
+            </div>
+          {% endif %}
+        </div>
+      </div>      
       <div class="place-content">
-        <div class="place-title">{{ place.title }}</div>
+        <div class="place-title-row">
+          <h3 class="place-title">{{ place.title }}</h3>
+          <span class="place-category">{{ place.category.name }}</span>
+        </div>
+        {% if place.active_booking %}
+          <div class="detail-unavailable" style="margin-bottom: 6px; font-size: 0.65rem;">
+            <span class="status-dot busy"></span>
+            <span>Занято до {{ place.active_booking.end_time|date:"d.m H:i" }}</span>
+          </div>
+        {% endif %}
         <div class="place-specs">
            <div><span class="spec-label">CPU:</span> {{ place.cpu|default:"-"|truncatechars:12 }}</div>
            <div><span class="spec-label">GPU:</span> {{ place.gpu|default:"-"|truncatechars:12 }}</div>
@@ -24,13 +45,15 @@
         <div class="place-price">{{ place.tariff.price_per_hour }} ₽</div>
       </div>
       <div class="place-actions">
-        {% if not place.active_booking %}
-          <a href="{% url 'booking:create_with_place' place.id %}" class="place-book-btn">Забронировать</a>
-        {% else %}
-          <div class="place-book-disabled">Недоступно</div>
-        {% endif %}
-
-        <a href="{% url 'places:detail' place.id %}" class="place-detail-btn" title="Подробнее">
+        <a href="{% url 'booking:create_with_place' place.id %}" 
+           class="place-book-btn"
+           onclick="event.stopPropagation()">
+          Забронировать
+        </a>
+        <a href="{% url 'places:detail' place.id %}" 
+           class="place-detail-btn" 
+           onclick="event.stopPropagation()"
+           title="Подробнее">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
           </svg>

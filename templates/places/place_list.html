@@ -66,16 +66,17 @@
           <span class="place-number">#{{ place.number }}</span>
         </div>
 
+        <!-- 🔴 СТАТУС МЕСТА (BUSY / ONLINE) -->
         <div class="place-status">
           {% if place.active_booking %}
             <div class="status-busy">
-               <span class="status-busy-dot"></span>
-               BUSY
+              <span class="status-busy-dot"></span>
+              BUSY
             </div>
           {% else %}
             <div class="status-free">
-               <span class="status-free-dot"></span>
-               ONLINE
+              <span class="status-free-dot"></span>
+              ONLINE
             </div>
           {% endif %}
         </div>
@@ -87,6 +88,16 @@
           <h3 class="place-title">{{ place.title }}</h3>
           <span class="place-category">{{ place.category.name }}</span>
         </div>
+
+        <!-- ⏱ ВРЕМЯ ОСВОБОЖДЕНИЯ ДЛЯ ЗАНЯТЫХ МЕСТ -->
+        {% if place.active_booking %}
+          <div class="detail-unavailable" style="margin-bottom: 8px;">
+            <span class="status-dot busy"></span>
+            <span>
+              Занято до {{ place.active_booking.end_time|date:"d.m H:i" }}
+            </span>
+          </div>
+        {% endif %}
 
         <p class="place-desc">
           {{ place.description|default:"Описание отсутствует" }}
@@ -105,15 +116,12 @@
           </div>
           <div class="place-actions">
 
-            {% if not place.active_booking %}
-              <a href="{% url 'booking:create_with_place' place.id %}"
-                 class="place-book-btn"
-                 onclick="event.stopPropagation()">
-                 Забронировать
-              </a>
-            {% else %}
-              <div class="place-book-disabled">Недоступно</div>
-            {% endif %}
+            <!-- ✅ ВСЕГДА показываем "Забронировать" -->
+            <a href="{% url 'booking:create_with_place' place.id %}"
+               class="place-book-btn"
+               onclick="event.stopPropagation()">
+               Забронировать
+            </a>
 
             <a href="{% url 'places:detail' place.id %}"
                class="place-detail-btn"

@@ -8,13 +8,11 @@ class UserRegisterForm(forms.ModelForm):
     password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Повтор пароля", widget=forms.PasswordInput)
 
-    # Только популярные пользовательские почтовые сервисы СНГ
     ALLOWED_EMAIL_DOMAINS = [
-        'yandex.ru', 'yandex.com', 'yandex.ua', 'yandex.by', 'yandex.kz', 'ya.ru', 'gmail.com', 'mail.ru', 'inbox.ru', 'list.ru', 'bk.ru', 'rambler.ru',
+        'yandex.ru', 'yandex.com', 'yandex.ua', 'yandex.by', 'yandex.kz',
+        'ya.ru', 'gmail.com', 'mail.ru', 'inbox.ru', 'list.ru', 'bk.ru', 'rambler.ru',
     ]
-    ALLOWED_TLDS = [
-        'ru', 'com', 'ua', 'by', 'kz',
-    ]
+    ALLOWED_TLDS = ['ru', 'com', 'ua', 'by', 'kz']
 
     class Meta:
         model = User
@@ -27,54 +25,31 @@ class UserRegisterForm(forms.ModelForm):
         if len(username) > 12:
             raise ValidationError("Имя пользователя не может быть длиннее 12 символов.")
         if not re.match(r'^[A-Za-z0-9_]+$', username):
-            raise ValidationError(
-                "Разрешены только латинские буквы, цифры и знак подчёркивания."
-            )
+            raise ValidationError("Разрешены только латинские буквы, цифры и знак подчёркивания.")
         if User.objects.filter(username=username).exists():
             raise ValidationError("Пользователь с таким именем уже существует.")
         return username
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower().strip()
-        
-        # Минимальная длина
         if len(email) < 5:
             raise ValidationError("Email слишком короткий (минимум 5 символов).")
-        
-        # Общая структура email
         if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
             raise ValidationError("Введите корректный email адрес.")
         
-        # Разбиваем на части
         local_part, domain = email.split('@', 1)
-        
-        # Локальная часть: минимум 1 символ, максимум 64
         if len(local_part) < 1 or len(local_part) > 64:
             raise ValidationError("Локальная часть email должна быть от 1 до 64 символов.")
-        
-        # Проверяем домен на наличие точки
         if '.' not in domain:
             raise ValidationError("Домен должен содержать точку (например, gmail.com).")
         
-        # Получаем TLD (последнюю часть после точки)
         tld = domain.split('.')[-1].lower()
-        
-        # Проверяем TLD
         if tld not in self.ALLOWED_TLDS:
-            raise ValidationError(
-                f"Домен .{tld} не поддерживается."
-            )
-        
-        # Проверяем, что домен в списке разрешённых
+            raise ValidationError(f"Домен .{tld} не поддерживается.")
         if domain not in self.ALLOWED_EMAIL_DOMAINS:
-            raise ValidationError(
-                f"Почтовый сервис {domain} не поддерживается. "
-            )
-        
-        # Проверка на уникальность
+            raise ValidationError(f"Почтовый сервис {domain} не поддерживается.")
         if User.objects.filter(email=email).exists():
             raise ValidationError("Этот email уже используется.")
-        
         return email
 
     def clean_password2(self):
@@ -85,7 +60,7 @@ class UserRegisterForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.is_active = True  
+        user.is_active = True
         user.set_password(self.cleaned_data['password1'])
         if commit:
             user.save()

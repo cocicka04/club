@@ -8,11 +8,13 @@ from tariffs.models import Tariff
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Prefetch
 from datetime import timedelta
 
 
 def place_list(request):
+    now = timezone.now()
+    
     places = Place.objects.select_related('tariff', 'category').all()
 
     # --- фильтры ---
@@ -32,10 +34,7 @@ def place_list(request):
     if max_price:
         places = places.filter(tariff__price_per_hour__lte=max_price)
 
-    # --- ВРЕМЯ ---
-    now = timezone.now()
-
-    # ✅ активная сессия (ИМЕННО сейчас идет)
+    # ✅ Активная сессия (ИМЕННО сейчас идет)
     active_bookings = Booking.objects.filter(
         place=OuterRef('pk'),
         status=Booking.STATUS_ACTIVE,
@@ -43,10 +42,24 @@ def place_list(request):
         end_time__gt=now
     )
 
-    # аннотация
-    places = places.annotate(
+    # 🎯 Prefetch для получения активного бронирования (чтобы был доступ к end_time)
+    places = places.prefetch_related(
+        Prefetch(
+            'booking_set',
+            queryset=Booking.objects.filter(
+                status=Booking.STATUS_ACTIVE,
+                start_time__lte=now,
+                end_time__gt=now
+            ),
+            to_attr='active_bookings_list'
+        )
+    ).annotate(
         is_busy=Exists(active_bookings)
     )
+
+    # ✅ Добавляем active_booking как свойство для каждого места
+    for place in places:
+        place.active_booking = place.active_bookings_list[0] if place.active_bookings_list else None
 
     # пагинация
     paginator = Paginator(places, 9)
@@ -153,6 +166,8 @@ def place_delete(request, pk):
 
 
 def place_search_ajax(request):
+    now = timezone.now()
+    
     places = Place.objects.select_related('tariff', 'category').all()
 
     # --- фильтры ---
@@ -172,9 +187,7 @@ def place_search_ajax(request):
     if max_price:
         places = places.filter(tariff__price_per_hour__lte=max_price)
 
-    now = timezone.now()
-
-    # ✅ та же логика для AJAX
+    # ✅ Та же логика для AJAX
     active_bookings = Booking.objects.filter(
         place=OuterRef('pk'),
         status=Booking.STATUS_ACTIVE,
@@ -182,9 +195,23 @@ def place_search_ajax(request):
         end_time__gt=now
     )
 
-    places = places.annotate(
+    places = places.prefetch_related(
+        Prefetch(
+            'booking_set',
+            queryset=Booking.objects.filter(
+                status=Booking.STATUS_ACTIVE,
+                start_time__lte=now,
+                end_time__gt=now
+            ),
+            to_attr='active_bookings_list'
+        )
+    ).annotate(
         is_busy=Exists(active_bookings)
     )
+
+    # ✅ Добавляем active_booking для AJAX-результатов
+    for place in places:
+        place.active_booking = place.active_bookings_list[0] if place.active_bookings_list else None
 
     html = render_to_string('places/place_cards.html', {
         'places': places
