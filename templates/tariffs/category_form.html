@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="max-w-2xl mx-auto">
+  <h1 class="text-4xl font-black text-white mb-8 uppercase tracking-tight">{{ title }}</h1>
+
+  <div class="glass-card p-8">
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+      {% for field in form %}
+        <div>
+          <label class="block text-[#6ECBF5] text-sm font-bold mb-2">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <p class="text-red-400 text-xs mt-1">{{ field.errors|striptags }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="flex gap-4 pt-4">
+        <button type="submit" class="bg-[#C252E1] hover:bg-[#a13bc4] text-white font-bold py-2 px-6 rounded transition">Сохранить</button>
+        <a href="{% url 'tariffs:category_list' %}" class="border border-[#586AE2] text-[#6ECBF5] hover:bg-[#586AE2]/20 font-bold py-2 px-6 rounded transition">Отмена</a>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

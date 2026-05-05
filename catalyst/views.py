@@ -16,11 +16,14 @@ from users.models import News
 from users.forms import UserRegisterForm
 from tariffs.models import Tariff
 from booking.models import Booking
+from booking.forms import BookingForm
 from places.models import Place
 from booking.utils import finish_expired_bookings
 from .chat_service import ask_gigachat
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from tariffs.models import Category
+from django.db.models import Q
 
 # ===== СТАТИЧНЫЕ СТРАНИЦЫ =====
 
@@ -76,12 +79,55 @@ def news_delete(request, pk):
 
 @staff_member_required
 def admin_dashboard(request):
+    bookings = Booking.objects.select_related('user', 'place').all()
+
+    # Поиск и фильтры
+    search = request.GET.get('search', '').strip()
+    user_filter = request.GET.get('user', '').strip()
+    place_filter = request.GET.get('place', '').strip()
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+
+    if search:
+        bookings = bookings.filter(
+            Q(id__icontains=search) |
+            Q(user__username__icontains=search) |
+            Q(place__title__icontains=search) |
+            Q(code__icontains=search)
+        )
+
+    if user_filter:
+        bookings = bookings.filter(user__username__icontains=user_filter)
+
+    if place_filter:
+        bookings = bookings.filter(place__title__icontains=place_filter)
+
+    if date_from:
+        bookings = bookings.filter(start_time__date__gte=date_from)
+
+    if date_to:
+        bookings = bookings.filter(start_time__date__lte=date_to)
+
+    bookings = bookings.order_by('-start_time')
+
+    # Пагинация по 10
+    paginator = Paginator(bookings, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        "bookings": Booking.objects.all().order_by('-start_time'),
+        "bookings": page_obj,
         "places": Place.objects.all(),
         "tariffs": Tariff.objects.all(),
         "users": User.objects.all(),
         "news": News.objects.all().order_by('-created_at'),
+        "categories": Category.objects.all(),
+        # сохраняем фильтры для ссылок пагинации
+        "search_query": search,
+        "user_filter": user_filter,
+        "place_filter": place_filter,
+        "date_from": date_from,
+        "date_to": date_to,
     }
     return render(request, "users/dashboard.html", context)
 
@@ -320,3 +366,60 @@ def ai_chat(request):
     reply = ask_gigachat(user_message)
     return JsonResponse({'reply': reply})
 
+# ===== АДМИН: БРОНИРОВАНИЯ =====
+
+
+@staff_member_required
+def admin_booking_edit(request, pk):
+    from booking.views import admin_booking_edit as _admin_booking_edit
+    return _admin_booking_edit(request, pk)
+
+
+@staff_member_required
+def admin_booking_delete(request, pk):
+    from booking.views import admin_booking_delete as _admin_booking_delete
+    return _admin_booking_delete(request, pk)
+
+# ===== АДМИН: ПОЛЬЗОВАТЕЛИ =====
+
+@staff_member_required
+def admin_user_create(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+
+        if not username or not password:
+            messages.error(request, 'Логин и пароль обязательны.')
+            return render(request, 'admin/user_form.html', {'title': 'Создать пользователя'})
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Пользователь с таким логином уже существует.')
+            return render(request, 'admin/user_form.html', {'title': 'Создать пользователя'})
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+        messages.success(request, f'Пользователь {user.username} создан.')
+        return redirect('dashboard')
+
+    return render(request, 'admin/user_form.html', {'title': 'Создать пользователя'})
+
+@staff_member_required
+def admin_user_edit(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        user.username = request.POST.get('username', '').strip()
+        user.email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        if password:
+            user.set_password(password)
+        user.save()
+        messages.success(request, f'Пользователь {user.username} обновлён.')
+        return redirect('dashboard')
+
+    return render(request, 'admin/user_form.html', {'edit_user': user, 'title': 'Редактировать пользователя'})
+
+@staff_member_required
+def admin_user_delete(request, pk):
+    User.objects.filter(pk=pk).delete()
+    messages.success(request, 'Пользователь удалён.')
+    return redirect('dashboard')

@@ -12,6 +12,7 @@
         
         <li class="admin-nav-item">
           <button class="admin-nav-link active" data-tab="tab-bookings">📅 Бронирования</button>
+          <a href="{% url 'places:list' %}" class="admin-add-icon" title="Создать бронирование">+</a>
         </li>
         
         <li class="admin-nav-item">
@@ -23,9 +24,15 @@
           <button class="admin-nav-link" data-tab="tab-tariffs">💰 Тарифы</button>
           <a href="{% url 'tariffs:create' %}" class="admin-add-icon" title="Добавить тариф">+</a>
         </li>
+
+        <li class="admin-nav-item">
+          <button class="admin-nav-link" data-tab="tab-categories">📂 Категории ПК</button>
+          <a href="{% url 'tariffs:category_create' %}" class="admin-add-icon" title="Добавить категорию">+</a>
+        </li>
         
         <li class="admin-nav-item">
           <button class="admin-nav-link" data-tab="tab-users">👤 Пользователи</button>
+          <a href="{% url 'admin_user_create' %}" class="admin-add-icon" title="Добавить пользователя">+</a>
         </li>
         
       </ul>
@@ -33,44 +40,114 @@
 
     <main class="admin-content glass-card">
 
+      <!-- ======================== БРОНИРОВАНИЯ ======================== -->
       <section id="tab-bookings" class="admin-section active">
         <div class="admin-section-header">
           <h2 class="admin-section-title">📅 Бронирования</h2>
+          <a href="{% url 'places:list' %}" class="btn btn-sm">Создать бронирование</a>
         </div>
-        <div class="table-responsive">
-          <table class="admin-theme-table">
+
+        <!-- Поиск и фильтры -->
+        <div class="filter-bar" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+          <input type="text" id="booking-search" placeholder="🔍 Поиск по ID, коду, юзеру, месту..." 
+                style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(194,82,225,0.3); background: rgba(21,18,43,0.7); color: white; flex: 2; min-width: 200px;"
+                value="{{ search_query }}"
+                onchange="applyBookingFilters()">
+          <input type="text" id="booking-user-filter" placeholder="👤 Пользователь" 
+                style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(194,82,225,0.3); background: rgba(21,18,43,0.7); color: white; flex: 1; min-width: 140px;"
+                value="{{ user_filter }}"
+                onchange="applyBookingFilters()">
+          <input type="text" id="booking-place-filter" placeholder="💻 Зона" 
+                style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(194,82,225,0.3); background: rgba(21,18,43,0.7); color: white; flex: 1; min-width: 140px;"
+                value="{{ place_filter }}"
+                onchange="applyBookingFilters()">
+          <input type="date" id="booking-date-from" 
+                style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(194,82,225,0.3); background: rgba(21,18,43,0.7); color: white; flex: 1; min-width: 140px;"
+                value="{{ date_from }}"
+                onchange="applyBookingFilters()">
+          <input type="date" id="booking-date-to" 
+                style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(194,82,225,0.3); background: rgba(21,18,43,0.7); color: white; flex: 1; min-width: 140px;"
+                value="{{ date_to }}"
+                onchange="applyBookingFilters()">
+          <button onclick="resetBookingFilters()" class="btn-outline" style="padding: 8px 16px; white-space: nowrap;">Сбросить</button>
+        </div>
+
+        <!-- Таблица -->
+        <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table class="admin-theme-table" style="min-width: 900px;">
             <thead>
               <tr>
-                <th>Пользователь</th>
-                <th>Зона</th>
+                <th>ID</th>
+                <th>User</th>
+                <th>Код</th>
+                <th>Место</th>
                 <th>Начало</th>
                 <th>Конец</th>
                 <th>Статус</th>
+                <th class="text-right">Действия</th>
               </tr>
             </thead>
             <tbody>
-{% for b in bookings %}
-<tr>
-  <td class="font-bold">{{ b.user.username }}</td>
-  <td>{{ b.place.title }}</td>
-  <td>{{ b.start_time|date:"d.m.Y H:i" }}</td>
-  <td>{{ b.end_time|date:"d.m.Y H:i" }}</td>
-  <td>
-    <span class="item-status-badge 
-      {% if b.status == 'active' %}status-active
-      {% elif b.status == 'finished' %}status-finished
-      {% elif b.status == 'canceled' %}status-canceled
-      {% endif %}">
-      {{ b.get_status_display }}
-    </span>
-  </td>
-</tr>
-{% endfor %}
+            {% for b in bookings %}
+            <tr>
+              <td class="font-bold" style="color: var(--neon-cyan);">#{{ b.id }}</td>
+              <td class="font-bold">{{ b.user.username }}</td>
+              <td style="font-family: monospace; letter-spacing: 1px; color: var(--neon-purple);">{{ b.code }}</td>
+              <td>{{ b.place.title }}</td>
+              <td>{{ b.start_time|date:"d.m.Y H:i" }}</td>
+              <td>{{ b.end_time|date:"d.m.Y H:i" }}</td>
+              <td>
+                <span class="item-status-badge 
+                  {% if b.status == 'active' %}status-active
+                  {% elif b.status == 'finished' %}status-finished
+                  {% elif b.status == 'canceled' %}status-canceled
+                  {% endif %}">
+                  {{ b.get_status_display }}
+                </span>
+              </td>
+              <td class="admin-action-cell">
+                <div class="admin-action-links">
+                  <a href="{% url 'admin_booking_edit' b.id %}" class="action-icon" title="Редактировать">✏️</a>
+                  {% if b.status == 'active' %}
+                  <a href="{% url 'admin_booking_delete' b.id %}" class="action-icon action-icon-delete" onclick="return confirm('Отменить бронирование #{{ b.id }}?')">🗑️</a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 30px; opacity: 0.5;">Бронирования не найдены</td>
+            </tr>
+            {% endfor %}
             </tbody>
           </table>
         </div>
+
+        <!-- Пагинация -->
+        {% if bookings.has_other_pages %}
+        <div class="pagination" style="margin-top: 25px;">
+          {% if bookings.has_previous %}
+            <a href="?page=1&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">«</a>
+            <a href="?page={{ bookings.previous_page_number }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">‹</a>
+          {% endif %}
+
+          {% for num in bookings.paginator.page_range %}
+            {% if num == bookings.number %}
+              <span class="pagination-current">{{ num }}</span>
+            {% elif num > bookings.number|add:'-3' and num < bookings.number|add:'3' %}
+              <a href="?page={{ num }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if bookings.has_next %}
+            <a href="?page={{ bookings.next_page_number }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">›</a>
+            <a href="?page={{ bookings.paginator.num_pages }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">»</a>
+          {% endif %}
+        </div>
+        {% endif %}
       </section>
 
+      <!-- ======================== ЗОНЫ ======================== -->
       <section id="tab-places" class="admin-section">
         <div class="admin-section-header">
           <h2 class="admin-section-title">💻 Зоны</h2>
@@ -103,6 +180,7 @@
         </div>
       </section>
 
+      <!-- ======================== ТАРИФЫ ======================== -->
       <section id="tab-tariffs" class="admin-section">
         <div class="admin-section-header">
           <h2 class="admin-section-title">💰 Тарифы</h2>
@@ -114,10 +192,7 @@
               <tr>
                 <th>Название</th>
                 <th>Цена</th>
-                <th class="text-right">Действия
-
-
-</th>
+                <th class="text-right">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -138,9 +213,42 @@
         </div>
       </section>
 
+      <!-- ======================== КАТЕГОРИИ ======================== -->
+      <section id="tab-categories" class="admin-section">
+        <div class="admin-section-header">
+          <h2 class="admin-section-title">📂 Категории ПК</h2>
+          <a href="{% url 'tariffs:category_create' %}" class="btn btn-sm">Добавить категорию</a>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-theme-table">
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th class="text-right">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in categories %}
+              <tr>
+                <td class="font-bold text-cyan">{{ c.name }}</td>
+                <td class="admin-action-cell">
+                  <div class="admin-action-links">
+                    <a href="{% url 'tariffs:category_edit' c.id %}" class="action-icon">✏️</a>
+                    <a href="{% url 'tariffs:category_delete' c.id %}" class="action-icon action-icon-delete" onclick="return confirm('Удалить категорию?')">🗑️</a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ======================== ПОЛЬЗОВАТЕЛИ ======================== -->
       <section id="tab-users" class="admin-section">
         <div class="admin-section-header">
           <h2 class="admin-section-title">👤 Пользователи</h2>
+          <a href="{% url 'admin_user_create' %}" class="btn btn-sm">Добавить пользователя</a>
         </div>
         <div class="table-responsive">
           <table class="admin-theme-table">
@@ -148,6 +256,7 @@
               <tr>
                 <th>Username</th>
                 <th>Email</th>
+                <th class="text-right">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -155,6 +264,12 @@
               <tr>
                 <td class="font-bold text-cyan">{{ u.username }}</td>
                 <td class="opacity-70">{{ u.email }}</td>
+                <td class="admin-action-cell">
+                  <div class="admin-action-links">
+                    <a href="{% url 'admin_user_edit' u.id %}" class="action-icon" title="Редактировать">✏️</a>
+                    <a href="{% url 'admin_user_delete' u.id %}" class="action-icon action-icon-delete" onclick="return confirm('Удалить пользователя?')">🗑️</a>
+                  </div>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -175,17 +290,41 @@
       link.addEventListener('click', function(e) {
         e.preventDefault();
         
-        // Убираем active у всех кнопок и скрываем все секции
         navLinks.forEach(l => l.classList.remove('active'));
         sections.forEach(s => s.classList.remove('active'));
 
-        // Добавляем active нажатой кнопке и показываем нужную секцию
         this.classList.add('active');
         const targetId = this.getAttribute('data-tab');
         document.getElementById(targetId).classList.add('active');
       });
     });
   });
+  function applyBookingFilters() {
+  const search = document.getElementById('booking-search').value;
+  const user = document.getElementById('booking-user-filter').value;
+  const place = document.getElementById('booking-place-filter').value;
+  const dateFrom = document.getElementById('booking-date-from').value;
+  const dateTo = document.getElementById('booking-date-to').value;
+
+  let url = window.location.pathname + '?';
+  if (search) url += 'search=' + encodeURIComponent(search) + '&';
+  if (user) url += 'user=' + encodeURIComponent(user) + '&';
+  if (place) url += 'place=' + encodeURIComponent(place) + '&';
+  if (dateFrom) url += 'date_from=' + encodeURIComponent(dateFrom) + '&';
+  if (dateTo) url += 'date_to=' + encodeURIComponent(dateTo) + '&';
+
+  window.location.href = url;
+}
+
+function resetBookingFilters() {
+  document.getElementById('booking-search').value = '';
+  document.getElementById('booking-user-filter').value = '';
+  document.getElementById('booking-place-filter').value = '';
+  document.getElementById('booking-date-from').value = '';
+  document.getElementById('booking-date-to').value = '';
+  window.location.href = window.location.pathname;
+}
+
 </script>
 
 {% endblock %}

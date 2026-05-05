@@ -19,7 +19,4 @@ class TariffForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['name', 'description']
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 3})
-        }
+        fields = ['name']

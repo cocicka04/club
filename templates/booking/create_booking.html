@@ -2,7 +2,9 @@
 {% block content %}
 <div class="booking-container">
   <div class="booking-header">
-    <h1 class="form-title" style="text-align: center;">Создание бронирования</h1>
+    <h1 class="form-title" style="text-align: center;">
+      {% if is_edit %}Редактирование бронирования{% else %}Создание бронирования{% endif %}
+    </h1>
   </div>
 
   <div class="glass-card booking-card">
@@ -11,9 +13,22 @@
     <form method="post" id="booking-form" class="booking-form">
       {% csrf_token %}
       {{ form.non_field_errors }}
+        {% if is_admin_booking or request.user.is_superuser %}
+        <div class="form-group">
+          <label class="form-label">Пользователь</label>
+          <select name="user" class="form-select">
+            <option value="">Выберите пользователя</option>
+            {% for u in all_users %}
+              <option value="{{ u.id }}" {% if selected_user and selected_user.id == u.id %}selected{% endif %}>
+                {{ u.username }} ({{ u.email }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
 
       <div class="form-group">
-        <label class="form-label">Зона</label>
+        <label class="form-label">Место</label>
         {% if place %}
           <div class="selected-place">
             <span class="selected-place-text">{{ place.title }} (#{{ place.number }})</span>
@@ -50,7 +65,6 @@
             Свободно с {{ free_from|date:"d.m H:i" }} до {{ free_to|date:"d.m H:i" }}
           </span>
         </div>
-
       {% elif existing_booking %}
         <div class="detail-unavailable">
           <span class="status-dot busy"></span>
@@ -62,11 +76,9 @@
       
       <div class="total-card">
         <div class="price-old" id="old-price">0 ₽</div>
-
         <div class="price-new">
           <span id="total-price">0</span> ₽
         </div>
-
         <div class="price-discount" id="discount-label">
           СКИДКА: 0%
         </div>
@@ -110,58 +122,52 @@ document.addEventListener('DOMContentLoaded', function(){
     if(startTime){
       const date = new Date(startTime);
       const hour = date.getHours();
-
       if(hour >= 22 || hour < 8){
         discount += 5;
       }
     }
     return discount;
   }
-function updatePrice(){
-  const hours = parseInt(hoursInput?.value || 1);
-  const price = getPrice();
-  const startTime = startInput?.value;
-  const base = price * hours;
-  const discount = getDiscount(hours, startTime);
-  const final = base * (1 - discount / 100);
-  totalEl.textContent = final.toFixed(0);
-  if(discount > 0){
-    oldEl.style.display = "block";
-    discountEl.style.display = "block";
-    oldEl.textContent = base.toFixed(0) + " ₽";
-    discountEl.textContent = "СКИДКА: " + discount + "%";
-  }else{
-    oldEl.style.display = "none";
-    discountEl.style.display = "none";
+  function updatePrice(){
+    const hours = parseInt(hoursInput?.value || 1);
+    const price = getPrice();
+    const startTime = startInput?.value;
+    const base = price * hours;
+    const discount = getDiscount(hours, startTime);
+    const final = base * (1 - discount / 100);
+    totalEl.textContent = final.toFixed(0);
+    if(discount > 0){
+      oldEl.style.display = "block";
+      discountEl.style.display = "block";
+      oldEl.textContent = base.toFixed(0) + " ₽";
+      discountEl.textContent = "СКИДКА: " + discount + "%";
+    }else{
+      oldEl.style.display = "none";
+      discountEl.style.display = "none";
+    }
   }
-}
   if(hoursInput) hoursInput.addEventListener('input', updatePrice);
   if(placeSelect) placeSelect.addEventListener('change', updatePrice);
   if(startInput) startInput.addEventListener('change', updatePrice);
   updatePrice();
 });
 const hoursInput = document.getElementById("id_hours");
-
 if (hoursInput) {
   hoursInput.addEventListener("input", function () {
     if (this.value > 24) {
       this.value = 24;
-
       showBookingError("Нельзя бронировать более чем на 24 часа");
     }
   });
 }
-
 function showBookingError(text) {
   let error = document.getElementById("booking-error");
-
   if (!error) {
     error = document.createElement("div");
     error.id = "booking-error";
     error.className = "form-error";
     hoursInput.parentNode.appendChild(error);
   }
-
   error.innerText = text;
 }
 </script>

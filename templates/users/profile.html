@@ -31,8 +31,12 @@
     <input type="text" id="username-input" 
            value="{{ user.username }}" 
            class="edit-input hidden"
-           maxlength="30"
-           required>
+           maxlength="12"
+           minlength="3"
+           pattern="[A-Za-zА-Яа-я0-9_]+"
+           title="Только латинские буквы, цифры и знак подчёркивания, от 3 до 12 символов"
+           required
+           oninput="onUsernameInput()">
 
     <button type="button" class="edit-btn" onclick="editField('username')">
       🖍
@@ -47,16 +51,18 @@
     </span>
 
     <input type="email" id="email-input" 
-           value="{{ user.email }}" 
-           class="edit-input hidden"
-           required>
+          value="{{ user.email }}" 
+          class="edit-input hidden"
+          minlength="5"
+          placeholder="example@gmail.com"
+          required
+          oninput="onEmailInput()">
 
     <button type="button" class="edit-btn" onclick="editField('email')">
       🖍
     </button>
   </div>
   <div id="email-error" style="color: #ff4655; font-size: 0.75rem; display: none; margin-bottom: 8px;"></div>
-
   <!-- КНОПКА СОХРАНЕНИЯ -->
   <button onclick="saveProfile()" class="btn mt-4 hidden" id="save-btn">
     Сохранить
@@ -190,55 +196,257 @@
 </div>
 
 <script>
+/* ========== КОНФИГУРАЦИЯ ВАЛИДАЦИИ EMAIL ========== */
+
+// Только популярные пользовательские почтовые сервисы СНГ
+const POPULAR_EMAIL_DOMAINS = [
+  // Яндекс
+  'yandex.ru', 'yandex.com', 'yandex.ua', 'yandex.by', 'yandex.kz',
+  'ya.ru',
+  // Google
+  'gmail.com',
+  // Mail.ru Group
+  'mail.ru', 'inbox.ru', 'list.ru', 'bk.ru',
+  // Rambler
+  'rambler.ru',
+];
+
+// Допустимые TLD (только основные для СНГ и международные)
+const ALLOWED_TLDS = [
+  'ru', 'com', 'ua', 'by', 'kz',
+];
+
+/* ========== РЕДАКТИРОВАНИЕ ПРОФИЛЯ ========== */
+
 function editField(field) {
-  document.getElementById(field + '-text').classList.add('hidden');
-  document.getElementById(field + '-input').classList.remove('hidden');
-  document.getElementById('save-btn').classList.remove('hidden');
-  // Скрываем ошибку при редактировании
-  const err = document.getElementById(field + '-error');
-  if (err) err.style.display = 'none';
+  const textEl = document.getElementById(field + '-text');
+  const inputEl = document.getElementById(field + '-input');
+  const saveBtn = document.getElementById('save-btn');
+  const errEl = document.getElementById(field + '-error');
+
+  textEl.classList.add('hidden');
+  inputEl.classList.remove('hidden');
+  saveBtn.classList.remove('hidden');
+
+  // Скрываем старую ошибку и убираем красную рамку
+  if (errEl) {
+    errEl.style.display = 'none';
+    errEl.innerText = '';
+  }
+  inputEl.classList.remove('input-error');
+
+  // Сразу проверяем поле при открытии
+  if (field === 'username') onUsernameInput();
+  if (field === 'email') onEmailInput();
 }
 
-function validateEmail(email) {
-  // Проверка наличия @ и точки в домене
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
+/* ---------- Вспомогательные функции ---------- */
+function showFieldError(field, message) {
+  const errEl = document.getElementById(field + '-error');
+  const inputEl = document.getElementById(field + '-input');
+  if (errEl) {
+    errEl.innerText = message;
+    errEl.style.display = 'block';
+  }
+  if (inputEl) {
+    inputEl.classList.add('input-error');
+  }
 }
 
+function hideFieldError(field) {
+  const errEl = document.getElementById(field + '-error');
+  const inputEl = document.getElementById(field + '-input');
+  if (errEl) {
+    errEl.style.display = 'none';
+    errEl.innerText = '';
+  }
+  if (inputEl) {
+    inputEl.classList.remove('input-error');
+  }
+}
+
+/* ---------- Живая валидация Username ---------- */
+function onUsernameInput() {
+  const input = document.getElementById('username-input');
+  let value = input.value;
+
+  // Автоудаление запрещённых символов (оставляем только A-Za-zА-Яа-я0-9_)
+  const cleaned = value.replace(/[^A-Za-zА-Яа-я0-9_]/g, '');
+  if (cleaned !== value) {
+    input.value = cleaned;
+    value = cleaned;
+  }
+
+  // Обрезка до 12 символов
+  if (value.length > 12) {
+    input.value = value.slice(0, 12);
+    value = input.value;
+  }
+
+  // Валидация
+  if (value.length === 0) {
+    showFieldError('username', 'Имя пользователя не может быть пустым');
+    return;
+  }
+  if (value.length < 3) {
+    showFieldError('username', 'Минимум 3 символа');
+    return;
+  }
+  if (value.length > 12) {
+    showFieldError('username', 'Максимум 12 символов');
+    return;
+  }
+  if (/[^A-Za-zА-Яа-я0-9_]/.test(value)) {
+    showFieldError('username', 'Спецсимволы запрещены. Только латиница, цифры и _');
+    return;
+  }
+
+  // Всё ок
+  hideFieldError('username');
+}
+
+/* ---------- Живая валидация Email ---------- */
+function onEmailInput() {
+  const input = document.getElementById('email-input');
+  const value = input.value.trim();
+
+  // Приводим к нижнему регистру для удобства
+  if (value !== value.toLowerCase()) {
+    input.value = value.toLowerCase();
+  }
+
+  const email = input.value.trim().toLowerCase();
+
+  // Пустое поле
+  if (email.length === 0) {
+    showFieldError('email', 'Email не может быть пустым');
+    return;
+  }
+
+  // Минимальная длина
+  if (email.length < 5) {
+    showFieldError('email', 'Email слишком короткий (минимум 5 символов)');
+    return;
+  }
+
+  // Проверка наличия @
+  if (!email.includes('@')) {
+    showFieldError('email', 'Email должен содержать символ @');
+    return;
+  }
+
+  // Разбиваем на локальную часть и домен
+  const parts = email.split('@');
+  if (parts.length !== 2) {
+    showFieldError('email', 'Email должен содержать ровно один символ @');
+    return;
+  }
+
+  const localPart = parts[0];
+  const domain = parts[1];
+
+  // Локальная часть не пустая
+  if (localPart.length === 0) {
+    showFieldError('email', 'Укажите имя пользователя перед @');
+    return;
+  }
+
+  // Локальная часть: максимум 64 символа
+  if (localPart.length > 64) {
+    showFieldError('email', 'Имя пользователя перед @ слишком длинное (максимум 64 символа)');
+    return;
+  }
+
+  // Домен не пустой
+  if (domain.length === 0) {
+    showFieldError('email', 'Укажите домен после @');
+    return;
+  }
+
+  // Проверка, что домен содержит точку
+  if (!domain.includes('.')) {
+    showFieldError('email', 'Домен должен содержать точку (например, gmail.com)');
+    return;
+  }
+
+  // Получаем TLD (последнюю часть после точки)
+  const domainParts = domain.split('.');
+  if (domainParts.length < 2) {
+    showFieldError('email', 'Неверный формат домена');
+    return;
+  }
+
+  const tld = domainParts[domainParts.length - 1];
+
+  // Проверяем TLD
+  if (!ALLOWED_TLDS.includes(tld)) {
+    showFieldError('email', `Домен .${tld} не поддерживается.`);
+    return;
+  }
+
+  // Проверяем, что перед TLD есть домен второго уровня
+  if (domainParts.length >= 2 && domainParts[domainParts.length - 2].length === 0) {
+    showFieldError('email', 'Неверный формат домена');
+    return;
+  }
+
+  // Проверяем, что домен в списке разрешённых
+  if (!POPULAR_EMAIL_DOMAINS.includes(domain)) {
+    showFieldError('email', `Почтовый сервис ${domain} не поддерживается.`);
+    return;
+  }
+
+  // Проверяем общую структуру регуляркой
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    showFieldError('email', 'Введите корректный email адрес');
+    return;
+  }
+
+  // Всё ок
+  hideFieldError('email');
+}
+
+/* ---------- Сохранение профиля ---------- */
 function saveProfile() {
   const usernameInput = document.getElementById('username-input');
   const emailInput = document.getElementById('email-input');
   const username = usernameInput.value.trim();
-  const email = emailInput.value.trim();
-  
+  const email = emailInput.value.trim().toLowerCase();
+
   let valid = true;
 
-  // Валидация username
-  const usernameError = document.getElementById('username-error');
+  // Финальная проверка username
   if (!username) {
-    usernameError.innerText = 'Имя пользователя не может быть пустым';
-    usernameError.style.display = 'block';
+    showFieldError('username', 'Имя пользователя не может быть пустым');
     valid = false;
   } else if (username.length < 3) {
-    usernameError.innerText = 'Имя пользователя должно содержать минимум 3 символа';
-    usernameError.style.display = 'block';
+    showFieldError('username', 'Минимум 3 символа');
+    valid = false;
+  } else if (username.length > 12) {
+    showFieldError('username', 'Максимум 12 символов');
+    valid = false;
+  } else if (/[^A-Za-zА-Яа-я0-9_]/.test(username)) {
+    showFieldError('username', 'Спецсимволы запрещены. Только латиница, цифры и _');
     valid = false;
   } else {
-    usernameError.style.display = 'none';
+    hideFieldError('username');
   }
 
-  // Валидация email
-  const emailError = document.getElementById('email-error');
+  // Финальная проверка email (быстрая)
   if (!email) {
-    emailError.innerText = 'Email не может быть пустым';
-    emailError.style.display = 'block';
+    showFieldError('email', 'Email не может быть пустым');
     valid = false;
-  } else if (!validateEmail(email)) {
-    emailError.innerText = 'Введите корректный email (содержит @ и точку)';
-    emailError.style.display = 'block';
+  } else if (email.length < 5) {
+    showFieldError('email', 'Email слишком короткий');
+    valid = false;
+  } else if (!email.includes('@') || !email.includes('.')) {
+    showFieldError('email', 'Введите корректный email');
+    valid = false;
+  } else if (!POPULAR_EMAIL_DOMAINS.includes(email.split('@')[1])) {
+    showFieldError('email', `Почтовый сервис не поддерживается`);
     valid = false;
   } else {
-    emailError.style.display = 'none';
+    hideFieldError('email');
   }
 
   if (!valid) return;
@@ -259,17 +467,17 @@ function saveProfile() {
     if (data.success) {
       location.reload();
     } else {
-      alert('Ошибка при сохранении');
+      showFieldError('username', 'Ошибка при сохранении. Возможно, имя уже занято.');
     }
+  })
+  .catch(() => {
+    showFieldError('username', 'Ошибка сети. Попробуйте позже.');
   });
 }
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-
-<script>
+/* ========== QR-CODE ========== */
 function openQR(id, code, event) {
-  if (event) event.stopPropagation(); // чтобы клик по кнопке не всплывал
+  if (event) event.stopPropagation();
 
   const modal = document.getElementById('qr-modal');
   const img = document.getElementById('qr-image');
@@ -287,9 +495,7 @@ function openQR(id, code, event) {
 
   text.innerText = "Резервный код: " + code;
 
-  // Убираем hidden, добавляем show для анимации
   modal.classList.remove('hidden');
-  // Принудительный reflow
   void modal.offsetWidth;
   modal.classList.add('show');
 }
@@ -297,7 +503,6 @@ function openQR(id, code, event) {
 function closeQR() {
   const modal = document.getElementById('qr-modal');
   
-  // Анимация улетания вверх
   modal.classList.add('hiding');
   modal.classList.remove('show');
   
@@ -320,6 +525,8 @@ document.addEventListener('keydown', function(e) {
     closeQR();
   }
 });
+
+/* ========== ПОДТВЕРЖДЕНИЕ EMAIL ========== */
 function showEmailConfirm() {
   document.getElementById('email-confirm-form').classList.toggle('hidden');
 }
@@ -380,4 +587,6 @@ function confirmEmail() {
   });
 }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 {% endblock %}

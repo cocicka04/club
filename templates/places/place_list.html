@@ -17,7 +17,7 @@
     <div class="search-dropdown-inner">
       <div class="search-filters">
         <h4>Фильтры</h4>
-        <select id="filter-tariff" style="border-radius: 6px;">
+        <select id="filter-tariff" style="border-radius: 6px; color: black;">
           <option value="">Все тарифы</option>
           {% for t in tariffs %}
             <option value="{{ t.id }}"
@@ -26,8 +26,8 @@
             </option>
           {% endfor %}
         </select>
-        <input type="number" id="filter-min" style="border-radius: 6px;" placeholder="Цена от">
-        <input type="number" id="filter-max" style="border-radius: 6px;" placeholder="Цена до">
+        <input type="number" id="filter-min" style="border-radius: 6px; color: black;" placeholder="Цена от">
+        <input type="number" id="filter-max" style="border-radius: 6px; color: black;" placeholder="Цена до">
         <button onclick="resetFilters()" class="btn-outline">Сбросить фильтры</button>
         <button onclick="applyFilters()" class="btn">Показать все результаты</button>
       </div>

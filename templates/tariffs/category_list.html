@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="max-w-4xl mx-auto mt-10">
+  <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-6">Категории ПК</h1>
+
+  <div class="glass-card p-6">
+    <a href="{% url 'tariffs:category_create' %}" class="btn mb-4">+ Добавить категорию</a>
+    <div class="table-responsive">
+      <table class="admin-theme-table">
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th class="text-right">Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in categories %}
+          <tr>
+            <td class="font-bold text-cyan">{{ c.name }}</td>
+            <td class="admin-action-cell">
+              <div class="admin-action-links">
+                <a href="{% url 'tariffs:category_edit' c.id %}" class="action-icon" title="Редактировать">✏️</a>
+                <a href="{% url 'tariffs:category_delete' c.id %}" class="action-icon action-icon-delete" onclick="return confirm('Удалить категорию?')">🗑️</a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="2" class="text-center opacity-50">Категорий пока нет</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

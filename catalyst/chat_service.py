@@ -38,7 +38,7 @@ def _get_places_full_info() -> str:
             info = busy_map[p.id]
             status = f"ЗАНЯТО (до {info['end_time']}, игрок {info['username']})"
         lines.append(
-            f"• Зона #{p.number} «{p.title}» [{p.category.name}] – {status}\n"
+            f"• Место #{p.number} «{p.title}» [{p.category.name}] – {status}\n"
             f"  Железо: CPU={p.cpu or '—'}, GPU={p.gpu or '—'}, RAM={p.ram or '—'}, Монитор={p.monitor or '—'}\n"
             f"  Цена: {p.tariff.price_per_hour} ₽/час"
         )
@@ -156,7 +156,7 @@ def add_links(reply: str) -> str:
     places = Place.objects.select_related('tariff').all()
     for p in places:
         if p.title.lower() in reply.lower():
-            links.append(f'<a href="/places/{p.id}/" class="ai-link-btn">💻 {p.title} (зона #{p.number})</a>')
+            links.append(f'<a href="/places/{p.id}/" class="ai-link-btn">💻 {p.title} (место #{p.number})</a>')
 
     if links:
         reply += '<div class="ai-links-block">' + ''.join(links) + '</div>'
