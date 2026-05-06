@@ -2,6 +2,7 @@ import re
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from users.models import Review
 
 
 class UserRegisterForm(forms.ModelForm):
@@ -80,3 +81,13 @@ class UserRegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ('rating', 'title', 'text')
+        widgets = {
+            'rating': forms.HiddenInput(),
+            'title': forms.TextInput(attrs={'placeholder': 'Заголовок отзыва'}),
+            'text': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Ваш отзыв...'}),
+        }

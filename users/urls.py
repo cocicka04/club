@@ -17,4 +17,7 @@ urlpatterns = [
     path('admin/user/create/', views.admin_user_create_ajax, name='admin_user_create_ajax'),
     path('admin/user/edit/', views.admin_user_edit_ajax, name='admin_user_edit_ajax'),
     path('captcha/', views.generate_captcha, name='captcha'),
+    path('review/create/', views.create_review, name='create_review'),
+    path('review/approve/<int:pk>/', views.approve_review, name='approve_review'),
+    path('review/delete/<int:pk>/', views.delete_review, name='delete_review'),
 ]

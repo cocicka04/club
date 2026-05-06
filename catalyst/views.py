@@ -16,26 +16,29 @@ from django.contrib.auth.models import User
 import json
 from users.models import News
 from users.forms import UserRegisterForm
-from tariffs.models import Tariff
+from tariffs.models import Tariff, Category
 from booking.models import Booking
-from booking.forms import BookingForm
 from places.models import Place
 from booking.utils import finish_expired_bookings
 from .chat_service import ask_gigachat
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from tariffs.models import Category
 from django.db.models import Q
 from django.db.models import Count
 from django.db.models.functions import ExtractHour
+from users.models import Review
+from django.contrib import admin
 
 # ===== СТАТИЧНЫЕ СТРАНИЦЫ =====
-
 def home(request):
     tariffs = Tariff.objects.select_related('category').order_by('-id')
+    reviews = Review.objects.filter(status='approved').order_by('-created_at')[:5]
+    can_review = request.user.is_authenticated and Booking.objects.filter(user=request.user).exists()
     context = {
         "now": timezone.now(),
-        "tariffs": tariffs
+        "tariffs": tariffs,
+        "reviews": reviews,
+        "can_review": can_review,
     }
     return render(request, "index.html", context)
 
@@ -128,8 +131,7 @@ def admin_dashboard(request):
         bookings = bookings.filter(status=status_filter)
 
     bookings = bookings.order_by('-start_time')
-
-    bookings = bookings.order_by('-start_time')
+    all_reviews = Review.objects.all().order_by('-created_at')
 
     # === СТАТИСТИКА (только для админа) ===
     # Самое популярное место
@@ -178,10 +180,15 @@ def admin_dashboard(request):
         "peak_hour": peak_hour,
         "peak_hour_count": peak_hour_count,
         "today_bookings": today_bookings,
+        "all_reviews": all_reviews,
     }
     return render(request, "users/dashboard.html", context)
 
-
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'rating', 'status', 'created_at')
+    list_filter = ('status',)
+    search_fields = ('author__username', 'title', 'text')
 # ===== РЕГИСТРАЦИЯ И ПОДТВЕРЖДЕНИЕ ПОЧТЫ =====
 
 def register(request):

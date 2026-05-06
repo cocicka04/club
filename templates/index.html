@@ -179,8 +179,99 @@
       </button>
     {% endif %}
   </div>
+  <!-- ======================== ОТЗЫВЫ ======================== -->
+<section id="reviews" class="mt-16 md:mt-20">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-[#586AE2]/30 pb-6 px-4 md:px-0">
+    <div class="relative mb-6 md:mb-0 w-full md:w-auto">
+      <div class="absolute -left-4 top-0 w-1 h-full bg-[#C252E1] shadow-[0_0_15px_#C252E1]"></div>
+      <h2 class="text-2xl md:text-4xl font-black text-white uppercase italic brand-font tracking-tight">
+        Отзывы игроков
+      </h2>
+      <p class="text-[#6ECBF5] font-mono text-xs md:text-sm uppercase tracking-widest mt-1">
+        Что говорят наши гости
+      </p>
+    </div>
+    {% if can_review %}
+      <button onclick="document.getElementById('review-form').classList.toggle('hidden')" 
+              class="group flex items-center gap-2 border border-[#C252E1] px-5 py-2 text-[#C252E1] font-bold uppercase text-xs hover:bg-[#C252E1] hover:text-white transition-all shadow-[0_0_15px_rgba(194,82,225,0.1)] hover:shadow-[0_0_20px_rgba(194,82,225,0.4)] rounded whitespace-nowrap self-start md:self-auto">
+        ✍️ Написать отзыв
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Форма создания отзыва -->
+  <div id="review-form" class="hidden glass-card p-6 mb-6">
+    <form method="post" action="{% url 'users:create_review' %}">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="form-label">Оценка</label>
+        <div class="stars-rating" data-rating-input="id_rating">
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
+        </div>
+        <input type="hidden" name="rating" id="id_rating" value="0">
+        <p id="rating-error" style="color: #ff4655; font-size: 0.8rem; display: none;">Поставьте оценку</p>
+      </div>
+      <div class="form-group">
+        <input type="text" name="title" maxlength="120" class="edit-input" placeholder="Заголовок отзыва" required>
+      </div>
+      <div class="form-group">
+        <textarea name="text" maxlength="1000" rows="4" class="edit-input" placeholder="Поделитесь впечатлениями..." required></textarea>
+      </div>
+      <button type="submit" class="btn btn-full" onclick="return validateReviewForm()">Отправить отзыв</button>
+    </form>
+  </div>
+
+  <!-- Список отзывов -->
+  <div class="space-y-4">
+    {% for review in reviews %}
+      <div class="glass-card p-4 md:p-6">
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            {% if review.author.profile.avatar %}
+              <img src="{{ review.author.profile.avatar.url }}" 
+                   class="w-12 h-12 rounded-full object-cover border border-[#C252E1]/30">
+            {% else %}
+              <div class="w-12 h-12 rounded-full bg-[#15122b] border border-[#C252E1]/30 flex items-center justify-center text-[#6ECBF5] font-bold text-lg">
+                {{ review.author.username|first|upper }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-1">
+              <div>
+                <h3 class="text-lg font-bold text-white">{{ review.title }}</h3>
+                <p class="text-sm text-[#6ECBF5]">{{ review.author.username }} — {{ review.created_at|date:"d.m.Y" }}</p>
+              </div>
+              <div class="stars-display" data-rating="{{ review.rating }}">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+              </div>
+            </div>
+            <p class="text-[#E0D9F6]/80 leading-relaxed mt-2">{{ review.text }}</p>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="glass-card p-8 text-center text-[#6ECBF5]/40 border-dashed border-[#586AE2]/30">
+        <p class="font-mono uppercase tracking-widest">Пока нет отзывов. Будьте первым!</p>
+      </div>
+    {% endfor %}
+  </div>
 </section>
 
+<script>
+  function validateReviewForm() {
+    const rating = document.getElementById('id_rating').value;
+    if (rating === '0' || rating === '') {
+      document.getElementById('rating-error').style.display = 'block';
+      return false;
+    }
+    return true;
+  }
+</script>
 <style>
   /* Скрываем полосу прокрутки, но оставляем функциональность */
   .no-scrollbar::-webkit-scrollbar {
@@ -232,5 +323,19 @@
     window.addEventListener('resize', updateButtonsVisibility);
     updateButtonsVisibility();
   })();
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('star')) {
+      const ratingContainer = e.target.closest('.stars-rating');
+      if (!ratingContainer) return;
+      const value = parseInt(e.target.dataset.value);
+      const allStars = ratingContainer.querySelectorAll('.star');
+      allStars.forEach((s, idx) => {
+        if (idx < value) s.classList.add('active');
+        else s.classList.remove('active');
+      });
+      const hiddenInput = document.getElementById('id_rating');
+      if (hiddenInput) hiddenInput.value = value;
+    }
+  });
 </script>
 {% endblock %}

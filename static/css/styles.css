@@ -3882,3 +3882,26 @@ body .glass-card {
     height: 50px;
   }
 }
+
+/* Звёзды рейтинга */
+.stars-rating, .stars-display {
+  display: flex;
+  gap: 4px;
+  font-size: 2rem;
+  cursor: pointer;
+  user-select: none;
+}
+.stars-display { cursor: default; }
+.star {
+  color: #555;
+  transition: all 0.3s ease;
+}
+.star:hover, .star.active {
+  background: linear-gradient(135deg, var(--neon-purple), var(--royal-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.star.filled {
+  color: var(--neon-purple);
+}

@@ -52,3 +52,23 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Review(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'На модерации'),
+        ('approved', 'Одобрен'),
+    )
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    title = models.CharField(max_length=120)
+    text = models.TextField(max_length=1000)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Отзыв от {self.author.username} ({self.get_status_display()})"

@@ -77,6 +77,22 @@
 <main class="container-main flex-grow-main">
   {% block content %}{% endblock %}
 </main>
+{% if messages %}
+  <div class="messages-container" style="position: fixed; top: 20px; right: 20px; z-index: 2000;">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" style="padding: 12px 20px; margin-bottom: 10px; border-radius: 8px; color: white; font-weight: bold; background: {% if message.tags == 'success' %}#4CAF50{% else %}#f44336{% endif %};">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+  <script>
+    // Автоматически скрывать сообщения через 5 секунд
+    setTimeout(() => {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => alert.style.display = 'none');
+    }, 5000);
+  </script>
+{% endif %}
 
 <footer class="border-t border-[#586AE2]/20 bg-[#0a081a] py-6 mt-auto relative z-10 text-xs">
   <div class="container mx-auto px-4 md:px-6">
