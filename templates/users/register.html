@@ -15,21 +15,46 @@
       {% endif %}
 
       {% for field in form %}
-        <div class="form-group">
-          <label class="form-label" for="{{ field.id_for_label }}">
-            {% if field.name == "username" %}Логин
-            {% elif field.name == "email" %}Email
-            {% elif field.name == "password1" %}Пароль
-            {% elif field.name == "password2" %}Повтор пароля
-            {% else %}{{ field.label }}
+        {% if field.name != 'captcha_answer' %}
+          <div class="form-group">
+            <label class="form-label" for="{{ field.id_for_label }}">
+              {% if field.name == "username" %}Логин
+              {% elif field.name == "email" %}Email
+              {% elif field.name == "password1" %}Пароль
+              {% elif field.name == "password2" %}Повтор пароля
+              {% else %}{{ field.label }}
+              {% endif %}
+            </label>
+            {{ field }}
+            {% if field.errors %}
+              <p class="field-error">{{ field.errors.0 }}</p>
             {% endif %}
-          </label>
-          {{ field }}
-          {% if field.errors %}
-            <p class="field-error">{{ field.errors.0 }}</p>
-          {% endif %}
-        </div>
+          </div>
+        {% endif %}
       {% endfor %}
+
+      <!-- Блок капчи -->
+      <div class="form-group">
+        <label class="form-label">Капча</label>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+          <img src="{% url 'users:captcha' %}" 
+               alt="captcha" 
+               id="captcha-image" 
+               style="height: 50px; border: 1px solid var(--glass-border); border-radius: 6px; cursor: pointer;" 
+               onclick="this.src='{% url 'users:captcha' %}?' + new Date().getTime()" 
+               title="Нажмите, чтобы обновить">
+        </div>
+        <input type="text" 
+               name="captcha_answer" 
+               class="edit-input" 
+               style="width: 100%;" 
+               placeholder="Введите код с картинки" 
+               maxlength="10" 
+               required>
+        {% if form.captcha_answer.errors %}
+          <p class="field-error">{{ form.captcha_answer.errors.0 }}</p>
+        {% endif %}
+      </div>
 
       <button class="btn btn-full" type="submit">СОЗДАТЬ АККАУНТ</button>
     </form>
@@ -37,7 +62,7 @@
     <div class="form-footer">
       <p class="form-footer-text">
         Есть аккаунт?
-        <a href="{% url 'users:login' %}" class="form-footer-link ">Войти</a>
+        <a href="{% url 'users:login' %}" class="form-footer-link">Войти</a>
       </p>
     </div>
 

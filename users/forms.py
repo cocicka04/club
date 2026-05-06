@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 class UserRegisterForm(forms.ModelForm):
     password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Повтор пароля", widget=forms.PasswordInput)
+    captcha_answer = forms.CharField(label="Код с картинки", max_length=10)
 
     ALLOWED_EMAIL_DOMAINS = [
         'yandex.ru', 'yandex.com', 'yandex.ua', 'yandex.by', 'yandex.kz',
@@ -17,6 +18,10 @@ class UserRegisterForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'email')
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
@@ -57,6 +62,16 @@ class UserRegisterForm(forms.ModelForm):
         if p1 and p2 and p1 != p2:
             raise ValidationError("Пароли не совпадают.")
         return p2
+
+    def clean_captcha_answer(self):
+        answer = self.cleaned_data.get('captcha_answer', '').strip().lower()
+        session_code = self.request.session.get('captcha_code', '') if self.request else ''
+        if answer != session_code:
+            raise ValidationError('Неверный код с картинки.')
+        # очищаем код после успешной проверки
+        if self.request:
+            self.request.session['captcha_code'] = ''
+        return answer
 
     def save(self, commit=True):
         user = super().save(commit=False)
