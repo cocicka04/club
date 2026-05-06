@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import user_passes_test
+from users.permissions import admin_or_cashier_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib import messages
@@ -24,6 +26,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from tariffs.models import Category
 from django.db.models import Q
+from django.db.models import Count
+from django.db.models.functions import ExtractHour
 
 # ===== СТАТИЧНЫЕ СТРАНИЦЫ =====
 
@@ -76,9 +80,19 @@ def news_delete(request, pk):
 
 
 # ===== АДМИН-ПАНЕЛЬ =====
+def is_admin_or_cashier(user):
+    return user.is_authenticated and (
+        user.is_superuser or
+        (hasattr(user, 'profile') and user.profile.role in ['admin', 'cashier'])
+    )
 
-@staff_member_required
+@user_passes_test(is_admin_or_cashier, login_url='users:login')
 def admin_dashboard(request):
+    is_cashier = (
+        not request.user.is_superuser and
+        hasattr(request.user, 'profile') and
+        request.user.profile.role == 'cashier'
+    )
     bookings = Booking.objects.select_related('user', 'place').all()
 
     # Поиск и фильтры
@@ -88,6 +102,7 @@ def admin_dashboard(request):
     date_from = request.GET.get('date_from', '').strip()
     date_to = request.GET.get('date_to', '').strip()
 
+    bookings = Booking.objects.select_related('user', 'place').all()
     if search:
         bookings = bookings.filter(
             Q(id__icontains=search) |
@@ -107,8 +122,37 @@ def admin_dashboard(request):
 
     if date_to:
         bookings = bookings.filter(start_time__date__lte=date_to)
+    status_filter = request.GET.get('status', '').strip()
+
+    if status_filter in ['active', 'finished', 'canceled']:
+        bookings = bookings.filter(status=status_filter)
 
     bookings = bookings.order_by('-start_time')
+
+    bookings = bookings.order_by('-start_time')
+
+    # === СТАТИСТИКА (только для админа) ===
+    # Самое популярное место
+    top_place_data = Booking.objects.values('place__title').annotate(cnt=Count('id')).order_by('-cnt').first()
+    if top_place_data:
+        top_place = top_place_data['place__title']
+        top_place_bookings = top_place_data['cnt']
+    else:
+        top_place = '—'
+        top_place_bookings = 0
+
+    # Пиковый час (по началу бронирований)
+    peak_data = Booking.objects.annotate(hour=ExtractHour('start_time')).values('hour').annotate(cnt=Count('id')).order_by('-cnt').first()
+    if peak_data:
+        peak_hour = f"{peak_data['hour']:02d}:00 – {peak_data['hour']+1:02d}:00"
+        peak_hour_count = peak_data['cnt']
+    else:
+        peak_hour = '—'
+        peak_hour_count = 0
+
+    # Бронирования за сегодня
+    today = timezone.now().date()
+    today_bookings = Booking.objects.filter(start_time__date=today).count()
 
     # Пагинация по 10
     paginator = Paginator(bookings, 10)
@@ -122,12 +166,18 @@ def admin_dashboard(request):
         "users": User.objects.all(),
         "news": News.objects.all().order_by('-created_at'),
         "categories": Category.objects.all(),
-        # сохраняем фильтры для ссылок пагинации
         "search_query": search,
         "user_filter": user_filter,
         "place_filter": place_filter,
+        "status_filter": status_filter,
         "date_from": date_from,
         "date_to": date_to,
+        "cashier_mode": is_cashier,
+        "top_place": top_place,
+        "top_place_bookings": top_place_bookings,
+        "peak_hour": peak_hour,
+        "peak_hour_count": peak_hour_count,
+        "today_bookings": today_bookings,
     }
     return render(request, "users/dashboard.html", context)
 
@@ -365,20 +415,6 @@ def ai_chat(request):
 
     reply = ask_gigachat(user_message)
     return JsonResponse({'reply': reply})
-
-# ===== АДМИН: БРОНИРОВАНИЯ =====
-
-
-@staff_member_required
-def admin_booking_edit(request, pk):
-    from booking.views import admin_booking_edit as _admin_booking_edit
-    return _admin_booking_edit(request, pk)
-
-
-@staff_member_required
-def admin_booking_delete(request, pk):
-    from booking.views import admin_booking_delete as _admin_booking_delete
-    return _admin_booking_delete(request, pk)
 
 # ===== АДМИН: ПОЛЬЗОВАТЕЛИ =====
 

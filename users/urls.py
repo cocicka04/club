@@ -16,6 +16,4 @@ urlpatterns = [
     path('password-reset/confirm/', password_reset_confirm, name='password_reset_confirm'),
     path('admin/user/create/', views.admin_user_create_ajax, name='admin_user_create_ajax'),
     path('admin/user/edit/', views.admin_user_edit_ajax, name='admin_user_edit_ajax'),
-    path('cashier/', views.cashier_panel, name='cashier_panel'),
-    path('cashier/search/', views.search_user, name='cashier_search_user'),
 ]

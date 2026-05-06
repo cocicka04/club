@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from users.permissions import admin_or_cashier_required
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Q
@@ -38,61 +39,26 @@ def create_booking(request, place_id=None):
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
-            booking = form.save(commit=False)
-
-            # Админ может выбрать пользователя
-            if request.user.is_superuser:
+            # Определяем пользователя, на которого бронируют
+            if request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.role in ['admin', 'cashier']):
                 user_id = request.POST.get('user')
                 if user_id:
-                    booking.user = get_object_or_404(User, pk=user_id)
+                    selected_user = get_object_or_404(User, pk=user_id)
                 else:
-                    booking.user = request.user
+                    selected_user = request.user
             else:
-                booking.user = request.user
+                selected_user = request.user
 
-            start = booking.start_time
-            end = booking.end_time
-            duration = (end - start).total_seconds() / 3600
+            # save() рассчитывает цену по новым правилам (15% / 10%)
+            booking = form.save(commit=False, user=selected_user)
 
-            if duration > 24:
-                form.add_error('end_time', 'Нельзя бронировать более чем на 24 часа')
-
-            price_per_hour = booking.place.tariff.price_per_hour
-            total_price = Decimal("0")
-            original_price = Decimal("0")
-            current_time = start
-
-            while current_time < end:
-                next_hour = current_time + timedelta(hours=1)
-                hour_price = price_per_hour
-                original_price += hour_price
-                if current_time.hour >= 22 or current_time.hour < 8:
-                    hour_price *= Decimal("0.95")
-                total_price += hour_price
-                current_time = next_hour
-
-            discount_percent = Decimal("0")
-            if duration >= 3:
-                discount_percent += Decimal("10")
-            if discount_percent > 0:
-                total_price = total_price * (Decimal("1") - discount_percent / Decimal("100"))
-
-            booking.total_price = total_price
-            booking.original_price = original_price
-            booking.discount_percent = discount_percent
-
-            if place:
-                booking.place = place
-            else:
-                booking.place = form.cleaned_data.get('place')
-
+            # Проверка конфликтов
             conflicts = Booking.objects.filter(
                 place=booking.place,
                 status=Booking.STATUS_ACTIVE,
                 start_time__lt=booking.end_time,
                 end_time__gt=booking.start_time
             )
-
             if conflicts.exists():
                 form.add_error('start_time', "На это время место уже занято")
             else:
@@ -105,6 +71,7 @@ def create_booking(request, place_id=None):
             initial['start_time'] = (timezone.now() + timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M")
         form = BookingForm(initial=initial)
 
+    # Вся остальная логика (поиск свободного окна) без изменений
     places = Place.objects.all()
     existing_booking = None
     free_from = None
@@ -164,13 +131,13 @@ def create_booking(request, place_id=None):
         'free_to': free_to,
         'all_users': User.objects.all(),
         'selected_user': None,
-        'is_admin_booking': request.GET.get('admin') == '1',
+        'is_admin_booking': request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.role in ['admin', 'cashier']),
     })
 
 
 # ===== АДМИН: БРОНИРОВАНИЯ =====
 
-@staff_member_required
+@admin_or_cashier_required
 def admin_booking_edit(request, pk):
     booking = get_object_or_404(Booking, pk=pk)
     places = Place.objects.all()
@@ -200,7 +167,7 @@ def admin_booking_edit(request, pk):
     })
 
 
-@staff_member_required
+@admin_or_cashier_required
 def admin_booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk)
     booking.status = Booking.STATUS_CANCELED

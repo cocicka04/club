@@ -2,43 +2,71 @@
 {% block content %}
 
 <div class="container-main flex-grow-main admin-page">
-  <h1 class="admin-page-title">Панель администратора</h1>
+  <h1 class="admin-page-title">
+  {% if cashier_mode %}Панель сотрудника{% else %}Панель администратора{% endif %}
+  </h1>
 
   <div class="admin-layout">
     
     <aside class="admin-sidebar glass-card">
       <h3 class="admin-sidebar-title">Навигация</h3>
       <ul class="admin-nav-list">
-        
         <li class="admin-nav-item">
           <button class="admin-nav-link active" data-tab="tab-bookings">📅 Бронирования</button>
           <a href="{% url 'places:list' %}" class="admin-add-icon" title="Создать бронирование">+</a>
         </li>
-        
+        {% if not cashier_mode %}
         <li class="admin-nav-item">
           <button class="admin-nav-link" data-tab="tab-places">💻 Зоны</button>
           <a href="{% url 'places:create' %}" class="admin-add-icon" title="Добавить зону">+</a>
         </li>
-        
         <li class="admin-nav-item">
           <button class="admin-nav-link" data-tab="tab-tariffs">💰 Тарифы</button>
           <a href="{% url 'tariffs:create' %}" class="admin-add-icon" title="Добавить тариф">+</a>
         </li>
-
         <li class="admin-nav-item">
           <button class="admin-nav-link" data-tab="tab-categories">📂 Категории ПК</button>
           <a href="{% url 'tariffs:category_create' %}" class="admin-add-icon" title="Добавить категорию">+</a>
         </li>
-        
         <li class="admin-nav-item">
           <button class="admin-nav-link" data-tab="tab-users">👤 Пользователи</button>
           <a href="#" class="admin-add-icon" title="Добавить пользователя" onclick="event.preventDefault(); openUserCreateModal();">+</a>
         </li>
-        
+        {% endif %}
       </ul>
     </aside>
 
     <main class="admin-content glass-card">
+
+      <!-- ===== СТАТИСТИКА (только админ) ===== -->
+      {% if not cashier_mode %}
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">💻</div>
+          <div class="stat-info">
+            <div class="stat-label">Популярное место</div>
+            <div class="stat-value">{{ top_place }}</div>
+            <div class="stat-sub">{{ top_place_bookings|default:"0" }} бронирований за все время</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏰</div>
+          <div class="stat-info">
+            <div class="stat-label">Пиковое время бронирований</div>
+            <div class="stat-value">{{ peak_hour }}</div>
+            <div class="stat-sub">{{ peak_hour_count|default:"0" }} бронирований</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-info">
+            <div class="stat-label">Сегодня</div>
+            <div class="stat-value">{{ today_bookings|default:"0" }}</div>
+            <div class="stat-sub">бронирований сегодня</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
 
       <!-- ======================== БРОНИРОВАНИЯ ======================== -->
       <section id="tab-bookings" class="admin-section active">
@@ -68,7 +96,15 @@
                 style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(194,82,225,0.3); background: rgba(21,18,43,0.7); color: white; flex: 1; min-width: 140px;"
                 value="{{ date_to }}"
                 onchange="applyBookingFilters()">
+              <select id="booking-status-filter" onchange="applyBookingFilters()"
+                  style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(194,82,225,0.3); background: rgba(21,18,43,0.7); color: white; flex: 1; min-width: 140px;">
+            <option value="">Все статусы</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Активные</option>
+            <option value="finished" {% if status_filter == 'finished' %}selected{% endif %}>Завершённые</option>
+            <option value="canceled" {% if status_filter == 'canceled' %}selected{% endif %}>Отменённые</option>
+          </select>
           <button onclick="resetBookingFilters()" class="btn-outline" style="padding: 8px 16px; white-space: nowrap;">Сбросить</button>
+          <button onclick="applyFilters()" class="btn">Показать все результаты</button>
         </div>
 
         <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
@@ -124,27 +160,28 @@
         {% if bookings.has_other_pages %}
         <div class="pagination" style="margin-top: 25px;">
           {% if bookings.has_previous %}
-            <a href="?page=1&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">«</a>
-            <a href="?page={{ bookings.previous_page_number }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">‹</a>
+            <a href="?page=1&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}" class="pagination-link">«</a>
+            <a href="?page={{ bookings.previous_page_number }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}" class="pagination-link">‹</a>
           {% endif %}
 
           {% for num in bookings.paginator.page_range %}
             {% if num == bookings.number %}
               <span class="pagination-current">{{ num }}</span>
             {% elif num > bookings.number|add:'-3' and num < bookings.number|add:'3' %}
-              <a href="?page={{ num }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">{{ num }}</a>
+              <a href="?page={{ num }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}" class="pagination-link">{{ num }}</a>
             {% endif %}
           {% endfor %}
 
           {% if bookings.has_next %}
-            <a href="?page={{ bookings.next_page_number }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">›</a>
-            <a href="?page={{ bookings.paginator.num_pages }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}" class="pagination-link">»</a>
+            <a href="?page={{ bookings.next_page_number }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}" class="pagination-link">›</a>
+            <a href="?page={{ bookings.paginator.num_pages }}&search={{ search_query }}&user={{ user_filter }}&place={{ place_filter }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}" class="pagination-link">»</a>
           {% endif %}
         </div>
         {% endif %}
       </section>
 
       <!-- ======================== ЗОНЫ ======================== -->
+      {% if not cashier_mode %}
       <section id="tab-places" class="admin-section">
         <div class="admin-section-header">
           <h2 class="admin-section-title">💻 Зоны</h2>
@@ -176,8 +213,10 @@
           </table>
         </div>
       </section>
+      {% endif %}
 
       <!-- ======================== ТАРИФЫ ======================== -->
+      {% if not cashier_mode %}
       <section id="tab-tariffs" class="admin-section">
         <div class="admin-section-header">
           <h2 class="admin-section-title">💰 Тарифы</h2>
@@ -209,8 +248,10 @@
           </table>
         </div>
       </section>
+      {% endif %}
 
       <!-- ======================== КАТЕГОРИИ ======================== -->
+      {% if not cashier_mode %}
       <section id="tab-categories" class="admin-section">
         <div class="admin-section-header">
           <h2 class="admin-section-title">📂 Категории ПК</h2>
@@ -240,8 +281,10 @@
           </table>
         </div>
       </section>
+      {% endif %}
 
       <!-- ======================== ПОЛЬЗОВАТЕЛИ ======================== -->
+      {% if not cashier_mode %}
       <section id="tab-users" class="admin-section">
         <div class="admin-section-header">
           <h2 class="admin-section-title">👤 Пользователи</h2>
@@ -277,6 +320,7 @@
           </table>
         </div>
       </section>
+      {% endif %}
     </main>
   </div>
     <!-- ======================== МОДАЛЬНОЕ ОКНО: СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ ======================== -->
@@ -413,6 +457,7 @@
     const place = document.getElementById('booking-place-filter').value;
     const dateFrom = document.getElementById('booking-date-from').value;
     const dateTo = document.getElementById('booking-date-to').value;
+    const status = document.getElementById('booking-status-filter').value;
 
     let url = window.location.pathname + '?';
     if (search) url += 'search=' + encodeURIComponent(search) + '&';
@@ -420,6 +465,7 @@
     if (place) url += 'place=' + encodeURIComponent(place) + '&';
     if (dateFrom) url += 'date_from=' + encodeURIComponent(dateFrom) + '&';
     if (dateTo) url += 'date_to=' + encodeURIComponent(dateTo) + '&';
+    if (status) url += 'status=' + encodeURIComponent(status) + '&';
 
     window.location.href = url;
   }
@@ -430,6 +476,7 @@
     document.getElementById('booking-place-filter').value = '';
     document.getElementById('booking-date-from').value = '';
     document.getElementById('booking-date-to').value = '';
+    document.getElementById('booking-status-filter').value = '';
     window.location.href = window.location.pathname;
   }
 

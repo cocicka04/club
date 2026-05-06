@@ -3787,3 +3787,98 @@ body .glass-card {
     right: 20px;
   }
 }
+
+/* ========== АДМИН-СТАТИСТИКА ========== */
+.stats-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 220px;
+  background: rgba(21, 18, 43, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(194, 82, 225, 0.3);
+  border-color: var(--neon-purple);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(110, 203, 245, 0.1);
+  border-radius: 12px;
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-label {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--neon-cyan);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: white;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.stat-sub {
+  font-size: 0.8rem;
+  color: var(--text-main);
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+  .stats-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .stat-card {
+    min-width: 0;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+  }
+}

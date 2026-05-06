@@ -11,6 +11,10 @@ from booking.models import Booking
 from booking.utils import finish_expired_bookings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
+from places.models import Place
+from tariffs.models import Tariff, Category
+from django.db.models import Q
+from datetime import datetime
 
 
 def is_superuser(user):
@@ -18,13 +22,14 @@ def is_superuser(user):
 
 
 # ====== ДЕКОРАТОР ДЛЯ КАССИРА ======
-def cashier_required(view_func):
-    def check_user(user):
-        return user.is_authenticated and (
-            user.is_superuser or
-            hasattr(user, 'profile') and user.profile.role in ['cashier', 'admin']
-        )
-    return user_passes_test(check_user, login_url='users:login')(view_func)
+def is_admin_or_cashier(user):
+    return user.is_authenticated and (
+        user.is_superuser or
+        (hasattr(user, 'profile') and user.profile.role in ['admin', 'cashier'])
+    )
+
+def admin_or_cashier_required(view_func):
+    return user_passes_test(is_admin_or_cashier, login_url='users:login')(view_func)
 
 
 def register(request):
@@ -188,32 +193,3 @@ def admin_user_edit_ajax(request):
 
     return JsonResponse({'success': False})
 
-
-# ====== ПАНЕЛЬ КАССИРА ======
-@login_required
-@cashier_required
-def cashier_panel(request):
-    now = timezone.now()
-
-    active_sessions = Booking.objects.filter(
-        status=Booking.STATUS_ACTIVE,
-        start_time__lte=now,
-        end_time__gt=now
-    ).select_related('user', 'place')
-
-    return render(request, 'users/cashier_panel.html', {
-        'active_sessions': active_sessions,
-        'now': now,
-    })
-
-
-# ====== ПОИСК ПОЛЬЗОВАТЕЛЯ (AJAX) ======
-@login_required
-@cashier_required
-def search_user(request):
-    query = request.GET.get('q', '').strip()
-    if len(query) < 2:
-        return JsonResponse({'results': []})
-
-    users = User.objects.filter(username__icontains=query).values('id', 'username', 'email')[:10]
-    return JsonResponse({'results': list(users)})

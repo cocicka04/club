@@ -106,69 +106,86 @@ document.addEventListener('DOMContentLoaded', function(){
   const totalEl = document.getElementById('total-price');
   const oldEl = document.getElementById('old-price');
   const discountEl = document.getElementById('discount-label');
+
   function getPrice(){
     if(fixedPriceInput) return parseFloat(fixedPriceInput.value);
-    if(placeSelect){
+    if(placeSelect && placeSelect.selectedIndex >= 0){
       const option = placeSelect.options[placeSelect.selectedIndex];
       return parseFloat(option.dataset.price || 0);
     }
     return 0;
   }
-  function getDiscount(hours, startTime){
-    let discount = 0;
-    if(hours >= 3){
-      discount += 10;
-    }
-    if(startTime){
-      const date = new Date(startTime);
-      const hour = date.getHours();
-      if(hour >= 22 || hour < 8){
-        discount += 5;
-      }
-    }
-    return discount;
-  }
+
   function updatePrice(){
     const hours = parseInt(hoursInput?.value || 1);
     const price = getPrice();
-    const startTime = startInput?.value;
-    const base = price * hours;
-    const discount = getDiscount(hours, startTime);
-    const final = base * (1 - discount / 100);
-    totalEl.textContent = final.toFixed(0);
-    if(discount > 0){
+    const startStr = startInput?.value;
+    const baseTotal = price * hours;   // без скидок
+    let discountedTotal = 0;
+
+    if (startStr) {
+      const current = new Date(startStr);
+      // проверяем, что дата валидна
+      if (!isNaN(current.getTime())) {
+        for (let i = 0; i < hours; i++) {
+          let hourPrice = price;
+          // скидка за длительность
+          if (hours >= 3) hourPrice *= 0.85;
+          // ночная скидка на конкретный час
+          const h = current.getHours();
+          if (h >= 22 || h < 8) hourPrice *= 0.90;
+          discountedTotal += hourPrice;
+          current.setHours(current.getHours() + 1);
+        }
+      } else {
+        // дата невалидна – показываем базовую цену
+        discountedTotal = baseTotal;
+      }
+    } else {
+      discountedTotal = baseTotal;
+    }
+
+    totalEl.textContent = discountedTotal.toFixed(0);
+
+    if (discountedTotal < baseTotal) {
       oldEl.style.display = "block";
       discountEl.style.display = "block";
-      oldEl.textContent = base.toFixed(0) + " ₽";
-      discountEl.textContent = "СКИДКА: " + discount + "%";
-    }else{
+      oldEl.textContent = baseTotal.toFixed(0) + " ₽";
+      const percent = Math.round((1 - discountedTotal / baseTotal) * 100);
+      discountEl.textContent = "СКИДКА: " + percent + "%";
+    } else {
       oldEl.style.display = "none";
       discountEl.style.display = "none";
     }
   }
+
   if(hoursInput) hoursInput.addEventListener('input', updatePrice);
   if(placeSelect) placeSelect.addEventListener('change', updatePrice);
   if(startInput) startInput.addEventListener('change', updatePrice);
   updatePrice();
-});
-const hoursInput = document.getElementById("id_hours");
-if (hoursInput) {
-  hoursInput.addEventListener("input", function () {
-    if (this.value > 24) {
-      this.value = 24;
-      showBookingError("Нельзя бронировать более чем на 24 часа");
-    }
-  });
-}
-function showBookingError(text) {
-  let error = document.getElementById("booking-error");
-  if (!error) {
-    error = document.createElement("div");
-    error.id = "booking-error";
-    error.className = "form-error";
-    hoursInput.parentNode.appendChild(error);
+
+  // ограничение на 24 часа
+  const hoursInput2 = document.getElementById("id_hours");
+  if (hoursInput2) {
+    hoursInput2.addEventListener("input", function () {
+      if (this.value > 24) {
+        this.value = 24;
+        showBookingError("Нельзя бронировать более чем на 24 часа");
+      }
+    });
   }
-  error.innerText = text;
-}
+
+  function showBookingError(text) {
+    let error = document.getElementById("booking-error");
+    if (!error) {
+      error = document.createElement("div");
+      error.id = "booking-error";
+      error.className = "form-error";
+      const parent = hoursInput2 ? hoursInput2.parentNode : document.querySelector('.booking-form');
+      if (parent) parent.appendChild(error);
+    }
+    error.innerText = text;
+  }
+});
 </script>
 {% endblock %}

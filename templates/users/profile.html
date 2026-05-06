@@ -67,10 +67,10 @@
   <button onclick="saveProfile()" class="btn mt-4 hidden" id="save-btn">
     Сохранить
   </button>
-  {% if request.user.is_superuser %}
-    <a href="{% url 'dashboard' %}" class="btn admin-btn">
-      Панель администратора
-    </a>
+  {% if request.user.is_superuser or request.user.profile.role == 'admin' %}
+    <a href="{% url 'dashboard' %}" class="btn admin-btn">Панель администратора</a>
+  {% elif request.user.profile.role == 'cashier' %}
+    <a href="{% url 'dashboard' %}" class="btn admin-btn">Панель сотрудника</a>
   {% endif %}
 </div>
 

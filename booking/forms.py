@@ -39,13 +39,13 @@ class BookingForm(forms.ModelForm):
         for i in range(hours):
             hour_price = price_per_hour
 
-            # 🔹 скидка за длительность (всегда ко всем часам)
+                        # 🔹 скидка за длительность (всегда ко всем часам)
             if hours >= 3:
-                hour_price *= Decimal('0.9')  # -10%
+                hour_price *= Decimal('0.85')  # -15%
 
             # 🔹 ночная скидка (ТОЛЬКО на конкретный час)
             if current_time.hour >= 22 or current_time.hour < 8:
-                hour_price *= Decimal('0.95')  # -5%
+                hour_price *= Decimal('0.90')  # -10%
 
             total += hour_price
             current_time += timedelta(hours=1)
