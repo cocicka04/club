@@ -34,11 +34,13 @@ def home(request):
     tariffs = Tariff.objects.select_related('category').order_by('-id')
     reviews = Review.objects.filter(status='approved').order_by('-created_at')[:5]
     can_review = request.user.is_authenticated and Booking.objects.filter(user=request.user).exists()
+    review_success = request.session.pop('review_success', False)
     context = {
         "now": timezone.now(),
         "tariffs": tariffs,
         "reviews": reviews,
         "can_review": can_review,
+        "review_success": review_success,
     }
     return render(request, "index.html", context)
 

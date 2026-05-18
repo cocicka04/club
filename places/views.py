@@ -14,35 +14,26 @@ from datetime import timedelta
 
 def place_list(request):
     now = timezone.now()
-    
     places = Place.objects.select_related('tariff', 'category').all()
-
     # --- фильтры ---
     search = request.GET.get('search')
     if search:
         places = places.filter(title__icontains=search)
-
     tariff = request.GET.get('tariff')
     if tariff:
         places = places.filter(tariff_id=tariff)
-
     min_price = request.GET.get('min_price')
     if min_price:
         places = places.filter(tariff__price_per_hour__gte=min_price)
-
     max_price = request.GET.get('max_price')
     if max_price:
         places = places.filter(tariff__price_per_hour__lte=max_price)
-
-    # ✅ Активная сессия (ИМЕННО сейчас идет)
     active_bookings = Booking.objects.filter(
         place=OuterRef('pk'),
         status=Booking.STATUS_ACTIVE,
         start_time__lte=now,
         end_time__gt=now
     )
-
-    # 🎯 Prefetch для получения активного бронирования (чтобы был доступ к end_time)
     places = places.prefetch_related(
         Prefetch(
             'booking_set',
@@ -56,16 +47,11 @@ def place_list(request):
     ).annotate(
         is_busy=Exists(active_bookings)
     )
-
-    # ✅ Добавляем active_booking как свойство для каждого места
     for place in places:
         place.active_booking = place.active_bookings_list[0] if place.active_bookings_list else None
-
-    # пагинация
     paginator = Paginator(places, 9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
     return render(request, 'places/place_list.html', {
         'places': page_obj,
         'tariffs': Tariff.objects.all()

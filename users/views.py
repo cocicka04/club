@@ -15,8 +15,7 @@ import random
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from .models import Review
-from django.utils import timezone
-from tariffs.models import Tariff
+
 
 def is_superuser(user):
     return user.is_superuser
@@ -212,7 +211,7 @@ def create_review(request):
             review = form.save(commit=False)
             review.author = request.user
             review.save()
-            messages.success(request, 'Спасибо! Ваш отзыв отправлен на модерацию и появится на сайте в ближайшее время.')
+            request.session['review_success'] = True
             return redirect('home')
         else:
             for field, errors_list in form.errors.items():

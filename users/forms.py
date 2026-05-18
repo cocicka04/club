@@ -7,7 +7,7 @@ from users.models import Review
 
 class UserRegisterForm(forms.ModelForm):
     password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Повтор пароля", widget=forms.PasswordInput)
+    password2 = forms.CharField(label="Подтверждение пароля", widget=forms.PasswordInput)
     captcha_answer = forms.CharField(label="Код с картинки", max_length=10)
 
     ALLOWED_EMAIL_DOMAINS = [

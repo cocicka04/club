@@ -1,5 +1,6 @@
 python -m venv venv
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& c:\Users\babck\OneDrive\Документы\GitHub\club\venv\Scripts\Activate.ps1)
 venv\Scripts\activate
 pip install -r req.txt
 python manage.py runserver

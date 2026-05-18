@@ -476,6 +476,8 @@ body {
   border: 1px solid transparent;
   color: var(--neon-cyan);
   cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .action-icon:hover {
@@ -925,7 +927,6 @@ body .glass-card {
   width: 100%;
   max-width: 1200px;
   margin: 20px auto;
-
 }
 
 /* dropdown */
@@ -3435,6 +3436,7 @@ body .glass-card {
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-theme-table {
@@ -3481,11 +3483,15 @@ body .glass-card {
 .admin-action-cell {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: nowrap;
+  white-space: nowrap;  
+  text-align: right;
 }
 
 .admin-action-links {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 /* --- Адаптивность для мобильных --- */
@@ -3902,6 +3908,60 @@ body .glass-card {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+.star.active,
 .star.filled {
+  background: linear-gradient(135deg, var(--neon-purple), var(--royal-blue), var(--neon-cyan), var(--neon-purple));
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: textGradientShift 4s ease-in-out infinite;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+}
+.sortable:hover {
   color: var(--neon-purple);
+  text-shadow: 0 0 8px rgba(194, 82, 225, 0.5);
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+th.sortable:hover {
+  color: var(--neon-purple) !important;
+  text-shadow: 0 0 8px rgba(194, 82, 225, 0.4);
+}
+
+.sort-icon {
+  display: inline-block;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.review-title-cell {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#rules-modal .qr-modal-content {
+  background: rgba(21, 18, 43, 0.95);
+  border: 1px solid rgba(194, 82, 225, 0.4);
+  box-shadow: 0 0 30px rgba(194, 82, 225, 0.3);
+}
+#rules-modal ul li:hover {
+  background: rgba(194, 82, 225, 0.08);
+  border-radius: 4px;
+  transition: 0.2s;
 }
